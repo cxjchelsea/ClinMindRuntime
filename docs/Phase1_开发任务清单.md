@@ -1,22 +1,12 @@
 # Phase 1 开发任务清单
 
 > 本文档用于跟踪 ClinMindRuntime Phase 1 Runtime MVP 的实现进度。  
-> AI / Cursor / Claude Code / Codex 每完成一个实现任务后，必须同步更新本文档。  
-> 本文档不是新的设计文档，而是实现进度控制表。
+> 当前 Phase 1 Runtime Core 采用 Java / Spring Boot。  
+> AI / Cursor / Claude Code / Codex 每完成一个实现任务后，必须同步更新本文档。
 
 ---
 
 # 一、使用规则
-
-```text
-1. 每次只实现一个小任务或一个小模块，不允许一次性实现整个 Phase 1。
-2. 每次实现前，先查看当前任务所属阶段。
-3. 每次实现后，必须更新任务状态。
-4. 如果实现过程中发现设计缺口，可以在“问题记录”中补充，但不要擅自扩大实现范围。
-5. 标记完成前，必须有对应代码和测试，或在备注中说明为什么暂时没有测试。
-```
-
-任务状态约定：
 
 ```text
 [ ] 未开始
@@ -25,78 +15,94 @@
 [!] 阻塞 / 需要人工确认
 ```
 
+```text
+1. 每次只实现一个小任务或一个小模块，不允许一次性实现整个 Phase 1。
+2. 每次实现前，先查看当前任务所属阶段。
+3. 每次实现后，必须更新任务状态。
+4. 如果实现过程中发现设计缺口，可以在“问题记录”中补充，但不要擅自扩大实现范围。
+5. 标记完成前，必须有对应代码和 JUnit 测试，或在备注中说明为什么暂时没有测试。
+```
+
 ---
 
 # 二、MVP-P0-A：Runtime 状态骨架
 
-目标：先让 Runtime 的状态对象、状态枚举、Trace 和最小存储能力站起来。
+目标：先让 Java Runtime Core 的状态对象、状态枚举、Trace、AOP Trace 和最小存储能力站起来。
 
-## 2.1 工程基础
+## 2.1 Spring Boot 工程基础
 
-- [ ] 创建 Python / FastAPI 项目基础结构
-- [ ] 创建 `app/` 主目录
-- [ ] 创建 `app/main.py`
-- [ ] 创建 `app/state/` 目录
-- [ ] 创建 `app/storage/` 目录
-- [ ] 创建 `tests/` 目录
-- [ ] 创建基础依赖文件，例如 `requirements.txt` 或 `pyproject.toml`
+- [ ] 创建 `pom.xml`
+- [ ] 引入 Spring Boot 3.x
+- [ ] 引入 Spring Web
+- [ ] 引入 Jakarta Validation
+- [ ] 引入 Spring AOP
+- [ ] 引入 JUnit 5 / AssertJ / Mockito
+- [ ] 创建 `src/main/java/com/clinmind/runtime/ClinMindRuntimeApplication.java`
+- [ ] 创建 `src/main/resources/application.yml`
+- [ ] 创建 `src/test/java/com/clinmind/runtime/` 测试目录
 
-## 2.2 RuntimeStatus
+## 2.2 Runtime 枚举
 
-- [ ] 创建 `app/state/runtime_status.py`
-- [ ] 定义 `RuntimeStatus` 枚举
-- [ ] 定义 `WorkMode` 枚举
-- [ ] 定义 `RuntimeMode` 枚举
-- [ ] 定义 `RiskLevel` 枚举
-- [ ] 定义 `CandidateStatus` 枚举，包含 `possible_after_exclusion`
-- [ ] 定义 `NextActionType` 枚举
-- [ ] 定义 `OutputLevel` 枚举
+- [ ] 创建 `state/RuntimeStatus.java`
+- [ ] 创建 `state/WorkMode.java`
+- [ ] 创建 `state/RuntimeMode.java`
+- [ ] 创建 `state/RiskLevel.java`
+- [ ] 创建 `state/CandidateStatus.java`，包含 `POSSIBLE_AFTER_EXCLUSION`
+- [ ] 创建 `state/NextActionType.java`
+- [ ] 创建 `state/OutputLevel.java`
 - [ ] 编写枚举单元测试
 
 ## 2.3 RuntimeState
 
-- [ ] 创建 `app/state/runtime_state.py`
-- [ ] 使用 Pydantic 定义 `UserInput`
-- [ ] 使用 Pydantic 定义 `EntryAssessmentResult`
-- [ ] 使用 Pydantic 定义 `CaseFrame` 最小结构
-- [ ] 使用 Pydantic 定义 `KnowledgeContext` 最小结构
-- [ ] 使用 Pydantic 定义 `ExperienceContext` 空实现结构
-- [ ] 使用 Pydantic 定义 `SafetyGateResult`
-- [ ] 使用 Pydantic 定义 `DifferentialDiagnosisBoard`
-- [ ] 使用 Pydantic 定义 `EvidenceGraph`
-- [ ] 使用 Pydantic 定义 `QuestionTestPolicyResult`
-- [ ] 使用 Pydantic 定义 `DecisionBoundaryResult`
-- [ ] 使用 Pydantic 定义 `PatientOutput`
-- [ ] 使用 Pydantic 定义 `ClinicianReport`
-- [ ] 使用 Pydantic 定义 `RuntimeState`
+- [ ] 创建 `state/RuntimeState.java`
+- [ ] 创建 `state/UserInput.java`
+- [ ] 创建 `state/EntryAssessmentResult.java`
+- [ ] 创建 `state/CaseFrame.java`
+- [ ] 创建 `state/KnowledgeContext.java`
+- [ ] 创建 `state/ExperienceContext.java`
+- [ ] 创建 `state/SafetyGateResult.java`
+- [ ] 创建 `state/DifferentialDiagnosisBoard.java`
+- [ ] 创建 `state/EvidenceGraph.java`
+- [ ] 创建 `state/QuestionTestPolicyResult.java`
+- [ ] 创建 `state/DecisionBoundaryResult.java`
+- [ ] 创建 `state/PatientOutput.java`
+- [ ] 创建 `state/ClinicianReport.java`
+- [ ] RuntimeState 包含 `inputHistory` 作为 Phase 1 Short-term Context 降级实现
 - [ ] 编写 RuntimeState 序列化 / 反序列化测试
 
-## 2.4 RuntimeTrace
+## 2.4 RuntimeTrace 与 AOP Trace
 
-- [ ] 创建 `app/state/runtime_trace.py`
-- [ ] 定义 `RuntimeTrace` schema
-- [ ] 支持记录输入、模块执行、知识使用、安全门结果、候选诊断变化、证据图变化、输出边界结果
+- [ ] 创建 `state/RuntimeTrace.java`
+- [ ] 创建 `trace/TraceStep.java`
+- [ ] 创建 `trace/RuntimeTraceAspect.java`
+- [ ] AOP Trace 支持记录 moduleName
+- [ ] AOP Trace 支持记录 runtimeId
+- [ ] AOP Trace 支持记录耗时
+- [ ] AOP Trace 支持记录异常信息
 - [ ] 编写 RuntimeTrace 单元测试
+- [ ] 编写 TraceStep / RuntimeTraceAspect 基础测试
 
 ## 2.5 RuntimeStore
 
-- [ ] 创建 `app/storage/runtime_store.py`
+- [ ] 创建 `storage/RuntimeStore.java`
 - [ ] 实现内存版 RuntimeStore
-- [ ] 实现 `create(state)`
-- [ ] 实现 `get(runtime_id)`
-- [ ] 实现 `update(state)`
-- [ ] 实现 `exists(runtime_id)`
+- [ ] 实现 `create(RuntimeState state)`
+- [ ] 实现 `get(String runtimeId)`
+- [ ] 实现 `update(RuntimeState state)`
+- [ ] 实现 `exists(String runtimeId)`
 - [ ] 定义 runtime 不存在时的异常或错误返回
 - [ ] 编写 RuntimeStore 单元测试
 
 ## 2.6 MVP-P0-A 验收
 
-- [ ] 所有 schema 能正常 import
+- [ ] Spring Boot 工程能启动
+- [ ] 所有核心模型能正常编译
 - [ ] RuntimeState 能创建默认对象
 - [ ] RuntimeState 能 JSON 序列化和反序列化
 - [ ] RuntimeTrace 能创建并保存关键字段
 - [ ] RuntimeStore 能完成 create / get / update / exists
-- [ ] 运行 `pytest` 通过
+- [ ] AOP Trace 基础能力可运行
+- [ ] 运行测试通过
 
 ---
 
@@ -106,36 +112,37 @@
 
 ## 3.1 Runtime API 基础
 
-- [ ] 创建 `app/api/runtime_api.py`
+- [ ] 创建 `api/RuntimeController.java`
+- [ ] 创建统一响应对象 `ApiResponse`
 - [ ] 实现 `POST /api/v1/runtime/start`
 - [ ] 实现 `POST /api/v1/runtime/continue`
 - [ ] 实现 `GET /api/v1/runtime/{runtime_id}/status`
 - [ ] 实现 `GET /api/v1/runtime/{runtime_id}/result`
 - [ ] 实现 `GET /api/v1/runtime/{runtime_id}/trace`
 - [ ] 统一使用 `runtime_id`，不要使用 `runtimeId`
-- [ ] 实现统一响应格式
 - [ ] 实现基础错误码
+- [ ] 编写 RuntimeController 测试
 
-## 3.2 EntryAssessment
+## 3.2 EntryAssessmentService
 
-- [ ] 创建 `app/entry/entry_assessment.py`
-- [ ] 实现 `assess_entry(user_input, basic_info)`
-- [ ] 支持 `wellness_mode`
-- [ ] 支持 `clinical_mode`
-- [ ] 支持 `emergency_hint`
-- [ ] 支持 `unsupported`
-- [ ] emergency_hint 不直接设置 `safety_gate_triggered`，只标记 work_mode
-- [ ] 编写 EntryAssessment 单元测试
+- [ ] 创建 `entry/EntryAssessmentService.java`
+- [ ] 实现 `assessEntry(UserInput input, Map<String, Object> basicInfo)`
+- [ ] 支持 `WELLNESS_MODE`
+- [ ] 支持 `CLINICAL_MODE`
+- [ ] 支持 `EMERGENCY_HINT`
+- [ ] 支持 `UNSUPPORTED`
+- [ ] emergency_hint 不直接设置 `SAFETY_GATE_TRIGGERED`，只标记 workMode
+- [ ] 编写 EntryAssessmentService 单元测试
 
-## 3.3 CaseFrame
+## 3.3 CaseFrameService
 
-- [ ] 创建 `app/case/case_frame.py`
-- [ ] 实现 `build_or_update_case_frame(...)`
+- [ ] 创建 `caseframe/CaseFrameService.java`
+- [ ] 实现 `buildOrUpdateCaseFrame(...)`
 - [ ] 支持主诉提取
 - [ ] 支持基础症状提取
-- [ ] 支持 basic_info 写入 patient_profile
-- [ ] 支持 missing_slots 生成
-- [ ] 编写 CaseFrame 单元测试
+- [ ] 支持 basicInfo 写入 patientProfile
+- [ ] 支持 missingSlots 生成
+- [ ] 编写 CaseFrameService 单元测试
 
 ## 3.4 MVP-P0-B 验收
 
@@ -154,52 +161,54 @@
 
 ## 4.1 StaticRuleProvider
 
-- [ ] 创建 `app/knowledge/static_rule_provider.py`
-- [ ] 创建 `assets/symptom_groups/chest_pain.yml`
-- [ ] 创建 `assets/symptom_groups/fever.yml`
-- [ ] 创建 `assets/red_flag_rules.yml`
-- [ ] 创建 `assets/test_recommendation_rules.yml`
-- [ ] 创建 `assets/capability_profiles.yml`
+- [ ] 创建 `knowledge/StaticRuleProvider.java`
+- [ ] 创建 `src/main/resources/assets/symptom-groups/chest-pain.yml`
+- [ ] 创建 `src/main/resources/assets/symptom-groups/fever.yml`
+- [ ] 创建 `src/main/resources/assets/red-flag-rules.yml`
+- [ ] 创建 `src/main/resources/assets/test-recommendation-rules.yml`
+- [ ] 创建 `src/main/resources/assets/capability-profiles.yml`
 - [ ] 实现症状群规则读取
 - [ ] 实现危险信号规则读取
 - [ ] 实现检查建议规则读取
 - [ ] 实现静态 Capability Profile 读取
 - [ ] 编写规则读取测试
 
-## 4.2 KnowledgeContext
+## 4.2 KnowledgeContextService
 
-- [ ] 创建 `app/knowledge/knowledge_context.py`
-- [ ] 实现 `build_knowledge_context(...)`
+- [ ] 创建 `knowledge/KnowledgeContextService.java`
+- [ ] 实现 `buildKnowledgeContext(...)`
 - [ ] 将静态规则聚合为 KnowledgeContext
-- [ ] 记录 source_assets
-- [ ] 编写 KnowledgeContext 单元测试
+- [ ] 记录 sourceAssets
+- [ ] 编写 KnowledgeContextService 单元测试
 
-## 4.3 ExperienceContext
+## 4.3 ExperienceContextService
 
-- [ ] 创建 `app/experience/experience_context.py`
+- [ ] 创建 `experience/ExperienceContextService.java`
 - [ ] 实现空 ExperienceContext
 - [ ] 可选实现 mock ExperienceContext
 - [ ] 明确不接入真实 Clinical Experience Memory
-- [ ] 编写 ExperienceContext 单元测试
+- [ ] 编写 ExperienceContextService 单元测试
 
-## 4.4 SafetyGate
+## 4.4 SafetyGateService
 
-- [ ] 创建 `app/safety/safety_gate.py`
-- [ ] 实现 `evaluate_safety(...)`
+- [ ] 创建 `safety/SafetyGateService.java`
+- [ ] 实现 `evaluateSafety(...)`
 - [ ] 支持危险信号规则匹配
 - [ ] 命中高风险时设置输出限制
 - [ ] SafetyGate 失败时进入保守策略
-- [ ] 编写 SafetyGate 单元测试
+- [ ] 使用 `@TraceStep("SafetyGate")`
+- [ ] 编写 SafetyGateService 单元测试
 
-## 4.5 Differential Diagnosis Board
+## 4.5 DifferentialDiagnosisBoardService
 
-- [ ] 创建 `app/reasoning/differential_board.py`
-- [ ] 实现 `build_differential_board(...)`
-- [ ] 支持 common_diagnoses
-- [ ] 支持 must_not_miss
-- [ ] 支持 `need_to_rule_out`
-- [ ] 支持 `possible_after_exclusion`
+- [ ] 创建 `reasoning/DifferentialDiagnosisBoardService.java`
+- [ ] 实现 `buildDifferentialBoard(...)`
+- [ ] 支持 commonDiagnoses
+- [ ] 支持 mustNotMiss
+- [ ] 支持 `NEED_TO_RULE_OUT`
+- [ ] 支持 `POSSIBLE_AFTER_EXCLUSION`
 - [ ] 高风险候选不能被删除
+- [ ] 使用 `@TraceStep("DifferentialDiagnosisBoard")`
 - [ ] 编写 DDx Board 单元测试
 
 ## 4.6 MVP-P0-C 验收
@@ -209,7 +218,7 @@
 - [ ] ExperienceContext 能以空实现参与链路
 - [ ] SafetyGate 能识别配置好的高风险规则
 - [ ] DDx Board 能生成候选诊断状态
-- [ ] 高风险候选保留为 must_not_miss 或 need_to_rule_out
+- [ ] 高风险候选保留为 MUST_NOT_MISS 或 NEED_TO_RULE_OUT
 
 ---
 
@@ -217,27 +226,29 @@
 
 目标：让系统能根据候选诊断和缺失证据决定下一步追问或检查建议。
 
-## 5.1 EvidenceGraph
+## 5.1 EvidenceGraphService
 
-- [ ] 创建 `app/reasoning/evidence_graph.py`
-- [ ] 实现 `build_evidence_graph(...)`
-- [ ] 支持 supporting_evidence
-- [ ] 支持 opposing_evidence
-- [ ] 支持 missing_evidence
-- [ ] 支持 next_questions
-- [ ] 支持 recommended_tests
-- [ ] 编写 EvidenceGraph 单元测试
+- [ ] 创建 `reasoning/EvidenceGraphService.java`
+- [ ] 实现 `buildEvidenceGraph(...)`
+- [ ] 支持 supportingEvidence
+- [ ] 支持 opposingEvidence
+- [ ] 支持 missingEvidence
+- [ ] 支持 nextQuestions
+- [ ] 支持 recommendedTests
+- [ ] 使用 `@TraceStep("EvidenceGraph")`
+- [ ] 编写 EvidenceGraphService 单元测试
 
-## 5.2 Question / Test Policy
+## 5.2 QuestionTestPolicyService
 
-- [ ] 创建 `app/reasoning/question_test_policy.py`
-- [ ] 实现 `decide_next_action(...)`
+- [ ] 创建 `reasoning/QuestionTestPolicyService.java`
+- [ ] 实现 `decideNextAction(...)`
 - [ ] 高风险优先
 - [ ] 缺失证据优先
-- [ ] 支持 ask_question
-- [ ] 支持 recommend_test
-- [ ] 支持 recommend_visit
-- [ ] 编写 Question / Test Policy 单元测试
+- [ ] 支持 ASK_QUESTION
+- [ ] 支持 RECOMMEND_TEST
+- [ ] 支持 RECOMMEND_VISIT
+- [ ] 使用 `@TraceStep("QuestionTestPolicy")`
+- [ ] 编写 QuestionTestPolicyService 单元测试
 
 ## 5.3 MVP-P0-D 验收
 
@@ -252,46 +263,47 @@
 
 目标：让系统能够根据风险和能力边界区分患者端与医生端输出。
 
-## 6.1 DecisionBoundary
+## 6.1 DecisionBoundaryService
 
-- [ ] 创建 `app/boundary/decision_boundary.py`
-- [ ] 创建 `app/boundary/capability_profile_provider.py`
-- [ ] 实现 `decide_output_boundary(...)`
+- [ ] 创建 `boundary/DecisionBoundaryService.java`
+- [ ] 创建 `boundary/CapabilityProfileProvider.java`
+- [ ] 实现 `decideOutputBoundary(...)`
 - [ ] 读取静态 Capability Profile
 - [ ] 高风险未排除时禁止低风险安抚
 - [ ] 患者端默认不展示完整候选诊断
 - [ ] 医生端允许展示 DDx 和 EvidenceGraph
-- [ ] 编写 DecisionBoundary 单元测试
+- [ ] 使用 `@TraceStep("DecisionBoundary")`
+- [ ] 编写 DecisionBoundaryService 单元测试
 
-## 6.2 PatientOutput
+## 6.2 PatientOutputService
 
-- [ ] 创建 `app/output/patient_output.py`
-- [ ] 实现 `build_patient_output(...)`
+- [ ] 创建 `output/PatientOutputService.java`
+- [ ] 实现 `buildPatientOutput(...)`
 - [ ] 输出继续追问
 - [ ] 输出风险提示
 - [ ] 输出线下评估建议
 - [ ] 禁止确定诊断
 - [ ] 禁止处方建议
-- [ ] 编写 PatientOutput 单元测试
+- [ ] 编写 PatientOutputService 单元测试
 
-## 6.3 ClinicianReport
+## 6.3 ClinicianReportService
 
-- [ ] 创建 `app/output/clinician_report.py`
-- [ ] 实现 `build_clinician_report(...)`
+- [ ] 创建 `output/ClinicianReportService.java`
+- [ ] 实现 `buildClinicianReport(...)`
 - [ ] 展示 CaseFrame Summary
 - [ ] 展示 SafetyGate Result
 - [ ] 展示 DDx Board
 - [ ] 展示 EvidenceGraph
 - [ ] 展示 Recommended Questions / Tests
-- [ ] 编写 ClinicianReport 单元测试
+- [ ] 编写 ClinicianReportService 单元测试
 
-## 6.4 FailurePolicy
+## 6.4 FailurePolicyService
 
-- [ ] 创建 `app/boundary/failure_policy.py`
+- [ ] 创建 `boundary/FailurePolicyService.java`
 - [ ] 实现安全模块失败时的保守输出
-- [ ] SafetyGate 失败时进入 `error_safe_halted`
-- [ ] DecisionBoundary 失败时进入 `error_safe_halted`
-- [ ] 编写 FailurePolicy 单元测试
+- [ ] SafetyGate 失败时进入 `ERROR_SAFE_HALTED`
+- [ ] DecisionBoundary 失败时进入 `ERROR_SAFE_HALTED`
+- [ ] 编写 FailurePolicyService 单元测试
 
 ## 6.5 MVP-P0-E 验收
 
@@ -309,8 +321,8 @@
 
 ## 7.1 测试病例
 
-- [ ] 创建 `tests/cases/chest_pain_cases.yml`
-- [ ] 创建 `tests/cases/fever_cases.yml`
+- [ ] 创建 `src/test/resources/cases/chest-pain-cases.yml`
+- [ ] 创建 `src/test/resources/cases/fever-cases.yml`
 - [ ] 至少 5 个胸痛 / 胸闷病例
 - [ ] 至少 5 个发热病例
 - [ ] 至少包含普通病例
@@ -320,7 +332,7 @@
 
 ## 7.2 集成测试
 
-- [ ] 创建 `tests/test_runtime_flow.py`
+- [ ] 创建 `RuntimeFlowIntegrationTest`
 - [ ] 测试 start API 完整链路
 - [ ] 测试 continue API 完整链路
 - [ ] 测试高风险链路
@@ -342,8 +354,6 @@
 
 # 八、问题记录
 
-用于记录实现过程中发现的设计缺口或需要人工确认的问题。
-
 | 编号 | 问题 | 影响模块 | 状态 | 处理结论 |
 |---|---|---|---|---|
 | Q1 | 暂无 | - | - | - |
@@ -355,3 +365,4 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-06-25 | 创建任务清单 | 用于约束 Phase 1 实现进度 |
+| 2026-06-25 | 调整为 Java Runtime Core | Phase 1 Runtime Core 改为 Java / Spring Boot，Python 作为后续可选 Provider |
