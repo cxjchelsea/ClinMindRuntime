@@ -2,16 +2,21 @@ package com.clinmind.runtime.api.dto;
 
 import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.ClinicianReport;
+import com.clinmind.runtime.state.DDxCandidate;
 import com.clinmind.runtime.state.DecisionBoundaryResult;
+import com.clinmind.runtime.state.DiagnosisRef;
 import com.clinmind.runtime.state.EntryAssessmentResult;
+import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.NextAction;
 import com.clinmind.runtime.state.PatientOutput;
 import com.clinmind.runtime.state.PatientProfile;
 import com.clinmind.runtime.state.QuestionTestPolicyResult;
+import com.clinmind.runtime.state.RedFlagRule;
 import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.RuntimeTrace;
 import com.clinmind.runtime.state.SafetyGateResult;
 import com.clinmind.runtime.state.SymptomItem;
+import com.clinmind.runtime.state.DifferentialDiagnosisBoard;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +35,9 @@ public final class ApiResponseMapper {
         data.put("risk_level", resolveRiskLevel(state.getSafetyGate()));
         data.put("entry_assessment", toEntryAssessmentMap(state.getEntryAssessment()));
         data.put("case_frame", toCaseFrameMap(state.getCaseFrame()));
+        data.put("knowledge_context", toKnowledgeContextMap(state.getKnowledgeContext()));
+        data.put("safety_gate", toSafetyGateMap(state.getSafetyGate()));
+        data.put("differential_board", toDifferentialBoardMap(state.getDifferentialBoard()));
         data.put("next_action", toNextActionMap(state.getQuestionTestPolicy()));
         data.put("patient_output", toPatientOutputMap(state.getPatientOutput()));
         data.put("clinician_report", toClinicianReportMap(state.getClinicianReport()));
@@ -115,6 +123,74 @@ public final class ApiResponseMapper {
         map.put("trigger", item.trigger());
         map.put("frequency", item.frequency());
         map.put("relief", item.relief());
+        return map;
+    }
+
+    private static Map<String, Object> toKnowledgeContextMap(KnowledgeContext context) {
+        if (context == null || context.symptomGroup() == null) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("symptom_group", context.symptomGroup());
+        map.put("common_diagnoses", context.commonDiagnoses().stream().map(ApiResponseMapper::toDiagnosisRefMap).toList());
+        map.put("must_not_miss", context.mustNotMiss().stream().map(ApiResponseMapper::toDiagnosisRefMap).toList());
+        map.put("red_flags", context.redFlags().stream().map(ApiResponseMapper::toRedFlagRuleMap).toList());
+        map.put("required_questions", context.requiredQuestions());
+        map.put("recommended_tests", context.recommendedTests());
+        map.put("source_assets", context.sourceAssets());
+        return map;
+    }
+
+    private static Map<String, Object> toDiagnosisRefMap(DiagnosisRef diagnosis) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("name", diagnosis.name());
+        map.put("risk_level", diagnosis.riskLevel().getValue());
+        return map;
+    }
+
+    private static Map<String, Object> toRedFlagRuleMap(RedFlagRule rule) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("rule_id", rule.ruleId());
+        map.put("symptom_group", rule.symptomGroup());
+        map.put("features", rule.features());
+        map.put("risk_level", rule.riskLevel().getValue());
+        map.put("action", rule.action());
+        map.put("patient_constraint", rule.patientConstraint());
+        return map;
+    }
+
+    private static Map<String, Object> toSafetyGateMap(SafetyGateResult safetyGate) {
+        if (safetyGate == null) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("triggered", safetyGate.triggered());
+        map.put("risk_level", safetyGate.riskLevel().getValue());
+        map.put("matched_rules", safetyGate.matchedRules());
+        map.put("reason", safetyGate.reason());
+        map.put("required_action", safetyGate.requiredAction());
+        map.put("patient_output_constraint", safetyGate.patientOutputConstraint());
+        map.put("fail_safe_required", safetyGate.failSafeRequired());
+        return map;
+    }
+
+    private static Map<String, Object> toDifferentialBoardMap(DifferentialDiagnosisBoard board) {
+        if (board == null || board.candidates().isEmpty()) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("candidates", board.candidates().stream().map(ApiResponseMapper::toDdxCandidateMap).toList());
+        map.put("updated_reason", board.updatedReason());
+        return map;
+    }
+
+    private static Map<String, Object> toDdxCandidateMap(DDxCandidate candidate) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("name", candidate.name());
+        map.put("status", candidate.status().getValue());
+        map.put("risk_level", candidate.riskLevel().getValue());
+        map.put("reason", candidate.reason());
+        map.put("patient_visible", candidate.patientVisible());
         return map;
     }
 

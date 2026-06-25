@@ -5,10 +5,18 @@ import com.clinmind.runtime.api.StartRuntimeRequest;
 import com.clinmind.runtime.api.UserInputRequest;
 import com.clinmind.runtime.caseframe.CaseFrameService;
 import com.clinmind.runtime.entry.EntryAssessmentService;
+import com.clinmind.runtime.experience.ExperienceContextService;
+import com.clinmind.runtime.knowledge.KnowledgeContextService;
+import com.clinmind.runtime.reasoning.DifferentialDiagnosisBoardService;
+import com.clinmind.runtime.safety.SafetyGateService;
+import com.clinmind.runtime.state.DDxCandidate;
 import com.clinmind.runtime.state.EntryAssessmentResult;
+import com.clinmind.runtime.state.ExperienceContext;
+import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.RuntimeStatus;
 import com.clinmind.runtime.state.RuntimeTrace;
+import com.clinmind.runtime.state.SafetyGateResult;
 import com.clinmind.runtime.state.UserInput;
 import com.clinmind.runtime.state.WorkMode;
 import com.clinmind.runtime.storage.RuntimeStore;
@@ -23,14 +31,26 @@ public class RuntimeService {
     private final RuntimeStore runtimeStore;
     private final EntryAssessmentService entryAssessmentService;
     private final CaseFrameService caseFrameService;
+    private final KnowledgeContextService knowledgeContextService;
+    private final ExperienceContextService experienceContextService;
+    private final SafetyGateService safetyGateService;
+    private final DifferentialDiagnosisBoardService differentialDiagnosisBoardService;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
             EntryAssessmentService entryAssessmentService,
-            CaseFrameService caseFrameService) {
+            CaseFrameService caseFrameService,
+            KnowledgeContextService knowledgeContextService,
+            ExperienceContextService experienceContextService,
+            SafetyGateService safetyGateService,
+            DifferentialDiagnosisBoardService differentialDiagnosisBoardService) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
+        this.knowledgeContextService = knowledgeContextService;
+        this.experienceContextService = experienceContextService;
+        this.safetyGateService = safetyGateService;
+        this.differentialDiagnosisBoardService = differentialDiagnosisBoardService;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -50,6 +70,7 @@ public class RuntimeService {
         if (entry.workMode() != WorkMode.UNSUPPORTED) {
             state.setCaseFrame(caseFrameService.buildOrUpdateCaseFrame(
                     userInput, state.getCaseFrame(), request.basicInfo()));
+            runClinicalPipeline(state);
         }
 
         RuntimeTrace trace = buildTrace(state, 1, userInput, request.basicInfo());
@@ -69,7 +90,9 @@ public class RuntimeService {
         state.setCaseFrame(caseFrameService.buildOrUpdateCaseFrame(
                 userInput, state.getCaseFrame(), null));
 
-        if (state.getRuntimeStatus() != RuntimeStatus.ERROR_SAFE_HALTED
+        if (state.getWorkMode() != WorkMode.UNSUPPORTED && state.getWorkMode() != WorkMode.WELLNESS_MODE) {
+            runClinicalPipeline(state);
+        } else if (state.getRuntimeStatus() != RuntimeStatus.ERROR_SAFE_HALTED
                 && state.getRuntimeStatus() != RuntimeStatus.COMPLETED) {
             state.setRuntimeStatus(RuntimeStatus.WAITING_FOR_USER);
         }
@@ -95,6 +118,32 @@ public class RuntimeService {
         return runtimeStore.getTraces(runtimeId);
     }
 
+    private void runClinicalPipeline(RuntimeState state) {
+        KnowledgeContext knowledgeContext = knowledgeContextService.buildKnowledgeContext(
+                state.getCaseFrame(), state.getEntryAssessment());
+        state.setKnowledgeContext(knowledgeContext);
+
+        ExperienceContext experienceContext = experienceContextService.buildExperienceContext(
+                state.getCaseFrame(), knowledgeContext);
+        state.setExperienceContext(experienceContext);
+
+        SafetyGateResult safetyGate = safetyGateService.evaluateSafety(state);
+        state.setSafetyGate(safetyGate);
+
+        if (safetyGate.failSafeRequired()) {
+            state.setRuntimeStatus(RuntimeStatus.ERROR_SAFE_HALTED);
+            return;
+        }
+
+        state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
+
+        if (safetyGate.triggered()) {
+            state.setRuntimeStatus(RuntimeStatus.SAFETY_GATE_TRIGGERED);
+        } else {
+            state.setRuntimeStatus(RuntimeStatus.COLLECTING_EVIDENCE);
+        }
+    }
+
     private RuntimeStatus statusAfterEntry(WorkMode workMode) {
         return switch (workMode) {
             case UNSUPPORTED -> RuntimeStatus.ERROR_SAFE_HALTED;
@@ -116,14 +165,42 @@ public class RuntimeService {
             outputSummary.put("work_mode", state.getEntryAssessment().workMode().getValue());
             outputSummary.put("symptom_group", state.getEntryAssessment().symptomGroup());
         }
-        if (state.getWorkMode() != WorkMode.UNSUPPORTED) {
+        if (state.getWorkMode() != WorkMode.UNSUPPORTED && state.getWorkMode() != WorkMode.WELLNESS_MODE) {
             trace.recordModule("CaseFrameBuilder");
             outputSummary.put("chief_complaint", state.getCaseFrame().chiefComplaint());
             outputSummary.put("missing_slots", state.getCaseFrame().missingSlots());
+
+            trace.recordModule("KnowledgeContext");
+            KnowledgeContext knowledge = state.getKnowledgeContext();
+            if (knowledge != null) {
+                knowledge.sourceAssets().forEach(trace::recordKnowledge);
+                outputSummary.put("must_not_miss_count", knowledge.mustNotMiss().size());
+            }
+
+            trace.recordModule("ExperienceContext");
+            trace.recordModule("SafetyGate");
+            SafetyGateResult safetyGate = state.getSafetyGate();
+            if (safetyGate != null) {
+                trace.setSafetyGateResult(safetyGate);
+                outputSummary.put("safety_gate_triggered", safetyGate.triggered());
+            }
+
+            trace.recordModule("DifferentialDiagnosisBoard");
+            if (state.getDifferentialBoard() != null) {
+                Map<String, Object> ddxChange = new LinkedHashMap<>();
+                ddxChange.put("candidate_count", state.getDifferentialBoard().candidates().size());
+                ddxChange.put("updated_reason", state.getDifferentialBoard().updatedReason());
+                ddxChange.put("statuses", state.getDifferentialBoard().candidates().stream()
+                        .map(DDxCandidate::status)
+                        .map(Enum::name)
+                        .toList());
+                trace.setDdxChange(ddxChange);
+            }
         }
         if (basicInfo != null) {
             outputSummary.put("basic_info_applied", true);
         }
+        outputSummary.put("runtime_status", state.getRuntimeStatus().getValue());
         trace.setOutputSummary(outputSummary);
         return trace;
     }

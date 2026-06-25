@@ -41,7 +41,10 @@ class RuntimeControllerTest {
                 .andExpect(jsonPath("$.data.work_mode").value("clinical_mode"))
                 .andExpect(jsonPath("$.data.entry_assessment.symptom_group").value("chest_pain"))
                 .andExpect(jsonPath("$.data.case_frame.chief_complaint").value("我最近胸口闷"))
-                .andExpect(jsonPath("$.data.case_frame.missing_slots[?(@=='age')]").isEmpty());
+                .andExpect(jsonPath("$.data.case_frame.missing_slots[?(@=='age')]").isEmpty())
+                .andExpect(jsonPath("$.data.runtime_status").value("collecting_evidence"))
+                .andExpect(jsonPath("$.data.knowledge_context.symptom_group").value("chest_pain"))
+                .andExpect(jsonPath("$.data.differential_board.candidates.length()").value(4));
     }
 
     @Test
@@ -71,7 +74,8 @@ class RuntimeControllerTest {
                                 }
                                 """.formatted(runtimeId)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.runtime_status").value("waiting_for_user"))
+                .andExpect(jsonPath("$.data.runtime_status").value("safety_gate_triggered"))
+                .andExpect(jsonPath("$.data.safety_gate.triggered").value(true))
                 .andExpect(jsonPath("$.data.case_frame.symptoms[?(@.name=='sweating')]").exists());
     }
 
@@ -101,7 +105,7 @@ class RuntimeControllerTest {
 
         mockMvc.perform(get("/api/v1/runtime/" + runtimeId + "/status"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.runtime_status").value("collecting_case_info"));
+                .andExpect(jsonPath("$.data.runtime_status").value("collecting_evidence"));
 
         mockMvc.perform(get("/api/v1/runtime/" + runtimeId + "/trace"))
                 .andExpect(status().isOk())
@@ -121,7 +125,8 @@ class RuntimeControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.work_mode").value("emergency_hint"))
-                .andExpect(jsonPath("$.data.runtime_status").value("collecting_case_info"));
+                .andExpect(jsonPath("$.data.runtime_status").value("safety_gate_triggered"))
+                .andExpect(jsonPath("$.data.safety_gate.triggered").value(true));
     }
 
     @Test

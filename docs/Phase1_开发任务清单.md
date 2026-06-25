@@ -161,64 +161,64 @@
 
 ## 4.1 StaticRuleProvider
 
-- [ ] 创建 `knowledge/StaticRuleProvider.java`
-- [ ] 创建 `src/main/resources/assets/symptom-groups/chest-pain.yml`
-- [ ] 创建 `src/main/resources/assets/symptom-groups/fever.yml`
-- [ ] 创建 `src/main/resources/assets/red-flag-rules.yml`
-- [ ] 创建 `src/main/resources/assets/test-recommendation-rules.yml`
-- [ ] 创建 `src/main/resources/assets/capability-profiles.yml`
-- [ ] 实现症状群规则读取
-- [ ] 实现危险信号规则读取
-- [ ] 实现检查建议规则读取
-- [ ] 实现静态 Capability Profile 读取
-- [ ] 编写规则读取测试
+- [x] 创建 `knowledge/StaticRuleProvider.java`
+- [x] 创建 `src/main/resources/assets/symptom-groups/chest-pain.yml`
+- [x] 创建 `src/main/resources/assets/symptom-groups/fever.yml`
+- [x] 创建 `src/main/resources/assets/red-flag-rules.yml`
+- [x] 创建 `src/main/resources/assets/test-recommendation-rules.yml`
+- [x] 创建 `src/main/resources/assets/capability-profiles.yml`
+- [x] 实现症状群规则读取
+- [x] 实现危险信号规则读取
+- [x] 实现检查建议规则读取
+- [x] 实现静态 Capability Profile 读取
+- [x] 编写规则读取测试
 
 ## 4.2 KnowledgeContextService
 
-- [ ] 创建 `knowledge/KnowledgeContextService.java`
-- [ ] 实现 `buildKnowledgeContext(...)`
-- [ ] 将静态规则聚合为 KnowledgeContext
-- [ ] 记录 sourceAssets
-- [ ] 编写 KnowledgeContextService 单元测试
+- [x] 创建 `knowledge/KnowledgeContextService.java`
+- [x] 实现 `buildKnowledgeContext(...)`
+- [x] 将静态规则聚合为 KnowledgeContext
+- [x] 记录 sourceAssets
+- [x] 编写 KnowledgeContextService 单元测试
 
 ## 4.3 ExperienceContextService
 
-- [ ] 创建 `experience/ExperienceContextService.java`
-- [ ] 实现空 ExperienceContext
-- [ ] 可选实现 mock ExperienceContext
-- [ ] 明确不接入真实 Clinical Experience Memory
-- [ ] 编写 ExperienceContextService 单元测试
+- [x] 创建 `experience/ExperienceContextService.java`
+- [x] 实现空 ExperienceContext
+- [x] 可选实现 mock ExperienceContext
+- [x] 明确不接入真实 Clinical Experience Memory
+- [x] 编写 ExperienceContextService 单元测试
 
 ## 4.4 SafetyGateService
 
-- [ ] 创建 `safety/SafetyGateService.java`
-- [ ] 实现 `evaluateSafety(...)`
-- [ ] 支持危险信号规则匹配
-- [ ] 命中高风险时设置输出限制
-- [ ] SafetyGate 失败时进入保守策略
-- [ ] 使用 `@TraceStep("SafetyGate")`
-- [ ] 编写 SafetyGateService 单元测试
+- [x] 创建 `safety/SafetyGateService.java`
+- [x] 实现 `evaluateSafety(...)`
+- [x] 支持危险信号规则匹配
+- [x] 命中高风险时设置输出限制
+- [x] SafetyGate 失败时进入保守策略
+- [x] 使用 `@TraceStep("SafetyGate")`
+- [x] 编写 SafetyGateService 单元测试
 
 ## 4.5 DifferentialDiagnosisBoardService
 
-- [ ] 创建 `reasoning/DifferentialDiagnosisBoardService.java`
-- [ ] 实现 `buildDifferentialBoard(...)`
-- [ ] 支持 commonDiagnoses
-- [ ] 支持 mustNotMiss
-- [ ] 支持 `NEED_TO_RULE_OUT`
-- [ ] 支持 `POSSIBLE_AFTER_EXCLUSION`
-- [ ] 高风险候选不能被删除
-- [ ] 使用 `@TraceStep("DifferentialDiagnosisBoard")`
-- [ ] 编写 DDx Board 单元测试
+- [x] 创建 `reasoning/DifferentialDiagnosisBoardService.java`
+- [x] 实现 `buildDifferentialBoard(...)`
+- [x] 支持 commonDiagnoses
+- [x] 支持 mustNotMiss
+- [x] 支持 `NEED_TO_RULE_OUT`
+- [x] 支持 `POSSIBLE_AFTER_EXCLUSION`
+- [x] 高风险候选不能被删除
+- [x] 使用 `@TraceStep("DifferentialDiagnosisBoard")`
+- [x] 编写 DDx Board 单元测试
 
 ## 4.6 MVP-P0-C 验收
 
-- [ ] 静态规则能被读取
-- [ ] KnowledgeContext 能生成
-- [ ] ExperienceContext 能以空实现参与链路
-- [ ] SafetyGate 能识别配置好的高风险规则
-- [ ] DDx Board 能生成候选诊断状态
-- [ ] 高风险候选保留为 MUST_NOT_MISS 或 NEED_TO_RULE_OUT
+- [x] 静态规则能被读取
+- [x] KnowledgeContext 能生成
+- [x] ExperienceContext 能以空实现参与链路
+- [x] SafetyGate 能识别配置好的高风险规则
+- [x] DDx Board 能生成候选诊断状态
+- [x] 高风险候选保留为 MUST_NOT_MISS 或 NEED_TO_RULE_OUT
 
 ---
 

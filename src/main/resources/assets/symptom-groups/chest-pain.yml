@@ -1,0 +1,17 @@
+symptom_group: chest_pain
+common_diagnoses:
+  - name: musculoskeletal_chest_pain
+    risk_level: low
+  - name: gastroesophageal_reflux
+    risk_level: low
+must_not_miss:
+  - name: acute_coronary_syndrome
+    risk_level: high
+  - name: aortic_dissection
+    risk_level: high
+required_questions:
+  - 是否活动后加重？
+  - 是否伴随出汗或呼吸困难？
+recommended_tests:
+  - 心电图
+  - 心肌酶
