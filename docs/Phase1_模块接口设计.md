@@ -1,8 +1,8 @@
 # Phase 1 模块接口设计
 
 > 本文档是 Phase 1 Runtime MVP 的低层设计文档之一。  
-> 它负责定义 Phase 1 核心模块的职责、上下游关系、输入输出、读写字段、核心方法和失败策略。  
-> 数据结构见 `Phase1_数据结构与状态设计.md`，API 与测试见 `Phase1_API与测试设计.md`。
+> 它负责定义 Phase 1 Java Runtime Core 的模块职责、上下游关系、输入输出、核心接口和失败策略。  
+> 数据结构见 `Phase1_数据结构与状态设计.md`，技术栈见 `Phase1_技术栈与工程架构决策.md`。
 
 ---
 
@@ -10,11 +10,12 @@
 
 ```text
 1. 每个模块只处理一个清晰职责。
-2. 模块之间通过结构化对象传递信息，而不是通过长 Prompt 隐式传递。
+2. 模块之间通过 Java 结构化对象传递信息，而不是通过长 Prompt 隐式传递。
 3. 所有模块都围绕 RuntimeState 读写。
 4. 关键模块输出必须写入 RuntimeTrace。
 5. 医疗安全相关模块失败时，必须进入保守策略。
 6. Phase 1 允许静态规则和 mock 实现，但接口要为后续扩展保留。
+7. Spring AOP 只负责横切追踪，不能替代业务状态更新。
 ```
 
 ---
@@ -22,33 +23,33 @@
 # 二、Phase 1 模块执行顺序
 
 ```text
-Runtime API
+RuntimeController
   ↓
 RuntimeStore
   ↓
-EntryAssessment
+EntryAssessmentService
   ↓
-CaseFrameBuilder
+CaseFrameService
   ↓
 StaticRuleProvider
   ↓
-KnowledgeContextBuilder
+KnowledgeContextService
   ↓
-ExperienceContextBuilder
+ExperienceContextService
   ↓
-SafetyGate
+SafetyGateService
   ↓
-DifferentialDiagnosisBoardBuilder
+DifferentialDiagnosisBoardService
   ↓
-EvidenceGraphBuilder
+EvidenceGraphService
   ↓
-QuestionTestPolicy
+QuestionTestPolicyService
   ↓
-DecisionBoundary
+DecisionBoundaryService
   ↓
-PatientOutputBuilder / ClinicianReportBuilder
+PatientOutputService / ClinicianReportService
   ↓
-RuntimeTraceRecorder
+RuntimeTraceAspect / RuntimeTraceStore
 ```
 
 ---
@@ -57,26 +58,26 @@ RuntimeTraceRecorder
 
 | 模块 | 主职责 | 主要输入 | 主要输出 |
 |---|---|---|---|
-| Runtime API | 接收请求、返回 Runtime 结果 | HTTP 请求 | RuntimeResponse |
-| RuntimeStore | 保存和读取 RuntimeState | runtime_id、RuntimeState | RuntimeState |
-| EntryAssessment | 判断入口工作态 | UserInput、basic_info | EntryAssessmentResult |
-| CaseFrameBuilder | 构建病例状态 | UserInput、旧 CaseFrame | CaseFrame |
-| StaticRuleProvider | 读取静态规则 | symptom_group | 静态规则对象 |
-| KnowledgeContextBuilder | 生成知识上下文 | CaseFrame、规则对象 | KnowledgeContext |
-| ExperienceContextBuilder | 生成经验上下文 | CaseFrame、KnowledgeContext | ExperienceContext |
-| SafetyGate | 识别危险信号 | CaseFrame、KnowledgeContext、ExperienceContext | SafetyGateResult |
-| DDxBoardBuilder | 构建候选诊断状态板 | CaseFrame、KnowledgeContext、SafetyGateResult | DifferentialDiagnosisBoard |
-| EvidenceGraphBuilder | 构建证据图 | CaseFrame、DDxBoard、KnowledgeContext | EvidenceGraph |
-| QuestionTestPolicy | 决定下一步动作 | EvidenceGraph、SafetyGateResult | QuestionTestPolicyResult |
-| DecisionBoundary | 控制输出边界 | RuntimeState 中关键状态 | DecisionBoundaryResult |
-| PatientOutputBuilder | 生成患者端安全表达 | DecisionBoundary、NextAction | PatientOutput |
-| ClinicianReportBuilder | 生成医生端报告 | CaseFrame、DDx、EvidenceGraph | ClinicianReport |
-| RuntimeTraceRecorder | 记录执行过程 | 模块结果 | RuntimeTrace |
-| FailurePolicy | 处理失败策略 | 异常、模块名、RuntimeState | 保守结果 / error_safe_halted |
+| RuntimeController | 接收请求、返回 Runtime 结果 | HTTP 请求 | ApiResponse |
+| RuntimeStore | 保存和读取 RuntimeState | runtimeId、RuntimeState | RuntimeState |
+| EntryAssessmentService | 判断入口工作态 | UserInput、basicInfo | EntryAssessmentResult |
+| CaseFrameService | 构建病例状态 | UserInput、旧 CaseFrame | CaseFrame |
+| StaticRuleProvider | 读取静态规则 | symptomGroup | 静态规则对象 |
+| KnowledgeContextService | 生成知识上下文 | CaseFrame、规则对象 | KnowledgeContext |
+| ExperienceContextService | 生成经验上下文 | CaseFrame、KnowledgeContext | ExperienceContext |
+| SafetyGateService | 识别危险信号 | CaseFrame、KnowledgeContext、ExperienceContext | SafetyGateResult |
+| DifferentialDiagnosisBoardService | 构建候选诊断状态板 | CaseFrame、KnowledgeContext、SafetyGateResult | DifferentialDiagnosisBoard |
+| EvidenceGraphService | 构建证据图 | CaseFrame、DDxBoard、KnowledgeContext | EvidenceGraph |
+| QuestionTestPolicyService | 决定下一步动作 | EvidenceGraph、SafetyGateResult | QuestionTestPolicyResult |
+| DecisionBoundaryService | 控制输出边界 | RuntimeState 中关键状态 | DecisionBoundaryResult |
+| PatientOutputService | 生成患者端安全表达 | DecisionBoundary、NextAction | PatientOutput |
+| ClinicianReportService | 生成医生端报告 | CaseFrame、DDx、EvidenceGraph | ClinicianReport |
+| RuntimeTraceAspect | 横切记录模块执行 | 注解方法输入输出 | TraceStep 记录 |
+| FailurePolicyService | 处理失败策略 | 异常、模块名、RuntimeState | 保守结果 / ERROR_SAFE_HALTED |
 
 ---
 
-# 四、Runtime API
+# 四、RuntimeController
 
 ## 4.1 职责
 
@@ -87,30 +88,25 @@ RuntimeTraceRecorder
 4. 返回患者端或医生端结果。
 ```
 
-## 4.2 核心方法
+## 4.2 核心接口
 
-```python
-def start_runtime(request: StartRuntimeRequest) -> RuntimeResponse:
-    pass
+```java
+ApiResponse<RuntimeResponse> startRuntime(StartRuntimeRequest request);
 
-def continue_runtime(request: ContinueRuntimeRequest) -> RuntimeResponse:
-    pass
+ApiResponse<RuntimeResponse> continueRuntime(ContinueRuntimeRequest request);
 
-def get_runtime_status(runtime_id: str) -> RuntimeStatusResponse:
-    pass
+ApiResponse<RuntimeStatusResponse> getRuntimeStatus(String runtimeId);
 
-def get_runtime_result(runtime_id: str) -> RuntimeResultResponse:
-    pass
+ApiResponse<RuntimeResultResponse> getRuntimeResult(String runtimeId);
 
-def get_runtime_trace(runtime_id: str) -> RuntimeTraceResponse:
-    pass
+ApiResponse<RuntimeTraceResponse> getRuntimeTrace(String runtimeId);
 ```
 
 ## 4.3 读写字段
 
 ```text
 读取：HTTP request
-写入：RuntimeState、RuntimeTrace
+写入：RuntimeState 基础字段、inputHistory、RuntimeTrace
 ```
 
 ---
@@ -121,35 +117,31 @@ def get_runtime_trace(runtime_id: str) -> RuntimeTraceResponse:
 
 保存、读取、更新 RuntimeState。
 
-Phase 1 可用内存字典、JSON 文件或 SQLite 实现。
+Phase 1 使用内存版实现，后续可替换为数据库或 Redis。
 
-## 5.2 核心方法
+## 5.2 核心接口
 
-```python
-def create(state: RuntimeState) -> RuntimeState:
-    pass
+```java
+RuntimeState create(RuntimeState state);
 
-def get(runtime_id: str) -> RuntimeState:
-    pass
+RuntimeState get(String runtimeId);
 
-def update(state: RuntimeState) -> RuntimeState:
-    pass
+RuntimeState update(RuntimeState state);
 
-def exists(runtime_id: str) -> bool:
-    pass
+boolean exists(String runtimeId);
 ```
 
 ## 5.3 失败策略
 
 ```text
-runtime_id 不存在：返回 404。
-状态读取失败：进入 error_safe_halted 或返回系统错误。
-状态更新失败：不能继续生成输出。
+runtimeId 不存在：返回统一错误 RUNTIME_NOT_FOUND。
+状态读取失败：不得继续生成输出。
+状态更新失败：不得继续生成输出。
 ```
 
 ---
 
-# 六、EntryAssessment
+# 六、EntryAssessmentService
 
 ## 6.1 职责
 
@@ -159,7 +151,7 @@ runtime_id 不存在：返回 404。
 
 ```text
 UserInput
-basic_info
+basicInfo
 旧 RuntimeState，可选
 ```
 
@@ -169,31 +161,30 @@ basic_info
 EntryAssessmentResult
 ```
 
-## 6.4 核心方法
+## 6.4 核心接口
 
-```python
-def assess_entry(user_input: UserInput, basic_info: dict | None = None) -> EntryAssessmentResult:
-    pass
+```java
+EntryAssessmentResult assessEntry(UserInput input, Map<String, Object> basicInfo);
 ```
 
 ## 6.5 Phase 1 实现策略
 
 ```text
 先用关键词和规则判断。
-可选使用 LLM 辅助分类，但不能让 LLM 结果直接绕过规则。
+可选使用后续 AI Provider 辅助分类，但不能让 Provider 结果直接绕过规则。
 ```
 
 ## 6.6 写入 RuntimeState
 
 ```text
-entry_assessment
-work_mode
-runtime_status
+entryAssessment
+workMode
+runtimeStatus
 ```
 
 ---
 
-# 七、CaseFrameBuilder
+# 七、CaseFrameService
 
 ## 7.1 职责
 
@@ -204,7 +195,7 @@ runtime_status
 ```text
 UserInput
 existing CaseFrame
-basic_info
+basicInfo
 ```
 
 ## 7.3 输出
@@ -213,27 +204,26 @@ basic_info
 CaseFrame
 ```
 
-## 7.4 核心方法
+## 7.4 核心接口
 
-```python
-def build_or_update_case_frame(
-    user_input: UserInput,
-    existing_case_frame: CaseFrame | None,
-    basic_info: dict | None = None
-) -> CaseFrame:
-    pass
+```java
+CaseFrame buildOrUpdateCaseFrame(
+    UserInput input,
+    CaseFrame existingCaseFrame,
+    Map<String, Object> basicInfo
+);
 ```
 
 ## 7.5 写入 RuntimeState
 
 ```text
-case_frame
+caseFrame
 ```
 
 ## 7.6 失败策略
 
 ```text
-抽取失败时保留原 CaseFrame，并将关键信息加入 missing_slots。
+抽取失败时保留原 CaseFrame，并将关键信息加入 missingSlots。
 不能因为抽取失败而输出诊断方向。
 ```
 
@@ -243,35 +233,31 @@ case_frame
 
 ## 8.1 职责
 
-从本地 YAML / JSON 中读取症状群规则、危险信号规则、检查建议规则和静态能力档案。
+从 `src/main/resources/assets/` 中读取症状群规则、危险信号规则、检查建议规则和静态能力档案。
 
-## 8.2 核心方法
+## 8.2 核心接口
 
-```python
-def load_symptom_group_rules(symptom_group: str) -> dict:
-    pass
+```java
+SymptomGroupRule loadSymptomGroupRules(String symptomGroup);
 
-def load_red_flag_rules(symptom_group: str) -> list[dict]:
-    pass
+List<RedFlagRule> loadRedFlagRules(String symptomGroup);
 
-def load_test_recommendation_rules(symptom_group: str) -> list[dict]:
-    pass
+List<TestRecommendationRule> loadTestRecommendationRules(String symptomGroup);
 
-def load_capability_profile(symptom_group: str) -> dict:
-    pass
+CapabilityProfile loadCapabilityProfile(String symptomGroup);
 ```
 
 ## 8.3 失败策略
 
 ```text
-规则缺失：KnowledgeContext 标记 source_assets 为空。
+规则缺失：KnowledgeContext 标记 sourceAssets 为空。
 危险信号规则读取失败：SafetyGate 应进入 fail-safe。
 能力档案读取失败：DecisionBoundary 默认收紧输出。
 ```
 
 ---
 
-# 九、KnowledgeContextBuilder
+# 九、KnowledgeContextService
 
 ## 9.1 职责
 
@@ -291,25 +277,24 @@ StaticRuleProvider
 KnowledgeContext
 ```
 
-## 9.4 核心方法
+## 9.4 核心接口
 
-```python
-def build_knowledge_context(
-    case_frame: CaseFrame,
-    entry_assessment: EntryAssessmentResult
-) -> KnowledgeContext:
-    pass
+```java
+KnowledgeContext buildKnowledgeContext(
+    CaseFrame caseFrame,
+    EntryAssessmentResult entryAssessment
+);
 ```
 
 ## 9.5 写入 RuntimeState
 
 ```text
-knowledge_context
+knowledgeContext
 ```
 
 ---
 
-# 十、ExperienceContextBuilder
+# 十、ExperienceContextService
 
 ## 10.1 职责
 
@@ -328,14 +313,13 @@ KnowledgeContext
 ExperienceContext
 ```
 
-## 10.4 核心方法
+## 10.4 核心接口
 
-```python
-def build_experience_context(
-    case_frame: CaseFrame,
-    knowledge_context: KnowledgeContext
-) -> ExperienceContext:
-    pass
+```java
+ExperienceContext buildExperienceContext(
+    CaseFrame caseFrame,
+    KnowledgeContext knowledgeContext
+);
 ```
 
 ## 10.5 Phase 1 实现策略
@@ -343,11 +327,12 @@ def build_experience_context(
 ```text
 默认 empty 实现：返回空经验。
 可选 mock 实现：返回少量手写经验提醒，用于验证 Trace 和边界链路。
+不接入真实 Clinical Experience Memory。
 ```
 
 ---
 
-# 十一、SafetyGate
+# 十一、SafetyGateService
 
 ## 11.1 职责
 
@@ -357,7 +342,7 @@ def build_experience_context(
 
 ```text
 CaseFrame
-KnowledgeContext.red_flags
+KnowledgeContext.redFlags
 ExperienceContext
 CapabilityProfile
 ```
@@ -368,32 +353,27 @@ CapabilityProfile
 SafetyGateResult
 ```
 
-## 11.4 核心方法
+## 11.4 核心接口
 
-```python
-def evaluate_safety(
-    case_frame: CaseFrame,
-    knowledge_context: KnowledgeContext,
-    experience_context: ExperienceContext,
-    capability_profile: dict | None = None
-) -> SafetyGateResult:
-    pass
+```java
+@TraceStep("SafetyGate")
+SafetyGateResult evaluateSafety(RuntimeState state);
 ```
 
 ## 11.5 写入 RuntimeState
 
 ```text
-safety_gate
-runtime_status，可选更新为 safety_gate_triggered 或 error_safe_halted
+safetyGate
+runtimeStatus，可选更新为 SAFETY_GATE_TRIGGERED 或 ERROR_SAFE_HALTED
 ```
 
 ## 11.6 Trace 记录点
 
 ```text
-matched_rules
-risk_level
-required_action
-patient_output_constraint
+matchedRules
+riskLevel
+requiredAction
+patientOutputConstraint
 ```
 
 ## 11.7 失败策略
@@ -405,7 +385,7 @@ SafetyGate 失败时必须 fail-safe。
 
 ---
 
-# 十二、DifferentialDiagnosisBoardBuilder
+# 十二、DifferentialDiagnosisBoardService
 
 ## 12.1 职责
 
@@ -415,8 +395,8 @@ SafetyGate 失败时必须 fail-safe。
 
 ```text
 CaseFrame
-KnowledgeContext.common_diagnoses
-KnowledgeContext.must_not_miss
+KnowledgeContext.commonDiagnoses
+KnowledgeContext.mustNotMiss
 SafetyGateResult
 ```
 
@@ -426,33 +406,23 @@ SafetyGateResult
 DifferentialDiagnosisBoard
 ```
 
-## 12.4 核心方法
+## 12.4 核心接口
 
-```python
-def build_differential_board(
-    case_frame: CaseFrame,
-    knowledge_context: KnowledgeContext,
-    safety_gate_result: SafetyGateResult
-) -> DifferentialDiagnosisBoard:
-    pass
+```java
+@TraceStep("DifferentialDiagnosisBoard")
+DifferentialDiagnosisBoard buildDifferentialBoard(RuntimeState state);
 ```
 
-## 12.5 写入 RuntimeState
+## 12.5 约束
 
 ```text
-differential_board
-```
-
-## 12.6 约束
-
-```text
-高风险候选必须保留为 must_not_miss 或 need_to_rule_out。
+高风险候选必须保留为 MUST_NOT_MISS 或 NEED_TO_RULE_OUT。
 患者端是否可见由 DecisionBoundary 决定。
 ```
 
 ---
 
-# 十三、EvidenceGraphBuilder
+# 十三、EvidenceGraphService
 
 ## 13.1 职责
 
@@ -473,34 +443,23 @@ ExperienceContext
 EvidenceGraph
 ```
 
-## 13.4 核心方法
+## 13.4 核心接口
 
-```python
-def build_evidence_graph(
-    case_frame: CaseFrame,
-    differential_board: DifferentialDiagnosisBoard,
-    knowledge_context: KnowledgeContext,
-    experience_context: ExperienceContext
-) -> EvidenceGraph:
-    pass
+```java
+@TraceStep("EvidenceGraph")
+EvidenceGraph buildEvidenceGraph(RuntimeState state);
 ```
 
-## 13.5 写入 RuntimeState
-
-```text
-evidence_graph
-```
-
-## 13.6 约束
+## 13.5 约束
 
 ```text
 EvidenceGraph 不是解释层，而是控制层。
-Question / Test Policy 必须读取 EvidenceGraph 的 missing_evidence。
+QuestionTestPolicyService 必须读取 EvidenceGraph 的 missingEvidence。
 ```
 
 ---
 
-# 十四、QuestionTestPolicy
+# 十四、QuestionTestPolicyService
 
 ## 14.1 职责
 
@@ -511,8 +470,8 @@ Question / Test Policy 必须读取 EvidenceGraph 的 missing_evidence。
 ```text
 EvidenceGraph
 SafetyGateResult
-KnowledgeContext.required_questions
-KnowledgeContext.recommended_tests
+KnowledgeContext.requiredQuestions
+KnowledgeContext.recommendedTests
 ```
 
 ## 14.3 输出
@@ -521,15 +480,11 @@ KnowledgeContext.recommended_tests
 QuestionTestPolicyResult
 ```
 
-## 14.4 核心方法
+## 14.4 核心接口
 
-```python
-def decide_next_action(
-    evidence_graph: EvidenceGraph,
-    safety_gate_result: SafetyGateResult,
-    knowledge_context: KnowledgeContext
-) -> QuestionTestPolicyResult:
-    pass
+```java
+@TraceStep("QuestionTestPolicy")
+QuestionTestPolicyResult decideNextAction(RuntimeState state);
 ```
 
 ## 14.5 优先级
@@ -544,7 +499,7 @@ def decide_next_action(
 
 ---
 
-# 十五、DecisionBoundary
+# 十五、DecisionBoundaryService
 
 ## 15.1 职责
 
@@ -568,24 +523,14 @@ FailurePolicy 状态
 DecisionBoundaryResult
 ```
 
-## 15.4 核心方法
+## 15.4 核心接口
 
-```python
-def decide_output_boundary(
-    runtime_state: RuntimeState,
-    capability_profile: dict | None = None
-) -> DecisionBoundaryResult:
-    pass
+```java
+@TraceStep("DecisionBoundary")
+DecisionBoundaryResult decideOutputBoundary(RuntimeState state);
 ```
 
-## 15.5 写入 RuntimeState
-
-```text
-decision_boundary
-runtime_status，可选更新为 ready_for_patient_output / ready_for_clinician_report / error_safe_halted
-```
-
-## 15.6 失败策略
+## 15.5 失败策略
 
 ```text
 DecisionBoundary 失败时必须 fail-safe。
@@ -594,7 +539,7 @@ DecisionBoundary 失败时必须 fail-safe。
 
 ---
 
-# 十六、PatientOutputBuilder
+# 十六、PatientOutputService
 
 ## 16.1 职责
 
@@ -614,15 +559,10 @@ SafetyGateResult
 PatientOutput
 ```
 
-## 16.4 核心方法
+## 16.4 核心接口
 
-```python
-def build_patient_output(
-    decision_boundary: DecisionBoundaryResult,
-    question_test_policy: QuestionTestPolicyResult,
-    safety_gate_result: SafetyGateResult
-) -> PatientOutput:
-    pass
+```java
+PatientOutput buildPatientOutput(RuntimeState state);
 ```
 
 ## 16.5 约束
@@ -636,7 +576,7 @@ def build_patient_output(
 
 ---
 
-# 十七、ClinicianReportBuilder
+# 十七、ClinicianReportService
 
 ## 17.1 职责
 
@@ -659,11 +599,10 @@ DecisionBoundaryResult
 ClinicianReport
 ```
 
-## 17.4 核心方法
+## 17.4 核心接口
 
-```python
-def build_clinician_report(runtime_state: RuntimeState) -> ClinicianReport:
-    pass
+```java
+ClinicianReport buildClinicianReport(RuntimeState state);
 ```
 
 ## 17.5 约束
@@ -676,54 +615,62 @@ def build_clinician_report(runtime_state: RuntimeState) -> ClinicianReport:
 
 ---
 
-# 十八、RuntimeTraceRecorder
+# 十八、RuntimeTraceAspect
 
 ## 18.1 职责
 
-记录每轮 Runtime 的输入、模块执行、知识使用、经验使用、安全判断、证据变化和输出边界。
+使用 Spring AOP 横切记录模块执行过程。
 
-## 18.2 核心方法
+## 18.2 注解
 
-```python
-def record_trace(
-    runtime_state: RuntimeState,
-    input_text: str,
-    modules_executed: list[str],
-    intermediate_results: dict
-) -> RuntimeTrace:
-    pass
+```java
+@TraceStep("ModuleName")
 ```
 
-## 18.3 写入 RuntimeState
+## 18.3 记录内容
 
 ```text
-runtime_trace_ids
+runtimeId
+moduleName
+inputSummary
+outputSummary
+startTime
+endTime
+durationMs
+success
+errorMessage
+```
+
+## 18.4 约束
+
+```text
+AOP Trace 不能替代业务模块显式写回 RuntimeState。
+它只负责横切追踪、耗时统计、异常记录和审计辅助。
 ```
 
 ---
 
-# 十九、FailurePolicy
+# 十九、FailurePolicyService
 
 ## 19.1 职责
 
 统一处理关键模块失败时的保守策略。
 
-## 19.2 核心方法
+## 19.2 核心接口
 
-```python
-def handle_failure(
-    module_name: str,
-    error: Exception,
-    runtime_state: RuntimeState
-) -> RuntimeState:
-    pass
+```java
+RuntimeState handleFailure(
+    String moduleName,
+    Exception error,
+    RuntimeState state
+);
 ```
 
 ## 19.3 规则
 
 ```text
-SafetyGate 失败：进入 error_safe_halted。
-DecisionBoundary 失败：进入 error_safe_halted。
+SafetyGate 失败：进入 ERROR_SAFE_HALTED。
+DecisionBoundary 失败：进入 ERROR_SAFE_HALTED。
 EvidenceGraph 失败：不得输出候选诊断。
 KnowledgeContext 失败：不得引用知识来源。
 PatientOutput 失败：返回结构化保守提示。
@@ -737,6 +684,7 @@ PatientOutput 失败：返回结构化保守提示。
 1. 每个模块都有明确输入输出。
 2. 每个模块读写 RuntimeState 字段清楚。
 3. 安全相关模块有 fail-safe 策略。
-4. RuntimeTrace 记录点清楚。
-5. Phase 1 可先使用规则和 mock，但接口可以无缝升级到 Phase 2–4。
+4. AOP Trace 记录点清楚。
+5. RuntimeTrace 记录关键判断。
+6. Phase 1 可先使用规则和 mock，但接口可以无缝升级到 Phase 2–4。
 ```
