@@ -2,7 +2,7 @@
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
 > 当前阶段只允许实现 Phase 1 Runtime MVP，不允许提前扩展到后续阶段。  
-> AI 在生成代码、修改代码、补测试或重构时，必须遵守本文档。
+> AI 在生成代码、修改代码、补测试、重构或更新任务清单时，必须遵守本文档。
 
 ---
 
@@ -45,12 +45,14 @@ Phase 1 要证明的不是完整医学能力，而是以下工程闭环成立：
 AI 实现时必须优先参考以下文档，优先级从高到低：
 
 ```text
-1. docs/Phase1_Runtime_MVP_实现规格.md
-2. docs/Phase1_数据结构与状态设计.md
-3. docs/Phase1_模块接口设计.md
-4. docs/Phase1_API与测试设计.md
-5. docs/ClinMindRuntime阶段拆分路线图.md
-6. docs/ClinMindRuntime完整系统设计.md
+1. docs/AI_IMPLEMENTATION_SKILL.md
+2. docs/Phase1_开发任务清单.md
+3. docs/Phase1_Runtime_MVP_实现规格.md
+4. docs/Phase1_数据结构与状态设计.md
+5. docs/Phase1_模块接口设计.md
+6. docs/Phase1_API与测试设计.md
+7. docs/ClinMindRuntime阶段拆分路线图.md
+8. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
@@ -59,6 +61,7 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 Phase 1 低层设计文档优先于总设计文档。
 总设计文档描述完整愿景，但不能作为提前实现 Phase 2–5 能力的理由。
 如果总设计和 Phase 1 文档看起来不一致，以 Phase 1 文档为准。
+任务清单用于跟踪实现进度，但不能覆盖设计文档的架构约束。
 ```
 
 ---
@@ -196,9 +199,51 @@ MVP-P0-F：最小测试集
 
 ---
 
-# 六、架构约束
+# 六、任务清单同步规则
 
-## 6.1 RuntimeState 是唯一事实源
+AI 每次实现、修改或测试 Phase 1 代码后，必须同步更新：
+
+```text
+docs/Phase1_开发任务清单.md
+```
+
+## 6.1 实现前
+
+在开始编码前，AI 必须：
+
+```text
+1. 读取 docs/Phase1_开发任务清单.md。
+2. 确认当前任务属于 MVP-P0-A 到 MVP-P0-F 的哪一项。
+3. 将正在处理的任务从 [ ] 改为 [/]。
+4. 如果任务不在清单中，先在对应阶段补充任务项，不要直接实现。
+```
+
+## 6.2 实现后
+
+完成代码和测试后，AI 必须：
+
+```text
+1. 将已完成任务从 [/] 改为 [x]。
+2. 如果任务部分完成，保持 [/]，并补充备注或问题记录。
+3. 如果任务被阻塞，将状态改为 [!]，并在“问题记录”中说明原因。
+4. 如果实现过程中新增了必要任务，补充到对应阶段。
+5. 如果修复了问题记录，应更新“处理结论”。
+```
+
+## 6.3 禁止行为
+
+```text
+1. 禁止不更新任务清单就声称任务完成。
+2. 禁止一次性勾选整个 MVP-P0 阶段。
+3. 禁止只改任务清单但不写代码或测试。
+4. 禁止把 Phase 2–5 的任务加入 Phase 1 清单。
+```
+
+---
+
+# 七、架构约束
+
+## 7.1 RuntimeState 是唯一事实源
 
 ```text
 所有模块必须围绕 RuntimeState 读写。
@@ -206,7 +251,7 @@ MVP-P0-F：最小测试集
 不能让 LLM 输出直接影响下一轮判断，必须先写回结构化状态。
 ```
 
-## 6.2 模块必须通过结构化对象交互
+## 7.2 模块必须通过结构化对象交互
 
 禁止用长 Prompt 隐式传递模块状态。
 
@@ -222,7 +267,7 @@ CaseFrame → KnowledgeContext → SafetyGateResult → DDxBoard → EvidenceGra
 把所有内容拼成 prompt，让 LLM 一次性决定风险、诊断、追问和输出。
 ```
 
-## 6.3 SafetyGate 是硬安全模块
+## 7.3 SafetyGate 是硬安全模块
 
 ```text
 SafetyGate 必须优先于候选诊断输出。
@@ -230,7 +275,7 @@ SafetyGate 命中高风险后，DecisionBoundary 必须收紧患者端输出。
 SafetyGate 失败时，必须进入 error_safe_halted 或保守输出。
 ```
 
-## 6.4 DecisionBoundary 必须控制输出
+## 7.4 DecisionBoundary 必须控制输出
 
 ```text
 Patient Output 和 Clinician Report 必须经过 DecisionBoundary。
@@ -238,14 +283,14 @@ Patient Output 和 Clinician Report 必须经过 DecisionBoundary。
 患者端不能输出确定诊断、处方和治疗方案。
 ```
 
-## 6.5 EvidenceGraph 是控制层，不只是解释层
+## 7.5 EvidenceGraph 是控制层，不只是解释层
 
 ```text
 EvidenceGraph 必须影响 Question / Test Policy。
 不能只把 EvidenceGraph 当作最终解释文本。
 ```
 
-## 6.6 RuntimeTrace 必须记录关键判断
+## 7.6 RuntimeTrace 必须记录关键判断
 
 每轮 Runtime 至少记录：
 
@@ -263,9 +308,9 @@ DecisionBoundary 结果
 
 ---
 
-# 七、代码风格约束
+# 八、代码风格约束
 
-## 7.1 推荐技术栈
+## 8.1 推荐技术栈
 
 Phase 1 推荐：
 
@@ -278,7 +323,7 @@ YAML / JSON 静态配置
 内存存储或 SQLite
 ```
 
-## 7.2 推荐目录
+## 8.2 推荐目录
 
 ```text
 app/
@@ -305,7 +350,7 @@ tests/
 └── test_runtime_flow.py
 ```
 
-## 7.3 代码要求
+## 8.3 代码要求
 
 ```text
 1. 使用清晰命名，不使用过度抽象。
@@ -319,7 +364,7 @@ tests/
 
 ---
 
-# 八、API 约束
+# 九、API 约束
 
 当前只实现以下 API：
 
@@ -366,7 +411,7 @@ runtime_id
 
 ---
 
-# 九、测试约束
+# 十、测试约束
 
 每实现一个模块，必须同时补充测试。
 
@@ -398,23 +443,24 @@ Phase 1 最小验收测试必须覆盖：
 
 ---
 
-# 十、AI 每次执行任务前的检查清单
+# 十一、AI 每次执行任务前的检查清单
 
 AI 在写代码前必须先确认：
 
 ```text
 1. 当前任务属于 Phase 1 吗？
 2. 当前任务属于 MVP-P0-A 到 MVP-P0-F 的哪一步？
-3. 是否需要读取 Phase 1 对应设计文档？
-4. 是否会误实现 Phase 2–5 的内容？
-5. 是否需要新增或更新测试？
+3. 是否读取了 Phase 1 对应设计文档？
+4. 是否读取并更新了 docs/Phase1_开发任务清单.md？
+5. 是否会误实现 Phase 2–5 的内容？
+6. 是否需要新增或更新测试？
 ```
 
 如果当前任务不属于 Phase 1，AI 必须先说明边界，不应直接实现。
 
 ---
 
-# 十一、AI 每次提交代码后的检查清单
+# 十二、AI 每次提交代码后的检查清单
 
 AI 写完代码后必须检查：
 
@@ -426,13 +472,14 @@ AI 写完代码后必须检查：
 5. RuntimeTrace 是否记录关键判断？
 6. 是否补充了测试？
 7. 是否破坏了既有 API 或数据结构？
+8. 是否同步更新了 docs/Phase1_开发任务清单.md？
 ```
 
 ---
 
-# 十二、常见错误与禁止行为
+# 十三、常见错误与禁止行为
 
-## 12.1 禁止把项目写成普通问答系统
+## 13.1 禁止把项目写成普通问答系统
 
 错误：
 
@@ -446,7 +493,7 @@ AI 写完代码后必须检查：
 用户输入 → RuntimeState → SafetyGate → EvidenceGraph → DecisionBoundary → 输出
 ```
 
-## 12.2 禁止提前实现真实经验记忆
+## 13.2 禁止提前实现真实经验记忆
 
 Phase 1 只能：
 
@@ -458,12 +505,12 @@ Experience Context 空实现 / mock 实现
 
 ```text
 真实 Clinical Experience Memory
-真实医生审核
+真实审核
 随访结局
 Shadow Learning
 ```
 
-## 12.3 禁止让高风险输出被自然语言淡化
+## 13.3 禁止让高风险输出被自然语言淡化
 
 如果 SafetyGate 命中高风险，患者端不能输出：
 
@@ -482,7 +529,7 @@ Shadow Learning
 线下评估或就医建议
 ```
 
-## 12.4 禁止医生端内容泄露到患者端
+## 13.4 禁止医生端内容泄露到患者端
 
 医生端可以包含：
 
@@ -497,7 +544,7 @@ EvidenceGraph
 
 ---
 
-# 十三、当前最优下一步
+# 十四、当前最优下一步
 
 当前最优实现任务是：
 
@@ -514,13 +561,14 @@ MVP-P0-A：Runtime 状态骨架
 4. 定义 RuntimeTrace Pydantic schema
 5. 实现 RuntimeStore 内存版
 6. 编写基础单元测试
+7. 同步更新 docs/Phase1_开发任务清单.md
 ```
 
 不要在这个任务中实现 SafetyGate、RAG、KG、经验记忆或平台后台。
 
 ---
 
-# 十四、最终约束
+# 十五、最终约束
 
 AI 必须始终记住：
 
@@ -528,4 +576,5 @@ AI 必须始终记住：
 当前不是在实现完整医疗 AI 平台。
 当前是在实现 Phase 1 Runtime MVP。
 Phase 1 的目标是验证受控诊断 Runtime 架构，而不是追求医学知识覆盖全面。
+实现完成后必须同步更新 Phase1_开发任务清单。
 ```
