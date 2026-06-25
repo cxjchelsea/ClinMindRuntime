@@ -16,6 +16,8 @@
 6. Phase 1 先保证可运行、可测试、可扩展。
 ```
 
+Phase 1 的数据结构是完整系统数据结构的最小可运行子集。总设计文档中的字段如果没有在 Phase 1 中完整展开，不代表被取消，而是留到 Phase 2–5 扩展。
+
 ---
 
 # 二、核心枚举
@@ -37,6 +39,14 @@ ready_for_patient_output
 ready_for_clinician_report
 completed
 error_safe_halted
+```
+
+说明：
+
+```text
+emergency_hint 不是 RuntimeStatus，而是 EntryAssessmentResult.work_mode 的一种取值。
+当 EntryAssessment 识别到 emergency_hint 时，RuntimeStatus 进入 clinical_mode，并在下一步优先执行 SafetyGate。
+只有 SafetyGate 真正命中危险信号后，RuntimeStatus 才进入 safety_gate_triggered。
 ```
 
 ## 2.2 WorkMode
@@ -75,8 +85,15 @@ main_alternative
 must_not_miss
 need_to_rule_out
 possible
+possible_after_exclusion
 unlikely
 insufficient_evidence
+```
+
+说明：
+
+```text
+possible_after_exclusion 与总设计保持一致，用于表示某候选只有在排除高风险方向后才适合作为低风险解释保留。
 ```
 
 ## 2.6 NextActionType
@@ -114,7 +131,7 @@ created
   ↓
 entry_assessing
   ↓
-wellness_mode / clinical_mode / safety_gate_triggered / error_safe_halted
+wellness_mode / clinical_mode / error_safe_halted
   ↓
 collecting_case_info
   ↓
@@ -122,7 +139,7 @@ building_differential
   ↓
 collecting_evidence
   ↓
-recommending_tests / waiting_for_user / ready_for_patient_output / ready_for_clinician_report
+safety_gate_triggered / recommending_tests / waiting_for_user / ready_for_patient_output / ready_for_clinician_report
   ↓
 completed
 ```
@@ -134,15 +151,28 @@ completed
 | created | 调用 start API | entry_assessing |
 | entry_assessing | 判断为健康咨询 | wellness_mode |
 | entry_assessing | 判断为临床问诊 | clinical_mode |
-| entry_assessing | 疑似高风险 | safety_gate_triggered |
+| entry_assessing | 判断为疑似高风险 | clinical_mode，并将 work_mode 标记为 emergency_hint，下一步优先执行 SafetyGate |
+| entry_assessing | 判断为 unsupported | error_safe_halted |
 | clinical_mode | 病例信息不足 | collecting_case_info |
 | collecting_case_info | 已识别症状群 | building_differential |
 | building_differential | 候选诊断构建完成 | collecting_evidence |
+| collecting_evidence | SafetyGate 真正命中危险信号 | safety_gate_triggered |
 | collecting_evidence | 需要继续补充信息 | waiting_for_user |
 | collecting_evidence | 需要建议检查或就医评估 | recommending_tests |
 | collecting_evidence | 可生成患者端安全输出 | ready_for_patient_output |
 | collecting_evidence | 可生成医生端报告 | ready_for_clinician_report |
+| safety_gate_triggered | DecisionBoundary 允许风险提示或就医建议 | ready_for_patient_output 或 recommending_tests |
 | 任意状态 | 安全模块或边界模块失败 | error_safe_halted |
+
+## 3.3 状态约束
+
+```text
+1. 患者端输出前必须经过 DecisionBoundary。
+2. SafetyGate 命中 high 风险时，不能进入 O4_low_risk_reference。
+3. error_safe_halted 只能输出保守安全提示，不能输出候选诊断。
+4. ready_for_clinician_report 允许包含 DDx 和 EvidenceGraph，但 patient_facing 不一定允许。
+5. completed 不代表医学诊断完成，只代表当前 Runtime 轮次完成。
+```
 
 ---
 
@@ -159,7 +189,7 @@ RuntimeState 是 Phase 1 的中心状态对象。
 | runtime_status | RuntimeStatus | 是 | created | 当前状态 |
 | work_mode | WorkMode | 否 | null | 入口工作态 |
 | mode | RuntimeMode | 是 | patient_facing | 运行模式 |
-| input_history | list[UserInput] | 是 | [] | 输入历史 |
+| input_history | list[UserInput] | 是 | [] | 输入历史，Phase 1 暂时代替 Short-term Context |
 | entry_assessment | EntryAssessmentResult | 否 | null | 入口判断结果 |
 | case_frame | CaseFrame | 是 | 空对象 | 病例结构化状态 |
 | knowledge_context | KnowledgeContext | 是 | 空对象 | 医学知识上下文 |
@@ -177,9 +207,24 @@ RuntimeState 是 Phase 1 的中心状态对象。
 
 ---
 
-# 五、核心子结构
+# 五、Short-term Context 的 Phase 1 降级说明
 
-## 5.1 CaseFrame
+总设计文档中 Short-term Context 可以由 Redis 或独立上下文存储承载。
+
+Phase 1 暂不单独实现 ShortTermContextStore，而是使用 `RuntimeState.input_history` 作为最小降级实现：
+
+```text
+1. input_history 保存最近若干轮用户输入。
+2. input_history 只用于语言连续性和 CaseFrame 更新。
+3. 诊断判断必须基于结构化 RuntimeState，而不能直接依赖历史文本。
+4. 后续如接入 Redis，可将 input_history 外拆为 ShortTermContextStore。
+```
+
+---
+
+# 六、核心子结构
+
+## 6.1 CaseFrame
 
 ```text
 chief_complaint: string | null
@@ -192,7 +237,7 @@ missing_slots: list[string]
 conflicting_slots: list[string]
 ```
 
-## 5.2 KnowledgeContext
+## 6.2 KnowledgeContext
 
 ```text
 symptom_group: string | null
@@ -204,7 +249,14 @@ recommended_tests: list[string]
 source_assets: list[string]
 ```
 
-## 5.3 ExperienceContext
+说明：
+
+```text
+Phase 1 的 KnowledgeContext 来自静态 JSON / YAML 规则。
+总设计中的 Clinical Pathway、KG-lite、RAG Evidence Library 会在 Phase 2 接入。
+```
+
+## 6.3 ExperienceContext
 
 ```text
 matched_experience_units: list[ExperienceUnit]
@@ -212,7 +264,14 @@ experience_alerts: list[string]
 implementation_mode: empty | mock
 ```
 
-## 5.4 SafetyGateResult
+说明：
+
+```text
+Phase 1 的 ExperienceContext 是空实现或 mock 实现。
+它保留完整接口，但不接入真实 Clinical Experience Memory。
+```
+
+## 6.4 SafetyGateResult
 
 ```text
 triggered: bool
@@ -224,7 +283,7 @@ patient_output_constraint: string | null
 fail_safe_required: bool
 ```
 
-## 5.5 DifferentialDiagnosisBoard
+## 6.5 DifferentialDiagnosisBoard
 
 ```text
 candidates: list[DDxCandidate]
@@ -241,7 +300,7 @@ reason: string | null
 patient_visible: bool
 ```
 
-## 5.6 EvidenceGraph
+## 6.6 EvidenceGraph
 
 ```text
 items: list[EvidenceGraphItem]
@@ -260,7 +319,7 @@ next_questions: list[string]
 recommended_tests: list[string]
 ```
 
-## 5.7 QuestionTestPolicyResult
+## 6.7 QuestionTestPolicyResult
 
 ```text
 next_action: NextAction
@@ -277,7 +336,7 @@ target_diagnosis: string | null
 priority: low | medium | high
 ```
 
-## 5.8 DecisionBoundaryResult
+## 6.8 DecisionBoundaryResult
 
 ```text
 allowed_output_level: OutputLevel
@@ -287,7 +346,7 @@ reason: string
 constraints: list[string]
 ```
 
-## 5.9 PatientOutput
+## 6.9 PatientOutput
 
 ```text
 allowed: bool
@@ -296,7 +355,7 @@ output_level: OutputLevel
 constraints_applied: list[string]
 ```
 
-## 5.10 ClinicianReport
+## 6.10 ClinicianReport
 
 ```text
 allowed: bool
@@ -308,7 +367,7 @@ recommended_questions: list[string]
 recommended_tests: list[string]
 ```
 
-## 5.11 RuntimeTrace
+## 6.11 RuntimeTrace
 
 ```text
 trace_id: string
@@ -328,7 +387,7 @@ created_at: datetime
 
 ---
 
-# 六、字段读写关系
+# 七、字段读写关系
 
 | 模块 | 主要读取 | 主要写入 |
 |---|---|---|
@@ -347,7 +406,7 @@ created_at: datetime
 
 ---
 
-# 七、完成标准
+# 八、完成标准
 
 ```text
 1. 所有核心结构可以用 Pydantic / dataclass 表达。
