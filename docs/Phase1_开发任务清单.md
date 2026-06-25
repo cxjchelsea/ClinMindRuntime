@@ -367,3 +367,4 @@
 | 2026-06-25 | 创建任务清单 | 用于约束 Phase 1 实现进度 |
 | 2026-06-25 | 调整为 Java Runtime Core | Phase 1 Runtime Core 改为 Java / Spring Boot，Python 作为后续可选 Provider |
 | 2026-06-25 | 完成 Python MVP-P0-A 原型 | `app/` 下已实现 Runtime 状态骨架原型，待迁移至 Java Runtime Core |
+| 2026-06-25 | 完成 Python MVP-P0-B 原型 | `app/` 下已实现 Runtime API、EntryAssessment 与 CaseFrame 原型，待迁移至 Java Runtime Core |
