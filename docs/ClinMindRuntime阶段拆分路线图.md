@@ -74,9 +74,10 @@ Phase 0 的目标是把总设计文档固化为项目起点，并建立最小工
 1. 固化 ClinMindRuntime 完整系统设计文档
 2. 新增阶段拆分路线图
 3. 确定 Phase 1 的开发范围
-4. 建立基础工程目录
-5. 建立最小 README
-6. 准备少量测试病例和静态规则样例
+4. 确定 Phase 1 技术栈与工程架构
+5. 建立基础工程目录
+6. 建立最小 README
+7. 准备少量测试病例和静态规则样例
 ```
 
 ## 5.3 阶段产出物
@@ -84,10 +85,12 @@ Phase 0 的目标是把总设计文档固化为项目起点，并建立最小工
 ```text
 docs/ClinMindRuntime完整系统设计.md
 docs/ClinMindRuntime阶段拆分路线图.md
+docs/Phase1_技术栈与工程架构决策.md
 docs/Phase1_Runtime_MVP_实现规格.md
 docs/Phase1_数据结构与状态设计.md
 docs/Phase1_模块接口设计.md
 docs/Phase1_API与测试设计.md
+docs/Phase1_开发任务清单.md
 README.md
 基础工程目录
 少量测试病例
@@ -100,8 +103,9 @@ README.md
 1. 总设计文档不再继续扩充愿景，只做必要修正
 2. 阶段拆分明确
 3. Phase 1 范围清晰
-4. Phase 1 低层设计已经拆分完成
-5. 工程目录可以支撑 Runtime MVP 开发
+4. Phase 1 技术路线明确：Java Spring Boot Runtime Core + 可选 Python AI Provider
+5. Phase 1 低层设计已经拆分完成
+6. 工程目录可以支撑 Runtime MVP 开发
 ```
 
 ---
@@ -130,33 +134,47 @@ Phase 1 是整个项目最关键的阶段。目标是跑通一次“受控诊断
 → RuntimeTrace
 ```
 
-## 6.2 本阶段要做什么
+## 6.2 技术路线
 
 ```text
-Runtime API
+Runtime Core：Java 17+ / Spring Boot 3.x
+Trace：Spring AOP + @TraceStep + RuntimeTrace
+Storage：In-memory RuntimeStore
+Config Assets：YAML / JSON
+Testing：JUnit 5
+Python：后续可选 AI Provider，不作为 Phase 1 主工程
+AI 框架：只能作为后续 Provider / Adapter，不能作为 Runtime 主控
+```
+
+## 6.3 本阶段要做什么
+
+```text
+Spring Boot 工程骨架
+RuntimeController
 RuntimeStatus
 RuntimeState
 RuntimeTrace
 RuntimeStore
+@TraceStep 与 RuntimeTraceAspect
 Short-term Context 降级实现
-EntryAssessment
-CaseFrame
-Knowledge Context
-Experience Context 空实现 / mock 实现
-SafetyGate
-Differential Diagnosis Board
-EvidenceGraph
-Question / Test Policy
-DecisionBoundary
+EntryAssessmentService
+CaseFrameService
+KnowledgeContextService
+ExperienceContextService 空实现 / mock 实现
+SafetyGateService
+DifferentialDiagnosisBoardService
+EvidenceGraphService
+QuestionTestPolicyService
+DecisionBoundaryService
 Patient-facing Output
 Clinician-facing Output
-FailurePolicy
+FailurePolicyService
 10–20 个测试病例
 ```
 
-Phase 1 暂不单独实现 Redis 级别 ShortTermContextStore，而是由 `RuntimeState.input_history` 承担最小短期上下文能力。
+Phase 1 暂不单独实现 Redis 级别 ShortTermContextStore，而是由 `RuntimeState.inputHistory` 承担最小短期上下文能力。
 
-## 6.3 本阶段不做什么
+## 6.4 本阶段不做什么
 
 ```text
 不做完整 RAG Evidence Library
@@ -168,21 +186,24 @@ Phase 1 暂不单独实现 Redis 级别 ShortTermContextStore，而是由 `Runti
 不做自动经验学习
 不输出患者端确定诊断
 不承诺临床有效性
+不引入 Spring Cloud、Nacos、消息队列或复杂微服务
+不让 LangChain / LangGraph / Spring AI / LangChain4j 取代 Runtime 主控
 ```
 
-## 6.4 阶段完成标准
+## 6.5 阶段完成标准
 
 ```text
 1. 用户输入症状后，可以创建 Runtime
 2. RuntimeState 能保存并更新病例状态
-3. SafetyGate 能识别配置好的危险信号
-4. DDx Board 能生成候选诊断状态
-5. EvidenceGraph 能记录支持、反对、缺失证据
-6. Question / Test Policy 能决定下一步追问或检查建议
-7. DecisionBoundary 能区分患者端和医生端输出
-8. RuntimeTrace 能记录本轮判断依据
-9. 高风险病例不会输出低风险安抚性结论
-10. 至少 10–20 个测试病例可以跑通
+3. Spring AOP Trace 能记录关键模块执行
+4. SafetyGate 能识别配置好的危险信号
+5. DDx Board 能生成候选诊断状态
+6. EvidenceGraph 能记录支持、反对、缺失证据
+7. Question / Test Policy 能决定下一步追问或检查建议
+8. DecisionBoundary 能区分患者端和医生端输出
+9. RuntimeTrace 能记录本轮判断依据
+10. 高风险病例不会输出低风险安抚性结论
+11. 至少 10–20 个测试病例可以跑通
 ```
 
 ---
@@ -336,16 +357,6 @@ Phase 4：经验进化闭环
 Phase 5：平台化与企业级治理
 ```
 
-关键依赖：
-
-```text
-没有 Phase 1 的 RuntimeState / SafetyGate / EvidenceGraph / DecisionBoundary，后续资产层和平台层没有真实调用对象。
-没有 Phase 2 的共享能力资产，Phase 3 的训练评估无法沉淀为可用资产。
-没有 Phase 3 的 Evaluation Results，Capability Profile 就没有可信来源。
-没有 Phase 4 的复盘闭环，Clinical Experience Memory 就只是手写经验库。
-没有 Phase 5 的治理平台，系统无法进入企业级运行。
-```
-
 ---
 
 # 十二、第一阶段优先级
@@ -356,7 +367,7 @@ MVP-P0-B：病例结构化与入口判断
 MVP-P0-C：安全门和候选诊断
 MVP-P0-D：证据图与下一步动作
 MVP-P0-E：输出边界与分角色表达
-MVP-P0-F：最小测试集
+MVP-P0-F：最小测试集与集成验证
 ```
 
 ---
@@ -385,13 +396,15 @@ MVP-P0-F：最小测试集
 当前 Phase 1 文档已经拆分为：
 
 ```text
+docs/Phase1_技术栈与工程架构决策.md
 docs/Phase1_Runtime_MVP_实现规格.md
 docs/Phase1_数据结构与状态设计.md
 docs/Phase1_模块接口设计.md
 docs/Phase1_API与测试设计.md
+docs/Phase1_开发任务清单.md
 ```
 
-下一步应该根据这些文档建立工程骨架，并优先实现 Runtime 状态骨架。
+下一步应该根据这些文档建立 Java Spring Boot 工程骨架，并优先实现 Runtime 状态骨架。
 
 ---
 
