@@ -1,461 +1,979 @@
-# AIdoctor 旧项目可复用设计资产整理
+# ClinMindRuntime 旧项目补充设计
 
-> 来源项目：`cxjchelsea/AIdoctor`  
-> 目标项目：`cxjchelsea/ClinMindRuntime`  
-> 目的：从旧 AI 医生项目中抽取真正有工程价值、可迁移到 ClinMindRuntime 的设计资产，避免重做已有能力，并把旧项目从“多服务医疗诊断流程系统”升级为“受控诊断 Runtime”。
-
----
-
-## 1. 总体判断
-
-旧项目 `AIdoctor` 不应该被整体废弃。
-
-它已经具备以下工程基础：
-
-- CDP 临床决策包状态管理
-- Java 编排服务 + Python AI 服务的混合架构
-- 多服务拆分和 Docker Compose 部署
-- 主动问诊与信息缺口识别
-- 鉴别诊断候选集生成
-- 多引擎融合诊断
-- 三层候选诊断分层
-- 证据链分析
-- 检查建议、风险评估、解释生成
-- 执行追踪与审计字段
-
-但是旧项目的问题也很明显：
-
-- 更偏固定 Workflow，而不是真正的 Runtime
-- 信息收集更多是 slot filling，而不是围绕诊断证据动态决策
-- 风险控制没有形成独立的 SafetyGate / DecisionBoundary
-- 证据链更像解释层，还没有成为诊断控制层
-- 多引擎融合以加权分数为主，缺少安全边界控制
-- 治疗推理在患者端风险较高，不适合作为核心卖点
-- 临床经验记忆、医生反馈、再认证机制尚未形成闭环
-
-因此，新项目 `ClinMindRuntime` 的合理定位不是推翻旧项目，而是：
-
-> 在 AIdoctor 的工程基础上，将原来的“多服务医疗问答 / 诊断流程系统”升级为“状态驱动、证据可追踪、输出受控、可复盘再认证的医疗诊断 Runtime”。
+> 来源旧项目：`cxjchelsea/AIdoctor`  
+> 目标新项目：`cxjchelsea/ClinMindRuntime`  
+> 文档目的：不是整理旧项目资产，也不是把旧项目整体搬迁过来，而是从 AIdoctor 中抽取 **ClinMindRuntime 当前设计中尚未充分展开、但旧项目已有可参考实现或工程细节的内容**，直接补充到新项目设计中。
 
 ---
 
-## 2. 旧项目中最值得保留的设计
+## 0. 使用原则
 
-### 2.1 CDP：保留并升级为 Runtime State
-
-旧项目中的 CDP（Clinical Decision Package）是最重要的可复用资产。
-
-它已经承担了一次问诊过程中的中心状态对象，包含：
-
-- patientState：患者状态
-- ddx：鉴别诊断列表
-- evidenceGraph：证据图
-- workupPlan：检查计划
-- managementPlan：处置计划
-- triage：风险评估
-- uncertainty：不确定性信息
-- audit：审计信息
-- executionTrace：执行追踪
-- cdpStatus：当前状态
-- version：版本号
-
-这些字段与 ClinMindRuntime 的核心对象高度对应。
-
-建议映射如下：
-
-| AIdoctor 旧字段 | ClinMindRuntime 新对象 | 迁移方式 |
-|---|---|---|
-| `patientState` | `CaseFrame` | 保留概念，字段更规范化 |
-| `ddx` | `Differential Diagnosis Board` | 从普通候选列表升级为候选诊断状态板 |
-| `evidenceGraph` | `EvidenceGraph` | 从解释型证据链升级为控制型证据状态图 |
-| `triage` | `SafetyGate / DecisionBoundary` | 拆分为风险识别和输出边界控制 |
-| `uncertainty` | `MissingEvidence / ConflictEvidence` | 显式记录缺失证据和冲突证据 |
-| `audit` | `AuditLog` | 保留，增加安全边界和医生反馈记录 |
-| `executionTrace` | `RuntimeTrace` | 保留，作为复盘和再认证依据 |
-| `cdpStatus` | `RuntimeStatus` | 从流程状态升级为诊断运行状态 |
-
-建议在新项目中将 CDP 改名为：
+新项目 ClinMindRuntime 已经有完整的核心设计方向：
 
 ```text
-DiagnosticRuntimeState
-```
-
-或者保留 CDP 名称，但明确说明：
-
-> CDP 是 ClinMindRuntime 的一次诊断运行状态快照，不只是数据包，而是 Runtime 的状态内核。
-
----
-
-### 2.2 Java 编排 + Python AI 服务：保留
-
-旧项目采用：
-
-- Spring Boot / Java：流程编排、状态管理、事务、接口聚合
-- FastAPI / Python：LLM 调用、知识图谱推理、诊断引擎、主动问诊、OCR
-- MySQL：结构化业务数据
-- Redis：对话上下文缓存
-- Neo4j：医学知识图谱
-- Docker Compose：多服务部署
-
-这个架构可以继续保留。
-
-原因是医疗诊断系统本身就需要把“稳定业务 Runtime”和“AI 能力模块”分开：
-
-```text
-Java Orchestrator：负责稳定、可审计、可回滚、可编排
-Python AI Services：负责 LLM、RAG、KG、模型推理、Prompt 策略
-```
-
-新项目中建议继续使用这种分层，但命名上做调整：
-
-| 旧服务 | 新定位 |
-|---|---|
-| diagnosis-service | Runtime Orchestrator |
-| diagnosis-engine-service | Diagnostic Reasoning Service |
-| dialog-service | Question / Test Policy Service |
-| risk-assessment-service | SafetyGate Service |
-| workup-planner-service | Test Policy / Workup Service |
-| explanation-service | Human-like Interaction / Report Service |
-| treatment-engine-service | Clinician-only Management Reference Service |
-
----
-
-### 2.3 五步诊断流程：保留骨架，但升级为 Runtime Loop
-
-旧项目中的五步流程是：
-
-```text
-Step 1：识别问题
-Step 2：构建鉴别诊断候选集并分层
-Step 3：组织候选集并建立分流路径
-Step 4：采集关键证据并形成验证计划
-Step 5：回填证据并输出终点结论包
-```
-
-这个流程有价值，因为它说明旧项目已经不是简单问答，而是有诊断流程意识。
-
-但它的问题是：
-
-- 更像固定 Workflow
-- 主要依赖信息完整度阈值推进流程
-- 没有把高危排除、证据充分性、输出权限作为硬约束
-
-在 ClinMindRuntime 中，应升级为 Runtime Loop：
-
-```text
-User Input
-  ↓
-Update CaseFrame
-  ↓
+症状群 Rotation
+能力档案 Capability Profile
+Clinical Experience Memory
+Diagnostic Runtime
 SafetyGate
-  ↓
-Update Differential Diagnosis Board
-  ↓
-Update EvidenceGraph
-  ↓
-Question / Test Policy
-  ↓
+Differential Diagnosis Board
+EvidenceGraph
 DecisionBoundary
-  ↓
 Human-like Interaction Layer
-  ↓
-RuntimeTrace / AuditLog
+Shadow Learning
+Review & Recertification
 ```
 
-也就是说：
+因此，旧项目中如果只是和这些概念重复，就不再重复保留。
 
-> 旧项目的五步流程可以作为流程骨架，但新项目的核心应该是每一轮都由 Runtime 状态决定下一步动作，而不是简单按步骤推进。
+本文件只保留三类内容：
+
+```text
+1. 新项目已有方向，但旧项目提供了更具体工程落点的内容
+2. 新项目设计中没有展开，但旧项目已经实现过的工程机制
+3. 旧项目虽然实现不完整，但能作为新项目 MVP 第一版落地骨架的内容
+```
+
+不保留三类内容：
+
+```text
+1. 旧项目中只是概念包装、但没有实质实现的内容
+2. 新项目已经设计得更完整的内容
+3. 医疗风险较高、容易让患者端越权的内容
+```
 
 ---
 
-### 2.4 主动问诊与信息缺口识别：保留并升级
+# 一、可以直接补充进新项目的内容
 
-旧项目的 dialog-service 已经实现了：
+## 1. Runtime API：启动、继续、查状态、查结果
 
-- 信息缺口识别
-- 信息缺口分级：required / important / optional
-- 完整度计算
-- 智能追问生成
-- NLU 理解用户回答
-- NLG 生成自然语言问题
-- 对话上下文缓存
-- WebSocket 实时对话
+### 1.1 为什么要补充
 
-这部分应该保留。
+ClinMindRuntime 的设计已经有 Runtime 思想，但还需要明确一次问诊对外暴露哪些基础接口。
 
-但旧逻辑更偏：
+AIdoctor 旧项目中已经形成了比较清楚的诊断流程 API：
 
 ```text
-缺字段 → 问字段
+POST /api/v1/diagnosis/start
+POST /api/v1/diagnosis/continue
+GET  /api/v1/diagnosis/{cdpId}/status
+GET  /api/v1/diagnosis/{cdpId}/result
+```
+
+这部分可以直接迁移为 ClinMindRuntime 的 Runtime API。
+
+### 1.2 在新项目中的设计
+
+ClinMindRuntime 第一阶段建议提供以下接口：
+
+```text
+POST /api/v1/runtime/start
+POST /api/v1/runtime/continue
+GET  /api/v1/runtime/{runtimeId}/status
+GET  /api/v1/runtime/{runtimeId}/result
+GET  /api/v1/runtime/{runtimeId}/trace
+```
+
+其中：
+
+```text
+start：创建一次新的诊断 Runtime
+continue：提交用户补充信息，推进 Runtime 一轮
+status：查看当前 Runtime 状态
+result：查看最终输出结果
+trace：查看诊断过程追踪，供医生端、调试和复盘使用
+```
+
+### 1.3 建议请求结构
+
+```json
+{
+  "user_id": "u_001",
+  "session_id": "s_001",
+  "mode": "patient_facing",
+  "input": {
+    "text": "我最近胸口闷，活动后更明显",
+    "attachments": []
+  },
+  "basic_info": {
+    "age": 58,
+    "sex": "male"
+  }
+}
+```
+
+### 1.4 建议响应结构
+
+```json
+{
+  "runtime_id": "rt_001",
+  "status": "collecting_evidence",
+  "work_mode": "clinical_mode",
+  "risk_level": "high",
+  "red_flags": ["胸闷", "活动后加重"],
+  "allowed_output": "O2_risk_warning",
+  "next_action": {
+    "type": "ask_question",
+    "content": "胸闷时是否伴随出汗、气短，或者疼痛向左肩、后背放射？",
+    "purpose": "rule_out_high_risk_diagnosis"
+  },
+  "case_frame_summary": {},
+  "timestamp": 1760000000000
+}
+```
+
+### 1.5 与新项目已有设计的关系
+
+这不是新增一个独立模块，而是把 Diagnostic Runtime 对外产品化。
+
+新项目已有 Diagnostic Runtime，但如果没有这组 API，项目会停留在架构设计层。加入这组接口后，面试时可以说明：
+
+> Runtime 不是一个抽象概念，而是一次问诊从 start 到 continue 再到 result 的完整状态机。
+
+---
+
+## 2. RuntimeStatus：补充具体运行状态枚举
+
+### 2.1 为什么要补充
+
+新项目已经有 CaseFrame、EvidenceGraph、DecisionBoundary 等对象，但还缺少一次问诊的状态枚举。
+
+AIdoctor 旧项目中的 CDP 状态设计可以直接补充到新项目中，但要做医疗 Runtime 化改造。
+
+旧项目中有：
+
+```text
+initial
+wellness_mode
+clinical_mode_collecting
+clinical_mode_diagnosing
+clinical_mode_managing
+completed
+follow_up
+```
+
+这组状态值得保留，但要升级。
+
+### 2.2 新项目建议状态枚举
+
+```text
+created
+entry_assessing
+wellness_mode
+collecting_case_info
+safety_gate_triggered
+building_differential
+collecting_evidence
+recommending_tests
+waiting_for_user
+waiting_for_doctor
+ready_for_patient_output
+ready_for_clinician_report
+completed
+follow_up_pending
+under_review
+archived
+error_safe_halted
+```
+
+### 2.3 状态解释
+
+| 状态 | 含义 | 是否允许患者端输出诊断 |
+|---|---|---|
+| `created` | Runtime 已创建，尚未完成入口判断 | 否 |
+| `entry_assessing` | 正在判断健康管理态还是临床诊疗态 | 否 |
+| `wellness_mode` | 健康管理态，仅提供健康教育或生活方式建议 | 否 |
+| `collecting_case_info` | 收集主诉、现病史、既往史等基础病例信息 | 否 |
+| `safety_gate_triggered` | 命中高危信号，输出被收紧 | 否，只能风险提示 |
+| `building_differential` | 构建候选诊断池 | 否 |
+| `collecting_evidence` | 围绕候选诊断收集关键证据 | 否 |
+| `recommending_tests` | 建议检查以排除或确认关键方向 | 患者端只展示就医/检查准备建议 |
+| `waiting_for_user` | 等待用户补充信息 | 否 |
+| `waiting_for_doctor` | 需要医生介入或审核 | 否 |
+| `ready_for_patient_output` | 可生成患者端安全输出 | 仅限风险提示/就医建议/健康教育 |
+| `ready_for_clinician_report` | 可生成医生端报告 | 医生端允许完整 DDx 和证据图 |
+| `completed` | 当前问诊闭环结束 | 按 DecisionBoundary 输出 |
+| `follow_up_pending` | 等待随访结局 | 否 |
+| `under_review` | 进入医生复盘或质控 | 否 |
+| `archived` | 已归档 | 否 |
+| `error_safe_halted` | 安全相关模块异常，流程保守中止 | 否 |
+
+### 2.4 设计收益
+
+这部分补充后，新项目可以更像一个真正的 Runtime，而不是只有对象没有生命周期。
+
+---
+
+## 3. Entry Assessment：入口工作态判定
+
+### 3.1 为什么要补充
+
+ClinMindRuntime 当前主线主要围绕诊断 Runtime 展开，但真实医疗产品里并不是所有用户输入都应该进入诊断流程。
+
+AIdoctor 旧项目有一个很实用的设计：先做健康状态判定，然后决定进入：
+
+```text
+wellness_mode：健康管理态
+clinical_mode：临床诊疗态
+```
+
+这部分可以补充到新项目作为 Runtime 的入口层。
+
+### 3.2 新项目中的定位
+
+新增模块：
+
+```text
+EntryAssessment
+```
+
+它在 CaseFrame 完整构建之前运行，用于判断当前输入属于哪类任务。
+
+```text
+用户输入
+  ↓
+EntryAssessment
+  ↓
+wellness_mode / clinical_mode / emergency_hint / unsupported
+```
+
+### 3.3 工作态分类
+
+```text
+wellness_mode：健康管理、日常咨询、轻症科普、非诊断需求
+clinical_mode：存在明确症状、需要问诊支持
+emergency_hint：疑似急症，直接触发 SafetyGate
+unsupported：超出系统能力范围，建议咨询医生或改写输入
+```
+
+### 3.4 输出结构
+
+```json
+{
+  "work_mode": "clinical_mode",
+  "reason": "用户描述胸闷且活动后加重，需要进入临床问诊流程",
+  "risk_level": "medium_high",
+  "red_flags": ["活动后加重"],
+  "next_runtime_status": "collecting_case_info"
+}
+```
+
+### 3.5 与 SafetyGate 的区别
+
+EntryAssessment 负责判断是否进入诊断流程。
+
+SafetyGate 负责判断当前是否存在高危风险。
+
+二者关系是：
+
+```text
+EntryAssessment：是否进入临床问诊
+SafetyGate：进入后是否需要收紧输出或建议急诊
+```
+
+---
+
+## 4. RuntimeState 数据结构：直接吸收 CDP 的字段经验
+
+### 4.1 为什么要补充
+
+新项目中已经设计了 CaseFrame、EvidenceGraph、DecisionBoundary 等对象，但还需要一个统一的持久化状态对象。
+
+AIdoctor 的 CDP 字段设计比较完整，可以直接作为 ClinMindRuntime 第一版 RuntimeState 的基础。
+
+### 4.2 新项目建议结构
+
+```json
+{
+  "runtime_id": "rt_001",
+  "user_id": "u_001",
+  "session_id": "s_001",
+  "version": 1,
+  "runtime_status": "collecting_evidence",
+  "work_mode": "clinical_mode",
+
+  "entry_assessment": {},
+  "case_frame": {},
+  "differential_board": {},
+  "evidence_graph": {},
+  "question_test_policy_state": {},
+  "safety_gate": {},
+  "decision_boundary": {},
+  "patient_output": {},
+  "clinician_report": {},
+  "uncertainty": {},
+  "audit_log": {},
+  "runtime_trace": {},
+
+  "created_at": "2026-06-25T10:00:00+09:00",
+  "updated_at": "2026-06-25T10:03:00+09:00"
+}
+```
+
+### 4.3 直接继承的字段思想
+
+从旧项目可直接继承：
+
+```text
+user_id / patient_id
+session_id
+version
+status
+patient_state
+DDx
+evidenceGraph
+workupPlan
+triage
+uncertainty
+audit
+executionTrace
+createdAt
+updatedAt
+```
+
+但在新项目中需要改名和升级：
+
+```text
+patient_state → case_frame
+DDx → differential_board
+workupPlan → question_test_policy_state.recommended_tests
+triage → safety_gate + decision_boundary
+executionTrace → runtime_trace
+```
+
+### 4.4 不建议继承的字段
+
+旧项目中的 `managementPlan` 不建议直接进入患者端 RuntimeState。
+
+原因：治疗和处置建议风险较高，容易越权。
+
+建议改为：
+
+```text
+clinician_management_reference
+```
+
+并且只允许医生端模式使用。
+
+---
+
+## 5. CaseFrame 的最小字段集：直接吸收旧项目的信息缺口字段
+
+### 5.1 为什么要补充
+
+新项目中有 CaseFrame 概念，但第一版落地需要一个最小字段集。
+
+AIdoctor 旧项目的 dialog-service 已经定义了一套基础信息缺口字段，可以作为 CaseFrame 第一版字段。
+
+### 5.2 第一版 CaseFrame 字段
+
+```json
+{
+  "chief_complaint": null,
+  "symptoms": [
+    {
+      "name": null,
+      "duration": null,
+      "severity": null,
+      "location": null,
+      "trigger": null,
+      "frequency": null,
+      "relief": null
+    }
+  ],
+  "associated_symptoms": [],
+  "vital_signs": {},
+  "past_history": [],
+  "family_history": [],
+  "medication_history": [],
+  "allergy_history": [],
+  "examination_results": [],
+  "user_answers": {},
+  "conflicting_slots": [],
+  "missing_slots": []
+}
+```
+
+### 5.3 字段分级
+
+直接吸收旧项目的 required / important / optional 思路。
+
+```text
+Required：
+- chief_complaint
+- symptom_trigger
+- symptom_duration
+
+Important：
+- symptom_severity
+- symptom_location
+- symptom_frequency
+- associated_symptoms
+
+Optional：
+- family_history
+- past_history
+- medication_history
+- allergy_history
+```
+
+### 5.4 升级规则
+
+旧项目中这些字段用于计算完整度。
+
+新项目中不能只用完整度推进流程，而要升级为：
+
+```text
+普通完整度：辅助指标
+关键证据完整度：核心指标
+高危排除证据：硬约束
 ```
 
 例如：
 
-- 缺症状诱因 → 问诱因
-- 缺症状持续时间 → 问持续时间
-- 缺症状严重程度 → 问严重程度
-
-在 ClinMindRuntime 中，应升级为：
-
 ```text
-候选诊断 / 高危排除 / 缺失证据 → 决定下一步追问或检查建议
+胸痛场景下，即使普通字段完整度达到 80%，如果没有排除急性冠脉综合征、主动脉夹层、肺栓塞，患者端也不能输出低风险判断。
 ```
 
-新的 Question / Test Policy 应该考虑：
+---
 
-- 当前症状群
-- 当前候选诊断
-- 必须排除的高危疾病
-- 支持证据
-- 反对证据
-- 缺失证据
-- 经验记忆提醒
-- 检查是否能改变判断
-- 患者端是否允许展示
+## 6. 对话上下文管理：直接保留 Redis + 内存降级思路
 
-建议迁移后的模块命名：
+### 6.1 为什么要补充
+
+新项目有多轮问诊，但还需要明确短期对话上下文如何保存。
+
+AIdoctor 旧项目使用 Redis 保存对话上下文，并在 Redis 不可用时使用内存存储作为降级。
+
+这部分可以直接用于 ClinMindRuntime 第一阶段。
+
+### 6.2 新项目设计
+
+```text
+Redis：保存短期对话上下文
+数据库：保存 RuntimeState 长期状态
+内存存储：开发环境或 Redis 不可用时的临时降级
+```
+
+### 6.3 上下文内容
+
+```json
+{
+  "runtime_id": "rt_001",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "我最近胸口闷"
+    },
+    {
+      "role": "assistant",
+      "content": "胸闷是在活动后更明显，还是休息时也会出现？"
+    }
+  ],
+  "last_question_field": "symptom_trigger",
+  "last_updated_at": "2026-06-25T10:00:00+09:00"
+}
+```
+
+### 6.4 对话历史长度
+
+旧项目限制最近 20 条对话。
+
+新项目可以保留这个策略，但需要说明：
+
+```text
+短期对话上下文只用于语言连续性。
+真正的诊断状态必须写入 RuntimeState，不能只依赖 conversation_history。
+```
+
+这点很重要。
+
+---
+
+## 7. WebSocket 实时对话：作为患者端交互补充
+
+### 7.1 为什么要补充
+
+旧项目 dialog-service 已经有 WebSocket 实时对话接口思想。
+
+ClinMindRuntime 第一阶段可以保留 HTTP API，但如果要展示产品体验，WebSocket 或 SSE 可以作为实时问诊交互补充。
+
+### 7.2 新项目建议
+
+```text
+HTTP：用于 start / continue / status / result
+WebSocket 或 SSE：用于实时返回追问、风险提示、医生端推理过程片段
+```
+
+### 7.3 第一阶段建议
+
+第一阶段不必复杂实现全双工，优先用 SSE 即可：
+
+```text
+患者端：流式返回自然表达
+医生端：流式返回结构化诊断状态更新
+```
+
+旧项目的 WebSocket 经验可以作为后续升级参考。
+
+---
+
+# 二、需要在新设计中升级后使用的内容
+
+## 8. 五步流程：不照搬，作为 Runtime Loop 的 MVP 骨架
+
+### 8.1 旧项目内容
+
+旧项目五步流程是：
+
+```text
+1. 识别问题
+2. 构建鉴别诊断候选集并分层
+3. 组织候选集并建立分流路径
+4. 采集关键证据并形成验证计划
+5. 回填证据并输出终点结论包
+```
+
+### 8.2 为什么不能原样保留
+
+新项目已经有 Diagnostic Runtime，不需要再重复一个固定 Workflow。
+
+而且旧项目五步流程的问题是：
+
+```text
+1. 步骤推进偏固定
+2. 信息完整度阈值影响较大
+3. SafetyGate 和 DecisionBoundary 没有成为硬控制层
+4. 高危疾病排除状态没有贯穿每一步
+```
+
+### 8.3 在新项目中的升级方式
+
+将五步流程变成 Runtime Loop 中的内部阶段：
+
+```text
+Runtime Round
+  1. Parse & Update CaseFrame
+  2. Run SafetyGate
+  3. Update Differential Board
+  4. Update EvidenceGraph
+  5. Decide Question / Test Action
+  6. Apply DecisionBoundary
+  7. Generate Patient / Clinician Output
+  8. Write RuntimeTrace
+```
+
+### 8.4 关键变化
+
+旧项目：
+
+```text
+流程决定下一步
+```
+
+新项目：
+
+```text
+状态决定下一步
+```
+
+旧项目：
+
+```text
+信息完整度够了 → 进入诊断
+```
+
+新项目：
+
+```text
+风险等级 + 证据充分性 + 高危排除状态 + 能力权限 → 决定是否允许输出
+```
+
+---
+
+## 9. 信息缺口识别：升级为 Evidence Gap
+
+### 9.1 旧项目内容
+
+旧项目可以识别：
+
+```text
+主诉
+症状诱因
+症状持续时间
+症状严重程度
+症状部位
+症状频率
+伴随症状
+家族史
+既往史
+用药史
+过敏史
+```
+
+并分为：
+
+```text
+required
+important
+optional
+```
+
+### 9.2 可直接用的部分
+
+这些字段可以直接作为 CaseFrame 第一版字段。
+
+`required / important / optional` 也可以作为基础信息优先级。
+
+### 9.3 必须升级的部分
+
+旧项目的信息缺口是 slot filling。
+
+新项目必须升级为 Evidence Gap：
+
+```text
+不是问“缺哪个字段”
+而是问“当前候选诊断还缺什么关键证据”
+```
+
+示例：
+
+```json
+{
+  "gap_type": "missing_evidence",
+  "target_diagnosis": "急性冠脉综合征",
+  "missing_evidence": ["疼痛放射部位", "活动后加重", "出汗", "心电图", "肌钙蛋白"],
+  "priority": "high",
+  "reason": "胸痛场景下该方向属于 must_not_miss，高危排除优先"
+}
+```
+
+### 9.4 模块命名
 
 ```text
 旧：InformationGapIdentifier
 新：EvidenceGapIdentifier
 
-旧：AdaptiveQuestioningStrategy
-新：QuestionTestPolicy
-
 旧：CompletenessCalculator
 新：EvidenceSufficiencyEvaluator
+
+旧：AdaptiveQuestioningStrategy
+新：QuestionTestPolicy
 ```
 
 ---
 
-### 2.5 多引擎融合诊断：保留，但降低决策权
+## 10. 三层诊断分层：升级为 Differential Diagnosis Board
 
-旧项目中的 diagnosis-engine-service 有五引擎融合设计：
+### 10.1 旧项目内容
 
-- Rule Engine
-- Knowledge Graph Engine
-- Statistical Model Engine
-- LLM Engine
-- Differential Engine
-
-这个设计应该保留，因为它说明系统不是完全依赖大模型。
-
-但旧项目的融合方式主要是：
-
-```text
-各引擎输出 disease possibilities
-按固定权重加权融合
-排序取 Top 5
-```
-
-这可以作为原型，但不应该作为最终临床判断机制。
-
-在 ClinMindRuntime 中，建议改为：
-
-```text
-Rule Engine：负责红旗规则和硬安全边界
-Knowledge Graph：负责疾病-症状-检查关系召回
-RAG Evidence：负责指南和证据引用
-LLM Engine：负责语义理解、证据归因、自然表达
-Statistical Model：负责风险评分，可选
-Differential Engine：负责候选诊断组织
-DecisionBoundary：负责最终输出权限控制
-```
-
-核心原则：
-
-> 多引擎可以提供候选和证据，但不能直接决定患者端输出。最终输出必须经过 SafetyGate 和 DecisionBoundary。
-
----
-
-### 2.6 三层候选诊断分层：保留并扩展
-
-旧项目中已经有三层候选诊断结构：
-
-```text
-primary_hypothesis：首要假设
-main_alternatives：主要备选
-must_exclude：必须排除
-```
-
-这个设计非常适合迁移到 ClinMindRuntime 的 Differential Diagnosis Board。
-
-但需要升级：
-
-旧版问题：
-
-- 高危诊断依赖关键词识别
-- must_exclude 只支持单个候选
-- 候选状态不够丰富
-- 缺少高危候选保留机制
-
-新版建议：
-
-```json
-{
-  "candidates": [
-    {
-      "name": "急性冠脉综合征",
-      "risk_level": "high",
-      "status": "must_not_miss",
-      "supporting_evidence": [],
-      "opposing_evidence": [],
-      "missing_evidence": []
-    },
-    {
-      "name": "胃食管反流",
-      "risk_level": "medium",
-      "status": "possible_after_exclusion"
-    }
-  ]
-}
-```
-
-候选状态建议包括：
+旧项目中已有：
 
 ```text
 primary_hypothesis
-main_alternative
+main_alternatives
+must_exclude
+```
+
+这和新项目 Differential Diagnosis Board 高度相关。
+
+### 10.2 不重复保留的原因
+
+新项目已经设计了 Differential Diagnosis Board，所以不需要把旧项目的三层分类作为独立模块重复保留。
+
+### 10.3 作为新项目的补充点
+
+旧项目能补充的是：第一版 Board 可以采用三层结构作为最小实现。
+
+```json
+{
+  "primary_hypothesis": [],
+  "main_alternatives": [],
+  "must_exclude": [],
+  "all_candidates": []
+}
+```
+
+### 10.4 必须升级的地方
+
+旧项目 `must_exclude` 更接近单个高危候选。
+
+新项目要改成列表，并且引入候选状态：
+
+```text
 must_not_miss
 need_to_rule_out
+possible
 possible_after_exclusion
 unlikely
 insufficient_evidence
 ```
 
-核心原则：
-
-> 高危候选不能因为分数低就删除，只能标记为必须排除或需要排除。
-
----
-
-### 2.7 证据链分析：保留并升级为 EvidenceGraph
-
-旧项目中的 EvidenceAnalyzer 已经能为候选疾病构建：
-
-- supporting_evidence
-- opposing_evidence
-- evidence_strength
-- evidence_summary
-- rule_engine 来源证据
-- knowledge_graph 来源证据
-- llm_engine 来源证据
-
-这部分是 EvidenceGraph 的前身。
-
-但旧版更像解释层：
+新项目原则：
 
 ```text
-为什么这个疾病可能成立？
-```
-
-ClinMindRuntime 中的 EvidenceGraph 应该升级为控制层：
-
-```text
-当前证据是否足够？
-还缺什么关键证据？
-下一步应该问什么？
-是否允许输出候选诊断？
-是否需要转急诊或人工医生？
-```
-
-新版 EvidenceGraph 建议字段：
-
-```json
-{
-  "diagnosis": "急性冠脉综合征",
-  "supporting_evidence": [],
-  "opposing_evidence": [],
-  "missing_evidence": [],
-  "conflicting_evidence": [],
-  "experience_alerts": [],
-  "recommended_questions": [],
-  "recommended_tests": [],
-  "status": "need_to_rule_out"
-}
+高危候选不能因为分数低而删除。
 ```
 
 ---
 
-### 2.8 执行追踪与审计：保留并加强
+## 11. 多引擎融合：升级为候选与证据提供器
 
-旧项目中已经有：
+### 11.1 旧项目内容
 
-- TraceExecution 注解
-- executionTrace 字段
-- audit 字段
-- cdpId 追踪上下文
-
-这部分非常重要，应完整保留。
-
-在 ClinMindRuntime 中，应升级为 RuntimeTrace：
+旧项目有五类引擎：
 
 ```text
-每轮输入是什么
-CaseFrame 更新了什么
-SafetyGate 是否触发
-DDx 如何变化
-EvidenceGraph 如何变化
-Question / Test Policy 为什么选择这个问题
-DecisionBoundary 为什么限制输出
-Human-like Layer 输出了什么
-医生是否采纳
-最终诊断 / 随访结局是什么
+规则引擎
+知识图谱引擎
+统计模型引擎
+LLM 引擎
+鉴别诊断引擎
 ```
 
-RuntimeTrace 是后续实现复盘、医生反馈、Shadow Learning、再认证的基础。
+并通过加权融合产生候选诊断可能性。
 
----
+### 11.2 新项目不应照搬的部分
 
-## 3. 可以保留但需要降级的设计
-
-### 3.1 治疗推理服务
-
-旧项目中有 treatment-engine-service 和 managementPlan。
-
-这部分不建议作为患者端核心能力。
+新项目不应该继续把“加权融合分数”作为最终决策。
 
 原因：
 
-- 治疗建议、用药建议和处方属于高风险医疗行为
-- 患者端输出容易产生误导
-- 合规和责任边界更复杂
-
-建议定位：
-
 ```text
-患者端：不输出治疗方案，只输出就医建议、风险提示、检查准备、健康教育。
-医生端：可以输出治疗方向参考，但必须标注为医生辅助信息。
+1. 医疗诊断不能只按分数排序
+2. 高危低概率疾病仍然要保留
+3. 患者端输出权限不是由分数决定，而是由 DecisionBoundary 决定
+4. LLM 分数和统计分数不一定可比较
 ```
 
-迁移方式：
+### 11.3 新项目升级方式
+
+将五引擎改成 Candidate & Evidence Providers：
 
 ```text
-旧 treatment-engine-service
-→ Clinician-only Management Reference Service
+Rule Provider：提供红旗信号、禁忌输出、高危疾病规则
+KG Provider：提供疾病-症状-检查关系
+RAG Provider：提供指南依据和证据引用
+LLM Provider：提供语义理解、候选补全、证据归因草稿
+Statistical Provider：提供风险评分，作为辅助信号
+Differential Provider：组织候选诊断池
+```
+
+这些 Provider 不直接决定最终回答。
+
+最终回答必须经过：
+
+```text
+SafetyGate
+EvidenceGraph
+DecisionBoundary
 ```
 
 ---
 
-### 3.2 OCR 和多模态输入
+## 12. 证据链分析：升级为控制型 EvidenceGraph
 
-旧项目支持 OCR 识别医疗报告和检查单。
+### 12.1 旧项目内容
 
-这部分可以保留为后续扩展能力，但不是 ClinMindRuntime 第一阶段核心。
-
-第一阶段建议聚焦：
+旧项目的 EvidenceAnalyzer 已经支持：
 
 ```text
-文本主诉
-多轮问诊
-结构化病例状态
-候选诊断
-证据图
-风险分诊
-输出边界
+supporting_evidence
+opposing_evidence
+evidence_strength
+evidence_summary
+rule_engine 来源
+knowledge_graph 来源
+llm_engine 来源
 ```
 
-OCR 可作为第二阶段：
+### 12.2 新项目已有内容
+
+新项目已经设计了 EvidenceGraph，所以不需要重复保留旧的 EvidenceAnalyzer 概念。
+
+### 12.3 旧项目能补充的部分
+
+旧项目能补充的是 EvidenceGraph 第一版实现时的证据来源结构。
+
+建议 EvidenceGraph 中保留来源字段：
+
+```json
+{
+  "source": "rule_engine | knowledge_graph | rag | llm | doctor_feedback | clinical_experience",
+  "type": "supporting | opposing | missing | conflicting",
+  "content": "胸痛活动后加重",
+  "target_diagnosis": "急性冠脉综合征",
+  "strength": "strong | medium | weak",
+  "trace_id": "trace_001"
+}
+```
+
+### 12.4 必须升级的部分
+
+旧项目证据链偏解释：
+
+```text
+为什么这个疾病可能？
+```
+
+新项目 EvidenceGraph 必须控制：
+
+```text
+下一步问什么
+是否建议检查
+是否允许输出候选诊断
+是否触发转医生
+是否禁止患者端诊断标签
+```
+
+---
+
+## 13. 服务容错：从普通降级升级为医疗 Fail-safe
+
+### 13.1 旧项目内容
+
+旧项目里多个服务调用失败后会继续流程，例如：
+
+```text
+健康状态判定服务失败 → 默认进入 clinical_mode
+诊断引擎失败 → 使用空 DDx 继续
+风险评估失败 → 不影响流程继续
+解释服务失败 → 使用简化结果
+```
+
+这体现了工程容错意识。
+
+### 13.2 新项目不能照搬的原因
+
+医疗系统不能所有模块失败都继续输出。
+
+尤其是 SafetyGate、RiskAssessment、DecisionBoundary 失败时，不能正常给患者输出。
+
+### 13.3 新项目补充规则
+
+新增：
+
+```text
+FailurePolicy
+```
+
+规则：
+
+```text
+LLM 失败：可以降级为规则输出
+RAG 失败：可以提示证据不足，不能引用指南
+Human-like Layer 失败：可以输出结构化安全结果
+Explanation 失败：可以返回医生端结构化报告
+KG 失败：可以用规则和 RAG 候选补充，但标记证据不足
+SafetyGate 失败：必须 fail-safe，不输出诊断方向
+DecisionBoundary 失败：必须 fail-safe，不输出诊断方向
+EvidenceGraph 失败：不得输出候选诊断，只能继续追问或转医生
+RiskAssessment 失败：高危场景默认收紧输出
+```
+
+### 13.4 状态处理
+
+当安全相关模块失败时，RuntimeStatus 应进入：
+
+```text
+error_safe_halted
+```
+
+患者端输出：
+
+```text
+当前信息不足或系统无法完成安全评估，建议咨询医生或及时就医。
+```
+
+医生端输出：
+
+```text
+安全模块执行失败，当前 AI 输出不可作为诊断参考。
+```
+
+---
+
+# 三、旧项目中不应补进新项目主线的内容
+
+## 14. 不保留“五脑思想”作为主表达
+
+旧项目 README 中有“五脑思想”表述。
+
+这个说法不建议继续使用。
+
+原因：
+
+```text
+1. 面试中显得概念包装重
+2. 不如 Runtime / State / Evidence / Boundary 专业
+3. 新项目已经有更强的架构表达
+```
+
+新项目统一使用：
+
+```text
+Diagnostic Runtime
+State-driven Diagnosis
+Evidence-controlled Reasoning
+DecisionBoundary
+Clinical Experience Memory
+```
+
+---
+
+## 15. 不把治疗推理作为患者端核心能力
+
+旧项目有 treatment-engine-service 和 managementPlan。
+
+新项目不应将其作为患者端核心能力。
+
+原因：
+
+```text
+1. 治疗建议和用药建议风险高
+2. 患者端容易越权
+3. 合规责任重
+4. 与 ClinMindRuntime 第一阶段“诊断支持 Runtime”主线不一致
+```
+
+如果保留，只能作为医生端扩展：
+
+```text
+Clinician Management Reference
+```
+
+并且必须满足：
+
+```text
+仅医生端可见
+必须标注证据来源
+不能生成处方
+不能替代医生决策
+```
+
+---
+
+## 16. 不把 OCR 作为第一阶段核心
+
+旧项目支持 OCR 和检查单识别。
+
+这部分有价值，但不适合作为 ClinMindRuntime 第一阶段主线。
+
+第一阶段应聚焦：
+
+```text
+文本问诊
+CaseFrame
+SafetyGate
+DDx Board
+EvidenceGraph
+QuestionTestPolicy
+DecisionBoundary
+RuntimeTrace
+```
+
+OCR 可以放到第二阶段：
 
 ```text
 检查报告解析
@@ -466,205 +984,90 @@ OCR 可作为第二阶段：
 
 ---
 
-## 4. 不建议继续使用的表达或机制
+# 四、建议写入新项目总体设计的补充段落
 
-### 4.1 不建议继续使用“五脑思想”作为项目主表达
+以下内容可以直接合并进 `系统总体设计.md`。
 
-旧项目 README 中使用“五脑思想”描述架构。
+## 17. 旧项目经验如何进入 ClinMindRuntime
 
-这个说法容易显得包装化，面试中不如下面这些表达专业：
+ClinMindRuntime 并不是从零开始设计。旧版 AIdoctor 项目已经实现过一个多服务医疗问诊系统，包括 CDP 状态管理、主动问诊、候选诊断生成、证据链分析、风险评估和执行追踪。
+
+但旧系统的核心问题是：它更像一个固定诊断 Workflow，主要按照步骤推进；而医疗问诊中的关键问题不是“流程执行到哪一步”，而是“当前诊断状态是否允许继续输出”。
+
+因此，ClinMindRuntime 只吸收旧项目中能够补充新 Runtime 的工程机制：
 
 ```text
-状态驱动的诊断 Runtime
-受控医疗 Agent 架构
-证据状态驱动的诊断支持系统
-多模块诊断编排系统
+1. Runtime API：start / continue / status / result / trace
+2. RuntimeStatus：一次问诊的完整状态生命周期
+3. EntryAssessment：入口工作态判定
+4. RuntimeState：从旧 CDP 升级而来的中心状态对象
+5. CaseFrame 最小字段集：由旧项目信息缺口字段升级而来
+6. Redis 对话上下文：用于短期语言连续性
+7. RuntimeTrace：由旧项目执行追踪升级而来
+8. FailurePolicy：由旧项目服务降级机制升级为医疗 fail-safe
 ```
 
-建议在新项目中不再使用“五脑思想”作为主概念。
+旧项目中与新方案重复的内容不再重复保留，例如候选诊断、证据图、风险评估这些新项目已经有更完整设计；旧项目只提供第一版落地字段、接口和工程经验。
+
+最终，AIdoctor 不是 ClinMindRuntime 的架构来源，而是 ClinMindRuntime 的工程补充来源。
 
 ---
 
-### 4.2 不建议用固定完整度阈值决定诊断推进
+# 五、MVP 实现建议
 
-旧项目中有基于完整度阈值推进诊断流程的设计。
+## 18. 第一阶段真正应该从旧项目拿过来的东西
 
-这在工程原型中可以使用，但医疗场景里不能作为核心判断。
-
-应改为：
+第一阶段只拿这些：
 
 ```text
-普通信息完整度：辅助指标
-关键证据完整度：核心指标
-高危疾病排除状态：硬约束
-DecisionBoundary：最终输出权限
+1. start / continue / status / result / trace 这组 API
+2. RuntimeStatus 状态枚举
+3. RuntimeState 持久化结构
+4. CaseFrame 最小字段集
+5. required / important / optional 字段分级
+6. Redis 短期对话上下文
+7. 最近 20 条对话历史限制
+8. RuntimeTrace 追踪结构
+9. EntryAssessment 的 wellness_mode / clinical_mode 分流思想
+10. FailurePolicy 的服务降级分类
 ```
 
-例如：
+这些是能直接补强新项目的。
+
+## 19. 第一阶段不要拿的东西
+
+第一阶段不要拿：
 
 ```text
-即使普通字段完整度达到 80%，如果胸痛高危证据没有排除，患者端也不能输出低风险判断。
+1. treatment-engine-service
+2. OCR
+3. 完整微服务拆分
+4. Nacos
+5. 复杂 Docker Compose
+6. 固定五步 Workflow
+7. 加权融合分数作为最终判断
+8. “五脑思想”表达
 ```
+
+原因：这些会让新项目变重，且和当前 Runtime 设计主线不完全一致。
 
 ---
 
-### 4.3 服务失败后不能一律继续流程
+# 六、最终结论
 
-旧项目中有多处“服务调用失败后继续流程”的容错设计。
-
-这在普通业务系统中合理，但医疗场景要区分安全等级。
-
-建议改为：
+AIdoctor 中真正能补充 ClinMindRuntime 的，不是宏观架构，而是一些具体工程落点：
 
 ```text
-非关键服务失败：允许降级
-表达层失败：允许返回结构化结果
-LLM 失败：允许规则兜底
-RAG 失败：允许提示证据不足
-SafetyGate 失败：必须 fail-safe
-RiskAssessment 失败：必须 fail-safe
-DecisionBoundary 失败：必须 fail-safe
-EvidenceGraph 构建失败：不得输出诊断方向
-```
-
-核心原则：
-
-> 医疗安全模块失败时，系统应该更保守，而不是继续正常输出。
-
----
-
-## 5. 新项目建议目录设计
-
-建议 ClinMindRuntime 初始目录如下：
-
-```text
-ClinMindRuntime/
-├── README.md
-├── docs/
-│   ├── AIdoctor可复用设计资产整理.md
-│   ├── 系统总体设计.md
-│   ├── Runtime核心对象设计.md
-│   ├── SafetyGate与DecisionBoundary设计.md
-│   ├── EvidenceGraph设计.md
-│   ├── QuestionTestPolicy设计.md
-│   ├── ClinicalExperienceMemory设计.md
-│   └── MVP实现边界.md
-├── runtime-orchestrator/
-├── diagnosis-reasoning-service/
-├── question-policy-service/
-├── safety-gate-service/
-├── evidence-service/
-├── interaction-service/
-├── evaluation-service/
-└── docker-compose.yml
-```
-
-第一阶段不建议直接完整复刻旧项目所有服务。
-
-更合理的 MVP 是：
-
-```text
-1. Runtime Orchestrator
-2. CaseFrame
-3. SafetyGate
-4. Differential Diagnosis Board
-5. EvidenceGraph
-6. Question / Test Policy
-7. DecisionBoundary
-8. Patient-facing / Clinician-facing 输出区分
-9. RuntimeTrace
-10. 小型病例评估集
-```
-
----
-
-## 6. 迁移优先级
-
-### P0：必须优先迁移
-
-```text
-CDP 状态中心 → DiagnosticRuntimeState
-五步流程骨架 → Runtime Loop
-信息缺口识别 → EvidenceGapIdentifier
-主动追问 → QuestionTestPolicy
-三层候选诊断 → DifferentialDiagnosisBoard
-证据链 → EvidenceGraph
-风险评估 → SafetyGate / DecisionBoundary
-执行追踪 → RuntimeTrace
-```
-
-### P1：可以第二阶段迁移
-
-```text
-多引擎融合诊断
-知识图谱推理
-RAG Evidence Library
-医生端报告
-Docker Compose 多服务部署
-评估服务
-```
-
-### P2：后续扩展
-
-```text
-OCR
-多模态检查报告输入
-治疗方案参考
-医生反馈闭环
-Silent Evaluation
-Clinical Experience Memory
-Shadow Learning
-Review & Recertification
-```
-
----
-
-## 7. 面试表述建议
-
-可以这样讲旧项目和新项目的关系：
-
-> 我原来的 AIdoctor 项目已经实现了 CDP 状态管理、多服务编排、主动问诊、多引擎诊断、证据分析和执行追踪。后来我复盘发现，旧项目虽然能跑通问诊流程，但整体还是偏固定 Workflow，信息收集也更像 slot filling，缺少明确的 SafetyGate、DecisionBoundary 和经验治理机制。  
-> 所以 ClinMindRuntime 不是推翻旧项目，而是在原有工程基础上，把它升级为状态驱动、证据可追踪、输出受控、可复盘再认证的诊断 Runtime。
-
-如果面试官问“你这个项目最大的演进是什么”，可以回答：
-
-> 最大的演进是从功能服务集合，升级为诊断 Runtime。旧项目关注“有哪些工具服务”，新项目关注“一次问诊中系统处于什么诊断状态、有哪些候选诊断、证据是否充分、下一步该问什么、当前是否允许输出”。
-
-如果面试官问“为什么不直接用大模型回答”，可以回答：
-
-> 医疗场景不能把最终控制权交给大模型。大模型可以做语言理解、候选生成和解释表达，但高危识别、输出权限、患者端边界和医生端报告必须由 Runtime 控制。
-
----
-
-## 8. 最终结论
-
-AIdoctor 中最值得保留的不是某个具体服务，而是以下工程资产：
-
-```text
-中心状态对象 CDP
-多服务编排经验
-主动问诊机制
-候选诊断分层
-多引擎诊断思想
-证据链分析
-执行追踪和审计意识
-Java + Python 混合架构
-```
-
-ClinMindRuntime 的核心任务是把这些资产升级为：
-
-```text
-DiagnosticRuntimeState
-SafetyGate
-DifferentialDiagnosisBoard
-EvidenceGraph
-QuestionTestPolicy
-DecisionBoundary
+Runtime API
+RuntimeStatus
+RuntimeState
+CaseFrame 最小字段集
+EntryAssessment
+短期对话上下文
 RuntimeTrace
-ClinicalExperienceMemory
-ReviewAndRecertification
+FailurePolicy
 ```
 
-一句话总结：
+这些内容可以直接让 ClinMindRuntime 从“设计很完整”变成“第一阶段可实现、可演示、可面试讲清楚”的工程项目。
 
-> AIdoctor 是旧的工程底座，ClinMindRuntime 是新的诊断 Runtime 架构升级。旧项目负责证明你做过完整工程，新项目负责证明你已经从“做功能”进化到“设计医疗 AI 运行时”。
+旧项目中和新项目已有设计重复的部分，不再重复搬迁；旧项目中实现不完整的部分，只作为新项目升级提示，不作为已完成能力。
