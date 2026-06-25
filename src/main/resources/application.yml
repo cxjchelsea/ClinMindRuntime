@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: clinmind-runtime
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.clinmind.runtime: INFO

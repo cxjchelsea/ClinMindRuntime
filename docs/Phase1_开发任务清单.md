@@ -31,78 +31,78 @@
 
 ## 2.1 Spring Boot 工程基础
 
-- [ ] 创建 `pom.xml`
-- [ ] 引入 Spring Boot 3.x
-- [ ] 引入 Spring Web
-- [ ] 引入 Jakarta Validation
-- [ ] 引入 Spring AOP
-- [ ] 引入 JUnit 5 / AssertJ / Mockito
-- [ ] 创建 `src/main/java/com/clinmind/runtime/ClinMindRuntimeApplication.java`
-- [ ] 创建 `src/main/resources/application.yml`
-- [ ] 创建 `src/test/java/com/clinmind/runtime/` 测试目录
+- [x] 创建 `pom.xml`
+- [x] 引入 Spring Boot 3.x
+- [x] 引入 Spring Web
+- [x] 引入 Jakarta Validation
+- [x] 引入 Spring AOP
+- [x] 引入 JUnit 5 / AssertJ / Mockito
+- [x] 创建 `src/main/java/com/clinmind/runtime/ClinMindRuntimeApplication.java`
+- [x] 创建 `src/main/resources/application.yml`
+- [x] 创建 `src/test/java/com/clinmind/runtime/` 测试目录
 
 ## 2.2 Runtime 枚举
 
-- [ ] 创建 `state/RuntimeStatus.java`
-- [ ] 创建 `state/WorkMode.java`
-- [ ] 创建 `state/RuntimeMode.java`
-- [ ] 创建 `state/RiskLevel.java`
-- [ ] 创建 `state/CandidateStatus.java`，包含 `POSSIBLE_AFTER_EXCLUSION`
-- [ ] 创建 `state/NextActionType.java`
-- [ ] 创建 `state/OutputLevel.java`
-- [ ] 编写枚举单元测试
+- [x] 创建 `state/RuntimeStatus.java`
+- [x] 创建 `state/WorkMode.java`
+- [x] 创建 `state/RuntimeMode.java`
+- [x] 创建 `state/RiskLevel.java`
+- [x] 创建 `state/CandidateStatus.java`，包含 `POSSIBLE_AFTER_EXCLUSION`
+- [x] 创建 `state/NextActionType.java`
+- [x] 创建 `state/OutputLevel.java`
+- [x] 编写枚举单元测试
 
 ## 2.3 RuntimeState
 
-- [ ] 创建 `state/RuntimeState.java`
-- [ ] 创建 `state/UserInput.java`
-- [ ] 创建 `state/EntryAssessmentResult.java`
-- [ ] 创建 `state/CaseFrame.java`
-- [ ] 创建 `state/KnowledgeContext.java`
-- [ ] 创建 `state/ExperienceContext.java`
-- [ ] 创建 `state/SafetyGateResult.java`
-- [ ] 创建 `state/DifferentialDiagnosisBoard.java`
-- [ ] 创建 `state/EvidenceGraph.java`
-- [ ] 创建 `state/QuestionTestPolicyResult.java`
-- [ ] 创建 `state/DecisionBoundaryResult.java`
-- [ ] 创建 `state/PatientOutput.java`
-- [ ] 创建 `state/ClinicianReport.java`
-- [ ] RuntimeState 包含 `inputHistory` 作为 Phase 1 Short-term Context 降级实现
-- [ ] 编写 RuntimeState 序列化 / 反序列化测试
+- [x] 创建 `state/RuntimeState.java`
+- [x] 创建 `state/UserInput.java`
+- [x] 创建 `state/EntryAssessmentResult.java`
+- [x] 创建 `state/CaseFrame.java`
+- [x] 创建 `state/KnowledgeContext.java`
+- [x] 创建 `state/ExperienceContext.java`
+- [x] 创建 `state/SafetyGateResult.java`
+- [x] 创建 `state/DifferentialDiagnosisBoard.java`
+- [x] 创建 `state/EvidenceGraph.java`
+- [x] 创建 `state/QuestionTestPolicyResult.java`
+- [x] 创建 `state/DecisionBoundaryResult.java`
+- [x] 创建 `state/PatientOutput.java`
+- [x] 创建 `state/ClinicianReport.java`
+- [x] RuntimeState 包含 `inputHistory` 作为 Phase 1 Short-term Context 降级实现
+- [x] 编写 RuntimeState 序列化 / 反序列化测试
 
 ## 2.4 RuntimeTrace 与 AOP Trace
 
-- [ ] 创建 `state/RuntimeTrace.java`
-- [ ] 创建 `trace/TraceStep.java`
-- [ ] 创建 `trace/RuntimeTraceAspect.java`
-- [ ] AOP Trace 支持记录 moduleName
-- [ ] AOP Trace 支持记录 runtimeId
-- [ ] AOP Trace 支持记录耗时
-- [ ] AOP Trace 支持记录异常信息
-- [ ] 编写 RuntimeTrace 单元测试
-- [ ] 编写 TraceStep / RuntimeTraceAspect 基础测试
+- [x] 创建 `state/RuntimeTrace.java`
+- [x] 创建 `trace/TraceStep.java`
+- [x] 创建 `trace/RuntimeTraceAspect.java`
+- [x] AOP Trace 支持记录 moduleName
+- [x] AOP Trace 支持记录 runtimeId
+- [x] AOP Trace 支持记录耗时
+- [x] AOP Trace 支持记录异常信息
+- [x] 编写 RuntimeTrace 单元测试
+- [x] 编写 TraceStep / RuntimeTraceAspect 基础测试
 
 ## 2.5 RuntimeStore
 
-- [ ] 创建 `storage/RuntimeStore.java`
-- [ ] 实现内存版 RuntimeStore
-- [ ] 实现 `create(RuntimeState state)`
-- [ ] 实现 `get(String runtimeId)`
-- [ ] 实现 `update(RuntimeState state)`
-- [ ] 实现 `exists(String runtimeId)`
-- [ ] 定义 runtime 不存在时的异常或错误返回
-- [ ] 编写 RuntimeStore 单元测试
+- [x] 创建 `storage/RuntimeStore.java`
+- [x] 实现内存版 RuntimeStore
+- [x] 实现 `create(RuntimeState state)`
+- [x] 实现 `get(String runtimeId)`
+- [x] 实现 `update(RuntimeState state)`
+- [x] 实现 `exists(String runtimeId)`
+- [x] 定义 runtime 不存在时的异常或错误返回
+- [x] 编写 RuntimeStore 单元测试
 
 ## 2.6 MVP-P0-A 验收
 
-- [ ] Spring Boot 工程能启动
-- [ ] 所有核心模型能正常编译
-- [ ] RuntimeState 能创建默认对象
-- [ ] RuntimeState 能 JSON 序列化和反序列化
-- [ ] RuntimeTrace 能创建并保存关键字段
-- [ ] RuntimeStore 能完成 create / get / update / exists
-- [ ] AOP Trace 基础能力可运行
-- [ ] 运行测试通过
+- [x] Spring Boot 工程能启动
+- [x] 所有核心模型能正常编译
+- [x] RuntimeState 能创建默认对象
+- [x] RuntimeState 能 JSON 序列化和反序列化
+- [x] RuntimeTrace 能创建并保存关键字段
+- [x] RuntimeStore 能完成 create / get / update / exists
+- [x] AOP Trace 基础能力可运行
+- [x] 运行测试通过
 
 ---
 
@@ -112,46 +112,46 @@
 
 ## 3.1 Runtime API 基础
 
-- [ ] 创建 `api/RuntimeController.java`
-- [ ] 创建统一响应对象 `ApiResponse`
-- [ ] 实现 `POST /api/v1/runtime/start`
-- [ ] 实现 `POST /api/v1/runtime/continue`
-- [ ] 实现 `GET /api/v1/runtime/{runtime_id}/status`
-- [ ] 实现 `GET /api/v1/runtime/{runtime_id}/result`
-- [ ] 实现 `GET /api/v1/runtime/{runtime_id}/trace`
-- [ ] 统一使用 `runtime_id`，不要使用 `runtimeId`
-- [ ] 实现基础错误码
-- [ ] 编写 RuntimeController 测试
+- [x] 创建 `api/RuntimeController.java`
+- [x] 创建统一响应对象 `ApiResponse`
+- [x] 实现 `POST /api/v1/runtime/start`
+- [x] 实现 `POST /api/v1/runtime/continue`
+- [x] 实现 `GET /api/v1/runtime/{runtime_id}/status`
+- [x] 实现 `GET /api/v1/runtime/{runtime_id}/result`
+- [x] 实现 `GET /api/v1/runtime/{runtime_id}/trace`
+- [x] 统一使用 `runtime_id`，不要使用 `runtimeId`
+- [x] 实现基础错误码
+- [x] 编写 RuntimeController 测试
 
 ## 3.2 EntryAssessmentService
 
-- [ ] 创建 `entry/EntryAssessmentService.java`
-- [ ] 实现 `assessEntry(UserInput input, Map<String, Object> basicInfo)`
-- [ ] 支持 `WELLNESS_MODE`
-- [ ] 支持 `CLINICAL_MODE`
-- [ ] 支持 `EMERGENCY_HINT`
-- [ ] 支持 `UNSUPPORTED`
-- [ ] emergency_hint 不直接设置 `SAFETY_GATE_TRIGGERED`，只标记 workMode
-- [ ] 编写 EntryAssessmentService 单元测试
+- [x] 创建 `entry/EntryAssessmentService.java`
+- [x] 实现 `assessEntry(UserInput input, Map<String, Object> basicInfo)`
+- [x] 支持 `WELLNESS_MODE`
+- [x] 支持 `CLINICAL_MODE`
+- [x] 支持 `EMERGENCY_HINT`
+- [x] 支持 `UNSUPPORTED`
+- [x] emergency_hint 不直接设置 `SAFETY_GATE_TRIGGERED`，只标记 workMode
+- [x] 编写 EntryAssessmentService 单元测试
 
 ## 3.3 CaseFrameService
 
-- [ ] 创建 `caseframe/CaseFrameService.java`
-- [ ] 实现 `buildOrUpdateCaseFrame(...)`
-- [ ] 支持主诉提取
-- [ ] 支持基础症状提取
-- [ ] 支持 basicInfo 写入 patientProfile
-- [ ] 支持 missingSlots 生成
-- [ ] 编写 CaseFrameService 单元测试
+- [x] 创建 `caseframe/CaseFrameService.java`
+- [x] 实现 `buildOrUpdateCaseFrame(...)`
+- [x] 支持主诉提取
+- [x] 支持基础症状提取
+- [x] 支持 basicInfo 写入 patientProfile
+- [x] 支持 missingSlots 生成
+- [x] 编写 CaseFrameService 单元测试
 
 ## 3.4 MVP-P0-B 验收
 
-- [ ] start API 能创建 Runtime
-- [ ] continue API 能读取并更新 Runtime
-- [ ] EntryAssessment 结果能写入 RuntimeState
-- [ ] CaseFrame 能写入 RuntimeState
-- [ ] runtime_id 不存在时返回统一错误
-- [ ] API 基础测试通过
+- [x] start API 能创建 Runtime
+- [x] continue API 能读取并更新 Runtime
+- [x] EntryAssessment 结果能写入 RuntimeState
+- [x] CaseFrame 能写入 RuntimeState
+- [x] runtime_id 不存在时返回统一错误
+- [x] API 基础测试通过
 
 ---
 
@@ -368,3 +368,5 @@
 | 2026-06-25 | 调整为 Java Runtime Core | Phase 1 Runtime Core 改为 Java / Spring Boot，Python 作为后续可选 Provider |
 | 2026-06-25 | 完成 Python MVP-P0-A 原型 | `app/` 下已实现 Runtime 状态骨架原型，待迁移至 Java Runtime Core |
 | 2026-06-25 | 完成 Python MVP-P0-B 原型 | `app/` 下已实现 Runtime API、EntryAssessment 与 CaseFrame 原型，待迁移至 Java Runtime Core |
+| 2026-06-25 | 完成 Java MVP-P0-A | Spring Boot 状态骨架、RuntimeStore、AOP Trace 及 JUnit 测试 |
+| 2026-06-25 | 完成 Java MVP-P0-B | RuntimeController、EntryAssessmentService、CaseFrameService 及 API 测试 |
