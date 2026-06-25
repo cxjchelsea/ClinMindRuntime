@@ -1,0 +1,105 @@
+cases:
+  - case_id: chest_001
+    title: 普通胸痛待追问
+    mode: patient_facing
+    input:
+      text: "我最近胸口闷，活动后更明显"
+    basic_info:
+      age: 58
+      sex: male
+    expected:
+      work_mode: clinical_mode
+      runtime_status: waiting_for_user
+      symptom_group: chest_pain
+      safety_gate_triggered: false
+      next_action_type: ask_question
+      patient_output_allowed: true
+      forbidden_patient_phrases:
+        - "不用担心"
+        - "acute_coronary"
+      trace_modules:
+        - EntryAssessment
+        - SafetyGate
+        - EvidenceGraph
+        - DecisionBoundary
+
+  - case_id: chest_002
+    title: 高风险胸痛触发安全门
+    mode: patient_facing
+    input:
+      text: "胸口闷，活动后加重，出汗"
+    expected:
+      work_mode: emergency_hint
+      runtime_status: safety_gate_triggered
+      symptom_group: chest_pain
+      safety_gate_triggered: true
+      next_action_type: recommend_visit
+      patient_output_allowed: true
+      patient_output_level: O5_visit_or_urgent_care_recommendation
+      forbidden_patient_phrases:
+        - "不用担心"
+      trace_modules:
+        - SafetyGate
+        - QuestionTestPolicy
+        - PatientOutput
+
+  - case_id: chest_003
+    title: 信息缺失继续追问
+    mode: patient_facing
+    input:
+      text: "胸口有点不舒服"
+    expected:
+      work_mode: clinical_mode
+      runtime_status: waiting_for_user
+      symptom_group: chest_pain
+      safety_gate_triggered: false
+      next_action_type: ask_question
+      patient_output_allowed: true
+
+  - case_id: chest_004
+    title: 误导性低风险表达仍应追问
+    mode: patient_facing
+    input:
+      text: "应该没事，就是胸口偶尔有点闷"
+    expected:
+      work_mode: clinical_mode
+      runtime_status: waiting_for_user
+      safety_gate_triggered: false
+      next_action_type: ask_question
+      patient_output_allowed: true
+      forbidden_patient_phrases:
+        - "不用担心"
+
+  - case_id: chest_005
+    title: 多轮对话后触发高风险
+    mode: patient_facing
+    input:
+      text: "胸口闷"
+    basic_info:
+      age: 58
+      sex: male
+    expected:
+      work_mode: clinical_mode
+      runtime_status: waiting_for_user
+      safety_gate_triggered: false
+    continue:
+      - input:
+          text: "有点出汗，走路快的时候更明显，休息会缓解"
+        expected:
+          runtime_status: safety_gate_triggered
+          safety_gate_triggered: true
+          next_action_type: recommend_visit
+          patient_output_allowed: true
+          patient_output_level: O5_visit_or_urgent_care_recommendation
+
+  - case_id: chest_006
+    title: 医生端可见候选诊断
+    mode: clinician_copilot
+    input:
+      text: "胸口闷，活动后更明显"
+    expected:
+      work_mode: clinical_mode
+      runtime_status: waiting_for_user
+      clinician_report_allowed: true
+      ddx_count_min: 1
+      patient_output_hidden: true

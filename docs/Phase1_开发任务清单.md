@@ -321,34 +321,34 @@
 
 ## 7.1 测试病例
 
-- [ ] 创建 `src/test/resources/cases/chest-pain-cases.yml`
-- [ ] 创建 `src/test/resources/cases/fever-cases.yml`
-- [ ] 至少 5 个胸痛 / 胸闷病例
-- [ ] 至少 5 个发热病例
-- [ ] 至少包含普通病例
-- [ ] 至少包含高风险病例
-- [ ] 至少包含信息缺失病例
-- [ ] 至少包含误导表达病例
+- [x] 创建 `src/test/resources/cases/chest-pain-cases.yml`
+- [x] 创建 `src/test/resources/cases/fever-cases.yml`
+- [x] 至少 5 个胸痛 / 胸闷病例
+- [x] 至少 5 个发热病例
+- [x] 至少包含普通病例
+- [x] 至少包含高风险病例
+- [x] 至少包含信息缺失病例
+- [x] 至少包含误导表达病例
 
 ## 7.2 集成测试
 
-- [ ] 创建 `RuntimeFlowIntegrationTest`
-- [ ] 测试 start API 完整链路
-- [ ] 测试 continue API 完整链路
-- [ ] 测试高风险链路
-- [ ] 测试患者端 / 医生端输出分离
-- [ ] 测试 RuntimeTrace 记录
-- [ ] 测试静态规则替换不影响核心链路
+- [x] 创建 `RuntimeFlowIntegrationTest`
+- [x] 测试 start API 完整链路
+- [x] 测试 continue API 完整链路
+- [x] 测试高风险链路
+- [x] 测试患者端 / 医生端输出分离
+- [x] 测试 RuntimeTrace 记录
+- [x] 测试静态规则替换不影响核心链路
 
 ## 7.3 Phase 1 总体验收
 
-- [ ] 10–20 个测试病例可以跑通
-- [ ] 高风险病例不会输出低风险安抚
-- [ ] 信息缺失病例会继续追问
-- [ ] 医生端可以看到结构化候选和证据图
-- [ ] 患者端和医生端输出不同
-- [ ] RuntimeTrace 可以解释每一轮判断
-- [ ] 所有测试通过
+- [x] 10–20 个测试病例可以跑通
+- [x] 高风险病例不会输出低风险安抚
+- [x] 信息缺失病例会继续追问
+- [x] 医生端可以看到结构化候选和证据图
+- [x] 患者端和医生端输出不同
+- [x] RuntimeTrace 可以解释每一轮判断
+- [x] 所有测试通过
 
 ---
 
@@ -369,4 +369,5 @@
 | 2026-06-25 | 完成 Python MVP-P0-A 原型 | `app/` 下已实现 Runtime 状态骨架原型，待迁移至 Java Runtime Core |
 | 2026-06-25 | 完成 Python MVP-P0-B 原型 | `app/` 下已实现 Runtime API、EntryAssessment 与 CaseFrame 原型，待迁移至 Java Runtime Core |
 | 2026-06-25 | 完成 Java MVP-P0-A | Spring Boot 状态骨架、RuntimeStore、AOP Trace 及 JUnit 测试 |
-| 2026-06-25 | 完成 Java MVP-P0-B | RuntimeController、EntryAssessmentService、CaseFrameService 及 API 测试 |
+| 2026-06-25 | 完成 Java MVP-P0-E | DecisionBoundary、PatientOutput、ClinicianReport、FailurePolicy 及分角色 API |
+| 2026-06-25 | 完成 Java MVP-P0-F | 12 个 YAML 集成病例与 RuntimeFlowIntegrationTest，Phase 1 MVP 闭环验收通过 |
