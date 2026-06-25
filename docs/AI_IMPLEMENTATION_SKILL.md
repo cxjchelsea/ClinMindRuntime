@@ -2,13 +2,11 @@
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
 > 当前阶段只允许实现 Phase 1 Runtime MVP，不允许提前扩展到后续阶段。  
-> AI 在生成代码、修改代码、补测试、重构或更新任务清单时，必须遵守本文档。
+> Phase 1 Runtime Core 采用 Java / Spring Boot，Python 仅作为后续可选 AI Provider。
 
 ---
 
 # 一、当前项目阶段
-
-当前项目阶段：
 
 ```text
 Phase 1：Runtime MVP
@@ -20,7 +18,7 @@ Phase 1：Runtime MVP
 跑通一个最小受控诊断 Runtime。
 ```
 
-Phase 1 要证明的不是完整医学能力，而是以下工程闭环成立：
+Phase 1 要证明的工程闭环：
 
 ```text
 用户输入
@@ -47,37 +45,63 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 ```text
 1. docs/AI_IMPLEMENTATION_SKILL.md
 2. docs/Phase1_开发任务清单.md
-3. docs/Phase1_Runtime_MVP_实现规格.md
-4. docs/Phase1_数据结构与状态设计.md
-5. docs/Phase1_模块接口设计.md
-6. docs/Phase1_API与测试设计.md
-7. docs/ClinMindRuntime阶段拆分路线图.md
-8. docs/ClinMindRuntime完整系统设计.md
+3. docs/Phase1_技术栈与工程架构决策.md
+4. docs/Phase1_Runtime_MVP_实现规格.md
+5. docs/Phase1_数据结构与状态设计.md
+6. docs/Phase1_模块接口设计.md
+7. docs/Phase1_API与测试设计.md
+8. docs/ClinMindRuntime阶段拆分路线图.md
+9. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
 
 ```text
+Phase 1 技术栈决策优先于此前的 Python/FastAPI 草案。
 Phase 1 低层设计文档优先于总设计文档。
 总设计文档描述完整愿景，但不能作为提前实现 Phase 2–5 能力的理由。
-如果总设计和 Phase 1 文档看起来不一致，以 Phase 1 文档为准。
 任务清单用于跟踪实现进度，但不能覆盖设计文档的架构约束。
 ```
 
 ---
 
-# 三、当前允许实现的内容
-
-AI 当前只允许实现以下内容。
-
-## 3.1 Runtime 基础设施
+# 三、当前技术栈决策
 
 ```text
-Runtime API
+Runtime Core：Java 17+ / Spring Boot 3.x
+API：Spring Web
+Validation：Jakarta Validation
+Trace：Spring AOP + 自定义 @TraceStep
+Data Model：Java enum / record / class
+Config Assets：YAML / JSON
+Testing：JUnit 5 + AssertJ / Mockito
+Storage Phase 1：In-memory RuntimeStore
+Python：后续可选 AI Provider，不作为 Runtime 主工程
+```
+
+AI 框架边界：
+
+```text
+Spring AI / LangChain4j / LangChain / LangGraph 只能作为后续 Provider / Adapter。
+它们不能成为 Runtime 主控。
+RuntimeState、SafetyGate、EvidenceGraph、DecisionBoundary 必须由 ClinMindRuntime 自己控制。
+```
+
+---
+
+# 四、当前允许实现的内容
+
+## 4.1 Runtime 基础设施
+
+```text
+Spring Boot 工程骨架
+RuntimeController
 RuntimeStatus
 RuntimeState
 RuntimeTrace
 RuntimeStore
+@TraceStep
+RuntimeTraceAspect
 Short-term Context 降级实现
 ```
 
@@ -85,50 +109,40 @@ Short-term Context 降级实现
 
 ```text
 Phase 1 暂不单独实现 Redis 级别 ShortTermContextStore。
-短期上下文由 RuntimeState.input_history 承担。
+短期上下文由 RuntimeState.inputHistory 承担。
 ```
 
-## 3.2 Runtime 执行链路
+## 4.2 Runtime 执行链路
 
 ```text
-EntryAssessment
-CaseFrame
+EntryAssessmentService
+CaseFrameService
 StaticRuleProvider
-Knowledge Context
-Experience Context 空实现 / mock 实现
-SafetyGate
-Differential Diagnosis Board
-EvidenceGraph
-Question / Test Policy
-DecisionBoundary
-Patient Output
-Clinician Report
-FailurePolicy
+KnowledgeContextService
+ExperienceContextService 空实现 / mock 实现
+SafetyGateService
+DifferentialDiagnosisBoardService
+EvidenceGraphService
+QuestionTestPolicyService
+DecisionBoundaryService
+PatientOutputService
+ClinicianReportService
+FailurePolicyService
 ```
 
-## 3.3 最小静态资产
+## 4.3 最小静态资产
 
 ```text
-assets/symptom_groups/chest_pain.yml
-assets/symptom_groups/fever.yml
-assets/red_flag_rules.yml
-assets/test_recommendation_rules.yml
-assets/capability_profiles.yml
-```
-
-## 3.4 最小测试集
-
-```text
-tests/cases/chest_pain_cases.yml
-tests/cases/fever_cases.yml
-tests/test_runtime_flow.py
+src/main/resources/assets/symptom-groups/chest-pain.yml
+src/main/resources/assets/symptom-groups/fever.yml
+src/main/resources/assets/red-flag-rules.yml
+src/main/resources/assets/test-recommendation-rules.yml
+src/main/resources/assets/capability-profiles.yml
 ```
 
 ---
 
-# 四、当前禁止实现的内容
-
-AI 不允许在 Phase 1 中实现以下内容。
+# 五、当前禁止实现的内容
 
 ```text
 1. 不做完整 RAG Evidence Library。
@@ -147,9 +161,11 @@ AI 不允许在 Phase 1 中实现以下内容。
 14. 不输出处方建议。
 15. 不输出治疗方案自动生成。
 16. 不承诺临床有效性。
+17. 不引入 Spring Cloud、Nacos、消息队列或复杂微服务。
+18. 不让 LangChain / LangGraph / Spring AI / LangChain4j 取代 Runtime 主控。
 ```
 
-如果用户或任务中出现上述需求，AI 必须回复：
+如果任务中出现上述需求，AI 必须回复：
 
 ```text
 该能力属于后续 Phase，不属于当前 Phase 1 Runtime MVP。本次只保留接口或 mock，不实现真实能力。
@@ -157,49 +173,51 @@ AI 不允许在 Phase 1 中实现以下内容。
 
 ---
 
-# 五、实现顺序
+# 六、实现顺序
 
 AI 必须按以下顺序推进，不要跳到后续模块。
 
 ```text
 MVP-P0-A：Runtime 状态骨架
-  1. RuntimeStatus
-  2. RuntimeState
-  3. RuntimeTrace
-  4. RuntimeStore
+  1. Spring Boot 工程基础结构
+  2. RuntimeStatus / WorkMode / RuntimeMode 等枚举
+  3. RuntimeState
+  4. RuntimeTrace
+  5. RuntimeStore 内存版
+  6. @TraceStep 与 RuntimeTraceAspect 基础能力
 
 MVP-P0-B：病例结构化与入口判断
-  5. Runtime API start / continue / status / trace
-  6. EntryAssessment
-  7. CaseFrame
+  7. RuntimeController start / continue / status / result / trace
+  8. EntryAssessmentService
+  9. CaseFrameService
 
 MVP-P0-C：安全门和候选诊断
-  8. StaticRuleProvider
-  9. Knowledge Context
-  10. Experience Context 空实现 / mock 实现
-  11. SafetyGate
-  12. Differential Diagnosis Board
+  10. StaticRuleProvider
+  11. KnowledgeContextService
+  12. ExperienceContextService 空实现 / mock 实现
+  13. SafetyGateService
+  14. DifferentialDiagnosisBoardService
 
 MVP-P0-D：证据图与下一步动作
-  13. EvidenceGraph
-  14. Question / Test Policy
+  15. EvidenceGraphService
+  16. QuestionTestPolicyService
 
 MVP-P0-E：输出边界与分角色表达
-  15. DecisionBoundary
-  16. Patient Output
-  17. Clinician Report
-  18. FailurePolicy
+  17. DecisionBoundaryService
+  18. PatientOutputService
+  19. ClinicianReportService
+  20. FailurePolicyService
 
 MVP-P0-F：最小测试集
-  19. 测试病例
-  20. Runtime 集成测试
+  21. 测试病例 YAML
+  22. Runtime 集成测试
 ```
 
 每次实现任务只能覆盖一个小阶段，不能一次性生成整个系统。
 
 ---
 
-# 六、任务清单同步规则
+# 七、任务清单同步规则
 
 AI 每次实现、修改或测试 Phase 1 代码后，必须同步更新：
 
@@ -207,9 +225,7 @@ AI 每次实现、修改或测试 Phase 1 代码后，必须同步更新：
 docs/Phase1_开发任务清单.md
 ```
 
-## 6.1 实现前
-
-在开始编码前，AI 必须：
+实现前：
 
 ```text
 1. 读取 docs/Phase1_开发任务清单.md。
@@ -218,32 +234,20 @@ docs/Phase1_开发任务清单.md
 4. 如果任务不在清单中，先在对应阶段补充任务项，不要直接实现。
 ```
 
-## 6.2 实现后
-
-完成代码和测试后，AI 必须：
+实现后：
 
 ```text
 1. 将已完成任务从 [/] 改为 [x]。
 2. 如果任务部分完成，保持 [/]，并补充备注或问题记录。
-3. 如果任务被阻塞，将状态改为 [!]，并在“问题记录”中说明原因。
+3. 如果任务被阻塞，将状态改为 [!]，并在问题记录中说明原因。
 4. 如果实现过程中新增了必要任务，补充到对应阶段。
-5. 如果修复了问题记录，应更新“处理结论”。
-```
-
-## 6.3 禁止行为
-
-```text
-1. 禁止不更新任务清单就声称任务完成。
-2. 禁止一次性勾选整个 MVP-P0 阶段。
-3. 禁止只改任务清单但不写代码或测试。
-4. 禁止把 Phase 2–5 的任务加入 Phase 1 清单。
 ```
 
 ---
 
-# 七、架构约束
+# 八、架构约束
 
-## 7.1 RuntimeState 是唯一事实源
+## 8.1 RuntimeState 是唯一事实源
 
 ```text
 所有模块必须围绕 RuntimeState 读写。
@@ -251,9 +255,7 @@ docs/Phase1_开发任务清单.md
 不能让 LLM 输出直接影响下一轮判断，必须先写回结构化状态。
 ```
 
-## 7.2 模块必须通过结构化对象交互
-
-禁止用长 Prompt 隐式传递模块状态。
+## 8.2 模块必须通过结构化对象交互
 
 正确方式：
 
@@ -267,7 +269,7 @@ CaseFrame → KnowledgeContext → SafetyGateResult → DDxBoard → EvidenceGra
 把所有内容拼成 prompt，让 LLM 一次性决定风险、诊断、追问和输出。
 ```
 
-## 7.3 SafetyGate 是硬安全模块
+## 8.3 SafetyGate 是硬安全模块
 
 ```text
 SafetyGate 必须优先于候选诊断输出。
@@ -275,7 +277,7 @@ SafetyGate 命中高风险后，DecisionBoundary 必须收紧患者端输出。
 SafetyGate 失败时，必须进入 error_safe_halted 或保守输出。
 ```
 
-## 7.4 DecisionBoundary 必须控制输出
+## 8.4 DecisionBoundary 必须控制输出
 
 ```text
 Patient Output 和 Clinician Report 必须经过 DecisionBoundary。
@@ -283,14 +285,14 @@ Patient Output 和 Clinician Report 必须经过 DecisionBoundary。
 患者端不能输出确定诊断、处方和治疗方案。
 ```
 
-## 7.5 EvidenceGraph 是控制层，不只是解释层
+## 8.5 EvidenceGraph 是控制层，不只是解释层
 
 ```text
 EvidenceGraph 必须影响 Question / Test Policy。
 不能只把 EvidenceGraph 当作最终解释文本。
 ```
 
-## 7.6 RuntimeTrace 必须记录关键判断
+## 8.6 RuntimeTrace 必须记录关键判断
 
 每轮 Runtime 至少记录：
 
@@ -306,65 +308,43 @@ DecisionBoundary 结果
 输出摘要
 ```
 
----
-
-# 八、代码风格约束
-
-## 8.1 推荐技术栈
-
-Phase 1 推荐：
+## 8.7 AOP Trace 不能替代业务状态更新
 
 ```text
-Python
-FastAPI
-Pydantic
-pytest
-YAML / JSON 静态配置
-内存存储或 SQLite
-```
-
-## 8.2 推荐目录
-
-```text
-app/
-├── api/
-├── state/
-├── entry/
-├── case/
-├── knowledge/
-├── experience/
-├── safety/
-├── reasoning/
-├── boundary/
-├── output/
-└── storage/
-
-assets/
-├── symptom_groups/
-├── red_flag_rules.yml
-├── test_recommendation_rules.yml
-└── capability_profiles.yml
-
-tests/
-├── cases/
-└── test_runtime_flow.py
-```
-
-## 8.3 代码要求
-
-```text
-1. 使用清晰命名，不使用过度抽象。
-2. Pydantic schema 与文档字段保持一致。
-3. 每个模块尽量保持纯函数或低副作用。
-4. RuntimeStore 统一负责状态保存。
-5. 错误处理必须显式，不吞异常。
-6. 安全相关失败必须保守处理。
-7. 不提前引入复杂微服务、Nacos、消息队列或大型后台。
+Spring AOP 只负责横切追踪、耗时、异常和审计辅助。
+业务状态仍必须由模块显式写回 RuntimeState。
 ```
 
 ---
 
-# 九、API 约束
+# 九、推荐工程目录
+
+```text
+clinmind-runtime/
+├── pom.xml
+├── src/main/java/com/clinmind/runtime/
+│   ├── ClinMindRuntimeApplication.java
+│   ├── api/
+│   ├── state/
+│   ├── storage/
+│   ├── trace/
+│   ├── entry/
+│   ├── caseframe/
+│   ├── knowledge/
+│   ├── experience/
+│   ├── safety/
+│   ├── reasoning/
+│   ├── boundary/
+│   └── output/
+├── src/main/resources/
+│   ├── application.yml
+│   └── assets/
+└── src/test/java/com/clinmind/runtime/
+```
+
+---
+
+# 十、API 约束
 
 当前只实现以下 API：
 
@@ -387,20 +367,6 @@ GET  /api/v1/runtime/{runtime_id}/trace
 }
 ```
 
-错误响应：
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "RUNTIME_NOT_FOUND",
-    "message": "Runtime 不存在"
-  },
-  "trace_id": null
-}
-```
-
 路径变量统一使用：
 
 ```text
@@ -411,21 +377,22 @@ runtime_id
 
 ---
 
-# 十、测试约束
+# 十一、测试约束
 
-每实现一个模块，必须同时补充测试。
+每实现一个模块，必须同时补充 JUnit 测试。
 
 至少包含：
 
 ```text
-test_runtime_state.py
-test_entry_assessment.py
-test_case_frame.py
-test_safety_gate.py
-test_differential_board.py
-test_evidence_graph.py
-test_decision_boundary.py
-test_runtime_flow.py
+RuntimeStateTest
+RuntimeStoreTest
+EntryAssessmentServiceTest
+CaseFrameServiceTest
+SafetyGateServiceTest
+DifferentialDiagnosisBoardServiceTest
+EvidenceGraphServiceTest
+DecisionBoundaryServiceTest
+RuntimeFlowIntegrationTest
 ```
 
 Phase 1 最小验收测试必须覆盖：
@@ -443,104 +410,32 @@ Phase 1 最小验收测试必须覆盖：
 
 ---
 
-# 十一、AI 每次执行任务前的检查清单
-
-AI 在写代码前必须先确认：
+# 十二、AI 每次执行任务前的检查清单
 
 ```text
 1. 当前任务属于 Phase 1 吗？
 2. 当前任务属于 MVP-P0-A 到 MVP-P0-F 的哪一步？
-3. 是否读取了 Phase 1 对应设计文档？
-4. 是否读取并更新了 docs/Phase1_开发任务清单.md？
-5. 是否会误实现 Phase 2–5 的内容？
-6. 是否需要新增或更新测试？
+3. 是否读取了技术栈决策文档？
+4. 是否读取了 Phase 1 对应设计文档？
+5. 是否读取并更新了 docs/Phase1_开发任务清单.md？
+6. 是否会误实现 Phase 2–5 的内容？
+7. 是否需要新增或更新测试？
 ```
-
-如果当前任务不属于 Phase 1，AI 必须先说明边界，不应直接实现。
 
 ---
 
-# 十二、AI 每次提交代码后的检查清单
-
-AI 写完代码后必须检查：
+# 十三、AI 每次提交代码后的检查清单
 
 ```text
-1. 是否遵守 Phase 1 范围？
-2. 是否新增了不该出现的 RAG / KG / 经验记忆 / 平台后台？
-3. 是否所有患者端输出都经过 DecisionBoundary？
-4. SafetyGate 失败是否会保守处理？
-5. RuntimeTrace 是否记录关键判断？
-6. 是否补充了测试？
-7. 是否破坏了既有 API 或数据结构？
+1. 是否遵守 Java Spring Boot Runtime Core 技术路线？
+2. 是否遵守 Phase 1 范围？
+3. 是否新增了不该出现的 RAG / KG / 经验记忆 / 平台后台？
+4. 是否所有患者端输出都经过 DecisionBoundary？
+5. SafetyGate 失败是否会保守处理？
+6. RuntimeTrace 是否记录关键判断？
+7. 是否补充了 JUnit 测试？
 8. 是否同步更新了 docs/Phase1_开发任务清单.md？
 ```
-
----
-
-# 十三、常见错误与禁止行为
-
-## 13.1 禁止把项目写成普通问答系统
-
-错误：
-
-```text
-用户输入 → LLM → 回答
-```
-
-正确：
-
-```text
-用户输入 → RuntimeState → SafetyGate → EvidenceGraph → DecisionBoundary → 输出
-```
-
-## 13.2 禁止提前实现真实经验记忆
-
-Phase 1 只能：
-
-```text
-Experience Context 空实现 / mock 实现
-```
-
-不能实现：
-
-```text
-真实 Clinical Experience Memory
-真实审核
-随访结局
-Shadow Learning
-```
-
-## 13.3 禁止让高风险输出被自然语言淡化
-
-如果 SafetyGate 命中高风险，患者端不能输出：
-
-```text
-问题不大
-可以先观察
-不用担心
-可能只是小问题
-```
-
-必须输出：
-
-```text
-继续补充关键信息
-风险提示
-线下评估或就医建议
-```
-
-## 13.4 禁止医生端内容泄露到患者端
-
-医生端可以包含：
-
-```text
-DDx Board
-EvidenceGraph
-候选诊断状态
-推荐检查理由
-```
-
-患者端必须受 DecisionBoundary 控制。
 
 ---
 
@@ -555,13 +450,14 @@ MVP-P0-A：Runtime 状态骨架
 具体包括：
 
 ```text
-1. 创建 Python / FastAPI 工程基础结构
-2. 定义 RuntimeStatus 枚举
-3. 定义 RuntimeState Pydantic schema
-4. 定义 RuntimeTrace Pydantic schema
+1. 创建 Spring Boot 工程基础结构
+2. 定义 RuntimeStatus / WorkMode / RuntimeMode 等枚举
+3. 定义 RuntimeState Java 模型
+4. 定义 RuntimeTrace Java 模型
 5. 实现 RuntimeStore 内存版
-6. 编写基础单元测试
-7. 同步更新 docs/Phase1_开发任务清单.md
+6. 实现 @TraceStep 和 RuntimeTraceAspect 基础能力
+7. 编写 JUnit 基础测试
+8. 同步更新 docs/Phase1_开发任务清单.md
 ```
 
 不要在这个任务中实现 SafetyGate、RAG、KG、经验记忆或平台后台。
@@ -570,11 +466,11 @@ MVP-P0-A：Runtime 状态骨架
 
 # 十五、最终约束
 
-AI 必须始终记住：
-
 ```text
 当前不是在实现完整医疗 AI 平台。
 当前是在实现 Phase 1 Runtime MVP。
+当前 Runtime Core 采用 Java / Spring Boot。
+Python 和 AI 框架只作为后续 Provider。
 Phase 1 的目标是验证受控诊断 Runtime 架构，而不是追求医学知识覆盖全面。
 实现完成后必须同步更新 Phase1_开发任务清单。
 ```
