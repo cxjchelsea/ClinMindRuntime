@@ -1,8 +1,8 @@
 # Phase 1 API 与测试设计
 
 > 本文档是 Phase 1 Runtime MVP 的低层设计文档之一。  
-> 它负责定义 Runtime API 契约、统一响应格式、错误码、静态规则文件格式、测试病例格式和验收用例。  
-> 数据结构见 `Phase1_数据结构与状态设计.md`，模块接口见 `Phase1_模块接口设计.md`。
+> 它负责定义 Java Spring Boot Runtime Core 的 API 契约、统一响应格式、错误码、静态规则文件格式、测试病例格式和验收用例。  
+> 数据结构见 `Phase1_数据结构与状态设计.md`，模块接口见 `Phase1_模块接口设计.md`，技术栈见 `Phase1_技术栈与工程架构决策.md`。
 
 ---
 
@@ -14,13 +14,25 @@
 3. 所有输出必须经过 DecisionBoundary。
 4. 高风险或安全模块异常时，API 返回保守结果。
 5. Phase 1 先保证 API 可测试，不追求复杂权限体系。
+6. API 由 Spring Boot RuntimeController 承载。
 ```
 
 ---
 
 # 二、统一响应格式
 
-所有 API 响应采用统一结构：
+Java 侧建议定义：
+
+```java
+public record ApiResponse<T>(
+    boolean success,
+    T data,
+    ApiError error,
+    String traceId
+) {}
+```
+
+成功响应：
 
 ```json
 {
@@ -55,8 +67,8 @@
 | INVALID_MODE | 400 | mode 不合法 | 返回参数错误 |
 | RUNTIME_NOT_FOUND | 404 | runtime_id 不存在 | 返回错误 |
 | RUNTIME_STATE_CONFLICT | 409 | Runtime 状态冲突 | 返回状态冲突 |
-| SAFETY_GATE_FAILED | 500 | SafetyGate 执行失败 | 进入 error_safe_halted |
-| DECISION_BOUNDARY_FAILED | 500 | DecisionBoundary 执行失败 | 进入 error_safe_halted |
+| SAFETY_GATE_FAILED | 500 | SafetyGate 执行失败 | 进入 ERROR_SAFE_HALTED |
+| DECISION_BOUNDARY_FAILED | 500 | DecisionBoundary 执行失败 | 进入 ERROR_SAFE_HALTED |
 | KNOWLEDGE_CONTEXT_FAILED | 500 | Knowledge Context 构建失败 | 保守输出或中止 |
 | INTERNAL_ERROR | 500 | 未知系统错误 | 返回系统错误 |
 
@@ -70,13 +82,22 @@
 POST /api/v1/runtime/start
 ```
 
+### Java Controller 方法
+
+```java
+@PostMapping("/start")
+public ApiResponse<RuntimeResponse> startRuntime(@RequestBody StartRuntimeRequest request) {
+    // ...
+}
+```
+
 ### 请求
 
 ```json
 {
   "session_id": "s_001",
   "user_id": "u_001",
-  "mode": "patient_facing",
+  "mode": "PATIENT_FACING",
   "input": {
     "text": "我最近胸口闷，活动后更明显",
     "attachments": []
@@ -94,7 +115,7 @@ POST /api/v1/runtime/start
 |---|---|---|---|
 | session_id | string | 是 | 会话 ID |
 | user_id | string | 否 | 用户 ID，可为空 |
-| mode | string | 是 | patient_facing / clinician_copilot / debug |
+| mode | string | 是 | PATIENT_FACING / CLINICIAN_COPILOT / DEBUG |
 | input.text | string | 是 | 用户输入 |
 | input.attachments | list | 否 | Phase 1 可为空 |
 | basic_info | object | 否 | 年龄、性别等基础信息 |
@@ -106,11 +127,11 @@ POST /api/v1/runtime/start
   "success": true,
   "data": {
     "runtime_id": "rt_001",
-    "runtime_status": "waiting_for_user",
-    "work_mode": "clinical_mode",
-    "risk_level": "medium_high",
+    "runtime_status": "WAITING_FOR_USER",
+    "work_mode": "CLINICAL_MODE",
+    "risk_level": "MEDIUM_HIGH",
     "next_action": {
-      "type": "ask_question",
+      "type": "ASK_QUESTION",
       "content": "为了判断风险，需要补充几个关键问题。",
       "purpose": "collect_key_evidence",
       "priority": "high"
@@ -118,7 +139,7 @@ POST /api/v1/runtime/start
     "patient_output": {
       "allowed": true,
       "content": "你描述的是明确症状，需要先补充关键信息来判断风险。",
-      "output_level": "O1_continue_questioning"
+      "output_level": "O1_CONTINUE_QUESTIONING"
     },
     "clinician_report": null
   },
@@ -133,6 +154,15 @@ POST /api/v1/runtime/start
 
 ```text
 POST /api/v1/runtime/continue
+```
+
+### Java Controller 方法
+
+```java
+@PostMapping("/continue")
+public ApiResponse<RuntimeResponse> continueRuntime(@RequestBody ContinueRuntimeRequest request) {
+    // ...
+}
 ```
 
 ### 请求
@@ -153,18 +183,18 @@ POST /api/v1/runtime/continue
   "success": true,
   "data": {
     "runtime_id": "rt_001",
-    "runtime_status": "recommending_tests",
-    "risk_level": "high",
+    "runtime_status": "RECOMMENDING_TESTS",
+    "risk_level": "HIGH",
     "next_action": {
-      "type": "recommend_test",
-      "content": "建议尽快进行必要检查或就医评估。",
+      "type": "RECOMMEND_TEST",
+      "content": "建议尽快进行必要检查或线下评估。",
       "purpose": "rule_out_high_risk_diagnosis",
       "priority": "high"
     },
     "patient_output": {
       "allowed": true,
       "content": "根据你补充的信息，建议尽快进行线下评估。",
-      "output_level": "O5_visit_or_urgent_care_recommendation"
+      "output_level": "O5_VISIT_OR_URGENT_CARE_RECOMMENDATION"
     }
   },
   "error": null,
@@ -187,9 +217,9 @@ GET /api/v1/runtime/{runtime_id}/status
   "success": true,
   "data": {
     "runtime_id": "rt_001",
-    "runtime_status": "collecting_evidence",
-    "work_mode": "clinical_mode",
-    "risk_level": "high",
+    "runtime_status": "COLLECTING_EVIDENCE",
+    "work_mode": "CLINICAL_MODE",
+    "risk_level": "HIGH",
     "updated_at": "2026-06-25T10:03:00+09:00"
   },
   "error": null,
@@ -215,7 +245,7 @@ GET /api/v1/runtime/{runtime_id}/result
     "patient_output": {},
     "clinician_report": {},
     "decision_boundary": {},
-    "runtime_status": "completed"
+    "runtime_status": "COMPLETED"
   },
   "error": null,
   "trace_id": null
@@ -255,8 +285,8 @@ Phase 1 使用静态 YAML / JSON 规则，不做完整资产管理后台。
 路径示例：
 
 ```text
-assets/symptom_groups/chest_pain.yml
-assets/symptom_groups/fever.yml
+src/main/resources/assets/symptom-groups/chest-pain.yml
+src/main/resources/assets/symptom-groups/fever.yml
 ```
 
 格式：
@@ -265,10 +295,10 @@ assets/symptom_groups/fever.yml
 symptom_group: chest_pain
 common_diagnoses:
   - name: common_condition_a
-    risk_level: low
+    risk_level: LOW
 must_not_miss:
   - name: high_risk_condition_a
-    risk_level: high
+    risk_level: HIGH
 required_questions:
   - 是否伴随明显不适？
   - 是否有持续加重？
@@ -289,7 +319,7 @@ Phase 1 的规则文件只用于验证 Runtime 机制。
 路径：
 
 ```text
-assets/red_flag_rules.yml
+src/main/resources/assets/red-flag-rules.yml
 ```
 
 格式：
@@ -301,7 +331,7 @@ red_flag_rules:
     features:
       - activity_related
       - sweating
-    risk_level: high
+    risk_level: HIGH
     action: urgent_evaluation
     patient_constraint: no_low_risk_reassurance
 ```
@@ -311,7 +341,7 @@ red_flag_rules:
 路径：
 
 ```text
-assets/test_recommendation_rules.yml
+src/main/resources/assets/test-recommendation-rules.yml
 ```
 
 格式：
@@ -320,7 +350,7 @@ assets/test_recommendation_rules.yml
 test_recommendation_rules:
   - rule_id: test_001
     symptom_group: chest_pain
-    target_status: need_to_rule_out
+    target_status: NEED_TO_RULE_OUT
     recommended_tests:
       - 基础检查 A
     purpose: collect_missing_evidence
@@ -331,7 +361,7 @@ test_recommendation_rules:
 路径：
 
 ```text
-assets/capability_profiles.yml
+src/main/resources/assets/capability-profiles.yml
 ```
 
 格式：
@@ -341,12 +371,12 @@ capability_profiles:
   - symptom_group: chest_pain
     level: L2
     patient_allowed_outputs:
-      - O1_continue_questioning
-      - O2_risk_hint
-      - O5_visit_or_urgent_care_recommendation
+      - O1_CONTINUE_QUESTIONING
+      - O2_RISK_HINT
+      - O5_VISIT_OR_URGENT_CARE_RECOMMENDATION
     clinician_allowed_outputs:
-      - O3_clinician_candidate_diagnosis
-      - O7_clinician_full_report
+      - O3_CLINICIAN_CANDIDATE_DIAGNOSIS
+      - O7_CLINICIAN_FULL_REPORT
 ```
 
 ---
@@ -356,8 +386,8 @@ capability_profiles:
 测试病例建议存放在：
 
 ```text
-tests/cases/chest_pain_cases.yml
-tests/cases/fever_cases.yml
+src/test/resources/cases/chest-pain-cases.yml
+src/test/resources/cases/fever-cases.yml
 ```
 
 格式：
@@ -365,41 +395,25 @@ tests/cases/fever_cases.yml
 ```yaml
 - case_id: chest_001
   title: 高风险症状输入
-  mode: patient_facing
+  mode: PATIENT_FACING
   input:
     text: "用户描述存在明显不适，并伴随高风险特征"
   basic_info:
     age: 58
     sex: male
   expected:
-    work_mode: clinical_mode
+    work_mode: CLINICAL_MODE
     safety_gate_triggered: true
-    risk_level: high
+    risk_level: HIGH
     patient_diagnosis_label_allowed: false
     expected_next_action_types:
-      - ask_question
-      - recommend_test
-      - recommend_visit
+      - ASK_QUESTION
+      - RECOMMEND_TEST
+      - RECOMMEND_VISIT
     forbidden_patient_outputs:
       - low_risk_reassurance
       - definitive_diagnosis
 ```
-
-字段说明：
-
-| 字段 | 含义 |
-|---|---|
-| case_id | 测试病例 ID |
-| title | 测试病例名称 |
-| mode | 运行模式 |
-| input.text | 用户输入 |
-| basic_info | 基础信息 |
-| expected.work_mode | 预期工作态 |
-| expected.safety_gate_triggered | 是否应触发安全门 |
-| expected.risk_level | 预期风险等级 |
-| expected.patient_diagnosis_label_allowed | 患者端是否允许诊断标签 |
-| expected_next_action_types | 允许的下一步动作类型 |
-| forbidden_patient_outputs | 禁止出现的患者端输出类型 |
 
 ---
 
@@ -414,7 +428,7 @@ Phase 1 至少准备 10–20 个测试病例。
 高风险输入
 信息缺失输入
 误导表达输入
-焦虑或情绪化表达输入
+情绪化表达输入
 非典型表达输入
 ```
 
@@ -440,92 +454,41 @@ RuntimeTrace 是否记录关键判断
 
 ---
 
-# 八、验收用例示例
+# 八、JUnit 测试建议
 
-## 8.1 Case A：信息缺失输入
-
-输入：
+## 8.1 单元测试
 
 ```text
-我今天有点不舒服。
+RuntimeStateTest
+RuntimeStoreTest
+EntryAssessmentServiceTest
+CaseFrameServiceTest
+StaticRuleProviderTest
+KnowledgeContextServiceTest
+SafetyGateServiceTest
+DifferentialDiagnosisBoardServiceTest
+EvidenceGraphServiceTest
+QuestionTestPolicyServiceTest
+DecisionBoundaryServiceTest
 ```
 
-预期：
+## 8.2 集成测试
 
 ```text
-进入 clinical_mode 或继续澄清。
-CaseFrame 标记 missing_slots。
-Question / Test Policy 生成追问。
-患者端不能输出诊断方向。
+RuntimeControllerTest
+RuntimeFlowIntegrationTest
+HighRiskFlowIntegrationTest
+PatientVsClinicianOutputTest
+RuntimeTraceAspectTest
 ```
 
-## 8.2 Case B：高风险输入
-
-输入：
-
-```text
-用户描述症状在活动后加重，并伴随明显不适。
-```
-
-预期：
-
-```text
-SafetyGate 触发。
-risk_level 为 high 或 medium_high。
-DecisionBoundary 禁止低风险安抚。
-PatientOutput 应提示尽快线下评估或继续补充关键问题。
-RuntimeTrace 记录命中规则。
-```
-
-## 8.3 Case C：医生端模式
-
-输入：
-
-```text
-医生端输入一个已经结构化的症状描述。
-```
-
-预期：
-
-```text
-ClinicianReport 允许展示 DDx Board 和 EvidenceGraph。
-PatientOutput 不应包含医生端完整内容。
-```
-
----
-
-# 九、自动化测试建议
-
-## 9.1 单元测试
-
-```text
-test_entry_assessment.py
-test_case_frame.py
-test_knowledge_context.py
-test_safety_gate.py
-test_differential_board.py
-test_evidence_graph.py
-test_question_test_policy.py
-test_decision_boundary.py
-```
-
-## 9.2 集成测试
-
-```text
-test_runtime_start_flow.py
-test_runtime_continue_flow.py
-test_high_risk_flow.py
-test_patient_vs_clinician_output.py
-test_runtime_trace.py
-```
-
-## 9.3 回归测试
+## 8.3 回归测试
 
 每次修改 SafetyGate、DecisionBoundary、EvidenceGraph 后，必须跑最小测试集。
 
 ---
 
-# 十、Phase 1 API 验收标准
+# 九、Phase 1 API 验收标准
 
 ```text
 1. start API 可以创建 Runtime 并返回 runtime_id。
@@ -540,7 +503,7 @@ test_runtime_trace.py
 
 ---
 
-# 十一、Phase 1 测试验收标准
+# 十、Phase 1 测试验收标准
 
 ```text
 1. 至少 10–20 个测试病例全部可以跑通。
@@ -549,12 +512,13 @@ test_runtime_trace.py
 4. 医生端可以看到结构化候选和证据图。
 5. 患者端和医生端输出不同。
 6. RuntimeTrace 可以解释每一轮为什么这样判断。
-7. 静态规则文件可以被替换，不需要改核心链路代码。
+7. AOP Trace 可以记录关键模块执行。
+8. 静态规则文件可以被替换，不需要改核心链路代码。
 ```
 
 ---
 
-# 十二、不合格表现
+# 十一、不合格表现
 
 ```text
 1. API 返回的是 LLM 直接回答，而不是 Runtime 结构化结果。
@@ -563,11 +527,12 @@ test_runtime_trace.py
 4. 患者端可以看到医生端完整候选诊断。
 5. 静态规则写死在业务逻辑里，无法替换。
 6. 测试病例只能人工观察，无法自动断言。
+7. LangChain / LangGraph / Spring AI / LangChain4j 取代了 Runtime 主控。
 ```
 
 ---
 
-# 十三、最终说明
+# 十二、最终说明
 
 Phase 1 的 API 与测试设计不是为了证明系统具备真实临床能力，而是为了证明受控诊断 Runtime 的工程闭环成立：
 
