@@ -1,7 +1,7 @@
 # Phase 1 Runtime MVP 实现规格
 
 > 本文档是 Phase 1 的总览入口。  
-> 它不再承载全部低层设计，而是定义 Phase 1 的目标、范围、核心闭环、模块清单、开发顺序和验收标准。  
+> 它不承载全部低层设计，而是定义 Phase 1 的目标、范围、核心闭环、模块清单、开发顺序和验收标准。  
 > 详细的数据结构、模块接口、API 契约和测试用例拆分到独立文档中。
 
 ---
@@ -26,11 +26,27 @@ Phase1_API与测试设计.md
 = Phase 1 的低层详细设计，直接指导开发实现
 ```
 
-因此，本文档的重点不是写尽所有字段和方法，而是确保 Phase 1 的实现边界清楚、开发顺序清楚、验收标准清楚。
+本文档的重点不是写尽所有字段和方法，而是确保 Phase 1 的实现边界清楚、开发顺序清楚、验收标准清楚。
 
 ---
 
-# 二、Phase 1 核心目标
+# 二、命名与范围说明
+
+为了避免和总设计文档中的 MVP 优先级混淆，本文档统一使用以下命名：
+
+```text
+Phase 0 / Phase 1 / Phase 2 ...
+= 项目迭代阶段
+
+MVP-P0 / MVP-P1 / MVP-P2
+= 某一阶段内部的任务优先级
+```
+
+因此，`Phase 1` 指项目第一阶段 Runtime MVP，不等同于总设计中可能出现的 `P1 第二阶段` 或任务优先级。
+
+---
+
+# 三、Phase 1 核心目标
 
 Phase 1 的目标不是实现完整医疗 AI 平台，也不是实现完整 RAG、知识图谱、训练后台、经验记忆或医生审核流程。
 
@@ -55,7 +71,7 @@ Phase 1 成功的标志是：
 
 ---
 
-# 三、Phase 1 核心闭环
+# 四、Phase 1 核心闭环
 
 Phase 1 必须跑通以下链路：
 
@@ -93,9 +109,9 @@ Phase 1 不是为了证明诊断覆盖面，而是证明这条 Runtime 链路成
 
 ---
 
-# 四、Phase 1 做什么
+# 五、Phase 1 做什么
 
-## 4.1 Runtime 基础设施
+## 5.1 Runtime 基础设施
 
 ```text
 Runtime API
@@ -103,10 +119,18 @@ RuntimeStatus
 RuntimeState
 RuntimeTrace
 RuntimeStore
-Short-term Context
+Short-term Context 降级实现
 ```
 
-## 4.2 Runtime 执行链路
+说明：
+
+```text
+Phase 1 暂不单独实现 Redis 级别 ShortTermContextStore，
+而是由 RuntimeState.input_history 承担最小短期上下文能力。
+后续如接入 Redis，再将其外拆为独立上下文存储。
+```
+
+## 5.2 Runtime 执行链路
 
 ```text
 EntryAssessment
@@ -123,7 +147,7 @@ Clinician Report
 FailurePolicy
 ```
 
-## 4.3 最小静态资产
+## 5.3 最小静态资产
 
 ```text
 胸痛 / 胸闷症状群静态规则
@@ -135,7 +159,7 @@ FailurePolicy
 静态 Capability Profile
 ```
 
-## 4.4 最小测试集
+## 5.4 最小测试集
 
 ```text
 10–20 个测试病例
@@ -145,7 +169,7 @@ FailurePolicy
 
 ---
 
-# 五、Phase 1 不做什么
+# 六、Phase 1 不做什么
 
 ```text
 不做完整 RAG Evidence Library
@@ -168,26 +192,25 @@ Phase 1 的医疗表达必须保持为原型系统和安全边界验证，不应
 
 ---
 
-# 六、Phase 1 合理降级策略
-
-为了快速验证 Runtime 架构，Phase 1 允许以下降级：
+# 七、Phase 1 合理降级策略
 
 | 模块 | Phase 1 实现方式 | 后续阶段升级 |
 |---|---|---|
 | Knowledge Context | 静态 JSON / YAML 规则 | Phase 2 接入 Clinical Pathway、KG-lite、RAG Evidence Library |
 | Experience Context | 空实现或 mock 经验 | Phase 2/4 接入 Clinical Experience Memory |
 | Capability Profile | 静态配置 | Phase 3 由 Evaluation Results 生成 |
+| Short-term Context | RuntimeState.input_history | 后续接入 Redis / 独立 ShortTermContextStore |
 | RuntimeStore | 内存 / JSON / SQLite | 后续升级为数据库持久化 |
 | 前端 | Swagger / Postman / 简单调试页面 | Phase 5 再做完整 Runtime Console |
 | LLM | 可选，仅辅助抽取或表达 | 后续再加强 Prompt、工具调用和评估 |
 
 ---
 
-# 七、详细设计文档入口
+# 八、详细设计文档入口
 
 Phase 1 的低层设计拆分为三份文档。
 
-## 7.1 数据结构与状态设计
+## 8.1 数据结构与状态设计
 
 文档：
 
@@ -213,7 +236,7 @@ PatientOutput / ClinicianReport 字段设计
 RuntimeTrace 字段设计
 ```
 
-## 7.2 模块接口设计
+## 8.2 模块接口设计
 
 文档：
 
@@ -234,7 +257,7 @@ docs/Phase1_模块接口设计.md
 RuntimeTrace 记录点
 ```
 
-## 7.3 API 与测试设计
+## 8.3 API 与测试设计
 
 文档：
 
@@ -257,7 +280,7 @@ Runtime API 请求响应契约
 
 ---
 
-# 八、推荐工程目录
+# 九、推荐工程目录
 
 Phase 1 建议先使用单体后端结构，避免一开始过度微服务化。
 
@@ -313,9 +336,7 @@ clinmind-runtime/
 
 ---
 
-# 九、开发顺序建议
-
-Phase 1 推荐按以下顺序实现：
+# 十、开发顺序建议
 
 ```text
 1. 定义 RuntimeStatus、RuntimeState、RuntimeTrace 数据结构
@@ -335,13 +356,9 @@ Phase 1 推荐按以下顺序实现：
 15. 跑通完整 Runtime 流程
 ```
 
-这个顺序的核心原则是：先让状态和主链路站起来，再逐步补推理、安全和输出。
-
 ---
 
-# 十、Phase 1 完成标准
-
-Phase 1 完成必须满足：
+# 十一、Phase 1 完成标准
 
 ```text
 1. 可以通过 API 创建和继续 Runtime。
@@ -363,9 +380,7 @@ Phase 1 完成必须满足：
 
 ---
 
-# 十一、Phase 1 不合格表现
-
-如果出现以下情况，说明 Phase 1 还没有真正完成：
+# 十二、Phase 1 不合格表现
 
 ```text
 1. 用户输入后直接生成自然语言回答，没有 RuntimeState。
@@ -380,7 +395,7 @@ Phase 1 完成必须满足：
 
 ---
 
-# 十二、Phase 1 与后续阶段关系
+# 十三、Phase 1 与后续阶段关系
 
 | Phase 1 模块 | 后续扩展方向 |
 |---|---|
@@ -395,7 +410,7 @@ Phase 1 开发时不能把规则和逻辑写死在业务函数里，应通过 Pr
 
 ---
 
-# 十三、Phase 1 最终目标总结
+# 十四、Phase 1 最终目标总结
 
 Phase 1 的最终目标不是证明系统医学能力很强，而是证明 ClinMindRuntime 的核心架构成立：
 
