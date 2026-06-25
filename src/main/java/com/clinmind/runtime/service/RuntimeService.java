@@ -8,11 +8,15 @@ import com.clinmind.runtime.entry.EntryAssessmentService;
 import com.clinmind.runtime.experience.ExperienceContextService;
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
 import com.clinmind.runtime.reasoning.DifferentialDiagnosisBoardService;
+import com.clinmind.runtime.reasoning.EvidenceGraphService;
+import com.clinmind.runtime.reasoning.QuestionTestPolicyService;
 import com.clinmind.runtime.safety.SafetyGateService;
 import com.clinmind.runtime.state.DDxCandidate;
 import com.clinmind.runtime.state.EntryAssessmentResult;
+import com.clinmind.runtime.state.EvidenceGraph;
 import com.clinmind.runtime.state.ExperienceContext;
 import com.clinmind.runtime.state.KnowledgeContext;
+import com.clinmind.runtime.state.QuestionTestPolicyResult;
 import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.RuntimeStatus;
 import com.clinmind.runtime.state.RuntimeTrace;
@@ -35,6 +39,8 @@ public class RuntimeService {
     private final ExperienceContextService experienceContextService;
     private final SafetyGateService safetyGateService;
     private final DifferentialDiagnosisBoardService differentialDiagnosisBoardService;
+    private final EvidenceGraphService evidenceGraphService;
+    private final QuestionTestPolicyService questionTestPolicyService;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -43,7 +49,9 @@ public class RuntimeService {
             KnowledgeContextService knowledgeContextService,
             ExperienceContextService experienceContextService,
             SafetyGateService safetyGateService,
-            DifferentialDiagnosisBoardService differentialDiagnosisBoardService) {
+            DifferentialDiagnosisBoardService differentialDiagnosisBoardService,
+            EvidenceGraphService evidenceGraphService,
+            QuestionTestPolicyService questionTestPolicyService) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -51,6 +59,8 @@ public class RuntimeService {
         this.experienceContextService = experienceContextService;
         this.safetyGateService = safetyGateService;
         this.differentialDiagnosisBoardService = differentialDiagnosisBoardService;
+        this.evidenceGraphService = evidenceGraphService;
+        this.questionTestPolicyService = questionTestPolicyService;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -136,12 +146,26 @@ public class RuntimeService {
         }
 
         state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
+        state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));
+        state.setQuestionTestPolicy(questionTestPolicyService.decideNextAction(state));
+        state.setRuntimeStatus(resolveStatusAfterPolicy(state));
+    }
 
-        if (safetyGate.triggered()) {
-            state.setRuntimeStatus(RuntimeStatus.SAFETY_GATE_TRIGGERED);
-        } else {
-            state.setRuntimeStatus(RuntimeStatus.COLLECTING_EVIDENCE);
+    private RuntimeStatus resolveStatusAfterPolicy(RuntimeState state) {
+        SafetyGateResult safetyGate = state.getSafetyGate();
+        if (safetyGate != null && safetyGate.triggered()) {
+            return RuntimeStatus.SAFETY_GATE_TRIGGERED;
         }
+        QuestionTestPolicyResult policy = state.getQuestionTestPolicy();
+        if (policy == null || policy.nextAction() == null) {
+            return RuntimeStatus.COLLECTING_EVIDENCE;
+        }
+        return switch (policy.nextAction().type()) {
+            case RECOMMEND_TEST -> RuntimeStatus.RECOMMENDING_TESTS;
+            case ASK_QUESTION, WAIT_FOR_USER -> RuntimeStatus.WAITING_FOR_USER;
+            case RECOMMEND_VISIT -> RuntimeStatus.SAFETY_GATE_TRIGGERED;
+            default -> RuntimeStatus.COLLECTING_EVIDENCE;
+        };
     }
 
     private RuntimeStatus statusAfterEntry(WorkMode workMode) {
@@ -195,6 +219,24 @@ public class RuntimeService {
                         .map(Enum::name)
                         .toList());
                 trace.setDdxChange(ddxChange);
+            }
+
+            trace.recordModule("EvidenceGraph");
+            EvidenceGraph evidenceGraph = state.getEvidenceGraph();
+            if (evidenceGraph != null && !evidenceGraph.items().isEmpty()) {
+                Map<String, Object> evidenceChange = new LinkedHashMap<>();
+                evidenceChange.put("item_count", evidenceGraph.items().size());
+                evidenceChange.put("missing_evidence_count", evidenceGraph.items().stream()
+                        .mapToInt(item -> item.missingEvidence().size())
+                        .sum());
+                trace.setEvidenceGraphChange(evidenceChange);
+            }
+
+            trace.recordModule("QuestionTestPolicy");
+            QuestionTestPolicyResult policy = state.getQuestionTestPolicy();
+            if (policy != null && policy.nextAction() != null) {
+                outputSummary.put("next_action_type", policy.nextAction().type().getValue());
+                outputSummary.put("next_action_content", policy.nextAction().content());
             }
         }
         if (basicInfo != null) {

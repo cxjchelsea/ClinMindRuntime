@@ -17,6 +17,8 @@ import com.clinmind.runtime.state.RuntimeTrace;
 import com.clinmind.runtime.state.SafetyGateResult;
 import com.clinmind.runtime.state.SymptomItem;
 import com.clinmind.runtime.state.DifferentialDiagnosisBoard;
+import com.clinmind.runtime.state.EvidenceGraph;
+import com.clinmind.runtime.state.EvidenceGraphItem;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ public final class ApiResponseMapper {
         data.put("knowledge_context", toKnowledgeContextMap(state.getKnowledgeContext()));
         data.put("safety_gate", toSafetyGateMap(state.getSafetyGate()));
         data.put("differential_board", toDifferentialBoardMap(state.getDifferentialBoard()));
+        data.put("evidence_graph", toEvidenceGraphMap(state.getEvidenceGraph()));
         data.put("next_action", toNextActionMap(state.getQuestionTestPolicy()));
         data.put("patient_output", toPatientOutputMap(state.getPatientOutput()));
         data.put("clinician_report", toClinicianReportMap(state.getClinicianReport()));
@@ -191,6 +194,28 @@ public final class ApiResponseMapper {
         map.put("risk_level", candidate.riskLevel().getValue());
         map.put("reason", candidate.reason());
         map.put("patient_visible", candidate.patientVisible());
+        return map;
+    }
+
+    private static Map<String, Object> toEvidenceGraphMap(EvidenceGraph graph) {
+        if (graph == null || graph.items().isEmpty()) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("items", graph.items().stream().map(ApiResponseMapper::toEvidenceGraphItemMap).toList());
+        return map;
+    }
+
+    private static Map<String, Object> toEvidenceGraphItemMap(EvidenceGraphItem item) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("diagnosis", item.diagnosis());
+        map.put("supporting_evidence", item.supportingEvidence());
+        map.put("opposing_evidence", item.opposingEvidence());
+        map.put("missing_evidence", item.missingEvidence());
+        map.put("conflicting_evidence", item.conflictingEvidence());
+        map.put("status", item.status().getValue());
+        map.put("next_questions", item.nextQuestions());
+        map.put("recommended_tests", item.recommendedTests());
         return map;
     }
 

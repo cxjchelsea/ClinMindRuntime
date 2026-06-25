@@ -228,34 +228,34 @@
 
 ## 5.1 EvidenceGraphService
 
-- [ ] 创建 `reasoning/EvidenceGraphService.java`
-- [ ] 实现 `buildEvidenceGraph(...)`
-- [ ] 支持 supportingEvidence
-- [ ] 支持 opposingEvidence
-- [ ] 支持 missingEvidence
-- [ ] 支持 nextQuestions
-- [ ] 支持 recommendedTests
-- [ ] 使用 `@TraceStep("EvidenceGraph")`
-- [ ] 编写 EvidenceGraphService 单元测试
+- [x] 创建 `reasoning/EvidenceGraphService.java`
+- [x] 实现 `buildEvidenceGraph(...)`
+- [x] 支持 supportingEvidence
+- [x] 支持 opposingEvidence
+- [x] 支持 missingEvidence
+- [x] 支持 nextQuestions
+- [x] 支持 recommendedTests
+- [x] 使用 `@TraceStep("EvidenceGraph")`
+- [x] 编写 EvidenceGraphService 单元测试
 
 ## 5.2 QuestionTestPolicyService
 
-- [ ] 创建 `reasoning/QuestionTestPolicyService.java`
-- [ ] 实现 `decideNextAction(...)`
-- [ ] 高风险优先
-- [ ] 缺失证据优先
-- [ ] 支持 ASK_QUESTION
-- [ ] 支持 RECOMMEND_TEST
-- [ ] 支持 RECOMMEND_VISIT
-- [ ] 使用 `@TraceStep("QuestionTestPolicy")`
-- [ ] 编写 QuestionTestPolicyService 单元测试
+- [x] 创建 `reasoning/QuestionTestPolicyService.java`
+- [x] 实现 `decideNextAction(...)`
+- [x] 高风险优先
+- [x] 缺失证据优先
+- [x] 支持 ASK_QUESTION
+- [x] 支持 RECOMMEND_TEST
+- [x] 支持 RECOMMEND_VISIT
+- [x] 使用 `@TraceStep("QuestionTestPolicy")`
+- [x] 编写 QuestionTestPolicyService 单元测试
 
 ## 5.3 MVP-P0-D 验收
 
-- [ ] EvidenceGraph 不只是解释文本，而能影响下一步动作
-- [ ] 缺失证据能触发追问
-- [ ] 高风险候选能触发检查或就医评估建议
-- [ ] Question / Test Policy 输出结构化 NextAction
+- [x] EvidenceGraph 不只是解释文本，而能影响下一步动作
+- [x] 缺失证据能触发追问
+- [x] 高风险候选能触发检查或就医评估建议
+- [x] Question / Test Policy 输出结构化 NextAction
 
 ---
 
