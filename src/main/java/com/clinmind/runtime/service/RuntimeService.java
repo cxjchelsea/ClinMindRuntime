@@ -3,15 +3,21 @@ package com.clinmind.runtime.service;
 import com.clinmind.runtime.api.ContinueRuntimeRequest;
 import com.clinmind.runtime.api.StartRuntimeRequest;
 import com.clinmind.runtime.api.UserInputRequest;
+import com.clinmind.runtime.boundary.DecisionBoundaryService;
+import com.clinmind.runtime.boundary.FailurePolicyService;
 import com.clinmind.runtime.caseframe.CaseFrameService;
 import com.clinmind.runtime.entry.EntryAssessmentService;
 import com.clinmind.runtime.experience.ExperienceContextService;
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
+import com.clinmind.runtime.output.ClinicianReportService;
+import com.clinmind.runtime.output.PatientOutputService;
 import com.clinmind.runtime.reasoning.DifferentialDiagnosisBoardService;
 import com.clinmind.runtime.reasoning.EvidenceGraphService;
 import com.clinmind.runtime.reasoning.QuestionTestPolicyService;
 import com.clinmind.runtime.safety.SafetyGateService;
 import com.clinmind.runtime.state.DDxCandidate;
+import com.clinmind.runtime.state.DecisionBoundaryResult;
+import com.clinmind.runtime.state.PatientOutput;
 import com.clinmind.runtime.state.EntryAssessmentResult;
 import com.clinmind.runtime.state.EvidenceGraph;
 import com.clinmind.runtime.state.ExperienceContext;
@@ -41,6 +47,10 @@ public class RuntimeService {
     private final DifferentialDiagnosisBoardService differentialDiagnosisBoardService;
     private final EvidenceGraphService evidenceGraphService;
     private final QuestionTestPolicyService questionTestPolicyService;
+    private final DecisionBoundaryService decisionBoundaryService;
+    private final PatientOutputService patientOutputService;
+    private final ClinicianReportService clinicianReportService;
+    private final FailurePolicyService failurePolicyService;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -51,7 +61,11 @@ public class RuntimeService {
             SafetyGateService safetyGateService,
             DifferentialDiagnosisBoardService differentialDiagnosisBoardService,
             EvidenceGraphService evidenceGraphService,
-            QuestionTestPolicyService questionTestPolicyService) {
+            QuestionTestPolicyService questionTestPolicyService,
+            DecisionBoundaryService decisionBoundaryService,
+            PatientOutputService patientOutputService,
+            ClinicianReportService clinicianReportService,
+            FailurePolicyService failurePolicyService) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -61,6 +75,10 @@ public class RuntimeService {
         this.differentialDiagnosisBoardService = differentialDiagnosisBoardService;
         this.evidenceGraphService = evidenceGraphService;
         this.questionTestPolicyService = questionTestPolicyService;
+        this.decisionBoundaryService = decisionBoundaryService;
+        this.patientOutputService = patientOutputService;
+        this.clinicianReportService = clinicianReportService;
+        this.failurePolicyService = failurePolicyService;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -141,14 +159,28 @@ public class RuntimeService {
         state.setSafetyGate(safetyGate);
 
         if (safetyGate.failSafeRequired()) {
-            state.setRuntimeStatus(RuntimeStatus.ERROR_SAFE_HALTED);
+            failurePolicyService.handleFailure(
+                    "SafetyGate",
+                    new RuntimeException("safety gate failed"),
+                    state);
             return;
         }
 
         state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
         state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));
         state.setQuestionTestPolicy(questionTestPolicyService.decideNextAction(state));
+        runOutputPipeline(state);
         state.setRuntimeStatus(resolveStatusAfterPolicy(state));
+    }
+
+    private void runOutputPipeline(RuntimeState state) {
+        try {
+            state.setDecisionBoundary(decisionBoundaryService.decideOutputBoundary(state));
+            state.setPatientOutput(patientOutputService.buildPatientOutput(state));
+            state.setClinicianReport(clinicianReportService.buildClinicianReport(state));
+        } catch (Exception error) {
+            failurePolicyService.handleFailure("DecisionBoundary", error, state);
+        }
     }
 
     private RuntimeStatus resolveStatusAfterPolicy(RuntimeState state) {
@@ -237,6 +269,24 @@ public class RuntimeService {
             if (policy != null && policy.nextAction() != null) {
                 outputSummary.put("next_action_type", policy.nextAction().type().getValue());
                 outputSummary.put("next_action_content", policy.nextAction().content());
+            }
+
+            trace.recordModule("DecisionBoundary");
+            DecisionBoundaryResult boundary = state.getDecisionBoundary();
+            if (boundary != null) {
+                trace.setDecisionBoundaryResult(boundary);
+                outputSummary.put("allowed_output_level", boundary.allowedOutputLevel().getValue());
+            }
+
+            trace.recordModule("PatientOutput");
+            PatientOutput patientOutput = state.getPatientOutput();
+            if (patientOutput != null && patientOutput.allowed()) {
+                outputSummary.put("patient_output_level", patientOutput.outputLevel().getValue());
+            }
+
+            if (state.getClinicianReport() != null && state.getClinicianReport().allowed()) {
+                trace.recordModule("ClinicianReport");
+                outputSummary.put("clinician_report_allowed", true);
             }
         }
         if (basicInfo != null) {

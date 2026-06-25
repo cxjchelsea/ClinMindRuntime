@@ -1,5 +1,6 @@
 package com.clinmind.runtime.api;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,8 +45,9 @@ class RuntimeControllerTest {
                 .andExpect(jsonPath("$.data.case_frame.missing_slots[?(@=='age')]").isEmpty())
                 .andExpect(jsonPath("$.data.runtime_status").value("waiting_for_user"))
                 .andExpect(jsonPath("$.data.next_action.type").value("ask_question"))
-                .andExpect(jsonPath("$.data.knowledge_context.symptom_group").value("chest_pain"))
-                .andExpect(jsonPath("$.data.differential_board.candidates.length()").value(4));
+                .andExpect(jsonPath("$.data.patient_output.allowed").value(true))
+                .andExpect(jsonPath("$.data.patient_output.content").isNotEmpty())
+                .andExpect(jsonPath("$.data.knowledge_context.symptom_group").value("chest_pain"));
     }
 
     @Test
@@ -128,7 +130,27 @@ class RuntimeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.work_mode").value("emergency_hint"))
                 .andExpect(jsonPath("$.data.runtime_status").value("safety_gate_triggered"))
-                .andExpect(jsonPath("$.data.next_action.type").value("recommend_visit"));
+                .andExpect(jsonPath("$.data.next_action.type").value("recommend_visit"))
+                .andExpect(jsonPath("$.data.patient_output.allowed").value(true))
+                .andExpect(jsonPath("$.data.patient_output.content").value(containsString("风险信号")));
+    }
+
+    @Test
+    void clinicianModeReturnsReportWithoutPatientOutput() throws Exception {
+        mockMvc.perform(post("/api/v1/runtime/start")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "session_id": "s_001",
+                                  "mode": "clinician_copilot",
+                                  "input": {"text": "胸口闷，活动后更明显"}
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.patient_output").isEmpty())
+                .andExpect(jsonPath("$.data.clinician_report.allowed").value(true))
+                .andExpect(jsonPath("$.data.clinician_report.ddx_summary.length()").value(4))
+                .andExpect(jsonPath("$.data.differential_board.candidates.length()").value(4));
     }
 
     @Test

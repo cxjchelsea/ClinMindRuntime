@@ -265,53 +265,53 @@
 
 ## 6.1 DecisionBoundaryService
 
-- [ ] 创建 `boundary/DecisionBoundaryService.java`
-- [ ] 创建 `boundary/CapabilityProfileProvider.java`
-- [ ] 实现 `decideOutputBoundary(...)`
-- [ ] 读取静态 Capability Profile
-- [ ] 高风险未排除时禁止低风险安抚
-- [ ] 患者端默认不展示完整候选诊断
-- [ ] 医生端允许展示 DDx 和 EvidenceGraph
-- [ ] 使用 `@TraceStep("DecisionBoundary")`
-- [ ] 编写 DecisionBoundaryService 单元测试
+- [x] 创建 `boundary/DecisionBoundaryService.java`
+- [x] 创建 `boundary/CapabilityProfileProvider.java`
+- [x] 实现 `decideOutputBoundary(...)`
+- [x] 读取静态 Capability Profile
+- [x] 高风险未排除时禁止低风险安抚
+- [x] 患者端默认不展示完整候选诊断
+- [x] 医生端允许展示 DDx 和 EvidenceGraph
+- [x] 使用 `@TraceStep("DecisionBoundary")`
+- [x] 编写 DecisionBoundaryService 单元测试
 
 ## 6.2 PatientOutputService
 
-- [ ] 创建 `output/PatientOutputService.java`
-- [ ] 实现 `buildPatientOutput(...)`
-- [ ] 输出继续追问
-- [ ] 输出风险提示
-- [ ] 输出线下评估建议
-- [ ] 禁止确定诊断
-- [ ] 禁止处方建议
-- [ ] 编写 PatientOutputService 单元测试
+- [x] 创建 `output/PatientOutputService.java`
+- [x] 实现 `buildPatientOutput(...)`
+- [x] 输出继续追问
+- [x] 输出风险提示
+- [x] 输出线下评估建议
+- [x] 禁止确定诊断
+- [x] 禁止处方建议
+- [x] 编写 PatientOutputService 单元测试
 
 ## 6.3 ClinicianReportService
 
-- [ ] 创建 `output/ClinicianReportService.java`
-- [ ] 实现 `buildClinicianReport(...)`
-- [ ] 展示 CaseFrame Summary
-- [ ] 展示 SafetyGate Result
-- [ ] 展示 DDx Board
-- [ ] 展示 EvidenceGraph
-- [ ] 展示 Recommended Questions / Tests
-- [ ] 编写 ClinicianReportService 单元测试
+- [x] 创建 `output/ClinicianReportService.java`
+- [x] 实现 `buildClinicianReport(...)`
+- [x] 展示 CaseFrame Summary
+- [x] 展示 SafetyGate Result
+- [x] 展示 DDx Board
+- [x] 展示 EvidenceGraph
+- [x] 展示 Recommended Questions / Tests
+- [x] 编写 ClinicianReportService 单元测试
 
 ## 6.4 FailurePolicyService
 
-- [ ] 创建 `boundary/FailurePolicyService.java`
-- [ ] 实现安全模块失败时的保守输出
-- [ ] SafetyGate 失败时进入 `ERROR_SAFE_HALTED`
-- [ ] DecisionBoundary 失败时进入 `ERROR_SAFE_HALTED`
-- [ ] 编写 FailurePolicyService 单元测试
+- [x] 创建 `boundary/FailurePolicyService.java`
+- [x] 实现安全模块失败时的保守输出
+- [x] SafetyGate 失败时进入 `ERROR_SAFE_HALTED`
+- [x] DecisionBoundary 失败时进入 `ERROR_SAFE_HALTED`
+- [x] 编写 FailurePolicyService 单元测试
 
 ## 6.5 MVP-P0-E 验收
 
-- [ ] PatientOutput 和 ClinicianReport 明确分离
-- [ ] 所有患者端输出经过 DecisionBoundary
-- [ ] 高风险场景不会输出低风险安抚
-- [ ] 医生端可以看到候选和证据图
-- [ ] 患者端看不到医生端完整内容
+- [x] PatientOutput 和 ClinicianReport 明确分离
+- [x] 所有患者端输出经过 DecisionBoundary
+- [x] 高风险场景不会输出低风险安抚
+- [x] 医生端可以看到候选和证据图
+- [x] 患者端看不到医生端完整内容
 
 ---
 

@@ -12,6 +12,7 @@ import com.clinmind.runtime.state.PatientOutput;
 import com.clinmind.runtime.state.PatientProfile;
 import com.clinmind.runtime.state.QuestionTestPolicyResult;
 import com.clinmind.runtime.state.RedFlagRule;
+import com.clinmind.runtime.state.RuntimeMode;
 import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.RuntimeTrace;
 import com.clinmind.runtime.state.SafetyGateResult;
@@ -44,7 +45,19 @@ public final class ApiResponseMapper {
         data.put("next_action", toNextActionMap(state.getQuestionTestPolicy()));
         data.put("patient_output", toPatientOutputMap(state.getPatientOutput()));
         data.put("clinician_report", toClinicianReportMap(state.getClinicianReport()));
+        applyRoleBasedVisibility(data, state);
         return data;
+    }
+
+    private static void applyRoleBasedVisibility(Map<String, Object> data, RuntimeState state) {
+        RuntimeMode mode = state.getMode() == null ? RuntimeMode.PATIENT_FACING : state.getMode();
+        if (mode == RuntimeMode.PATIENT_FACING) {
+            data.put("clinician_report", null);
+            data.put("differential_board", null);
+            data.put("evidence_graph", null);
+        } else if (mode == RuntimeMode.CLINICIAN_COPILOT) {
+            data.put("patient_output", null);
+        }
     }
 
     public static Map<String, Object> toStatusResponse(RuntimeState state) {
@@ -254,6 +267,8 @@ public final class ApiResponseMapper {
         map.put("allowed", report.allowed());
         map.put("case_summary", report.caseSummary());
         map.put("safety_summary", report.safetySummary());
+        map.put("ddx_summary", report.ddxSummary().stream().map(ApiResponseMapper::toDdxCandidateMap).toList());
+        map.put("evidence_summary", toEvidenceGraphMap(report.evidenceSummary()));
         map.put("recommended_questions", report.recommendedQuestions());
         map.put("recommended_tests", report.recommendedTests());
         return map;
