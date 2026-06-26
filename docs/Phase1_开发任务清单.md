@@ -339,6 +339,10 @@
 - [x] 测试患者端 / 医生端输出分离
 - [x] 测试 RuntimeTrace 记录
 - [x] 测试静态规则替换不影响核心链路
+- [x] 测试 continue 轮次 Trace 不含 EntryAssessment
+- [x] 测试 WELLNESS_MODE 不进入临床管线
+- [x] 测试 DecisionBoundary fail-safe 进入 ERROR_SAFE_HALTED
+- [x] 测试患者端 API 不泄露诊断字段
 
 ## 7.3 Phase 1 总体验收
 
@@ -346,8 +350,10 @@
 - [x] 高风险病例不会输出低风险安抚
 - [x] 信息缺失病例会继续追问
 - [x] 医生端可以看到结构化候选和证据图
-- [x] 患者端和医生端输出不同
-- [x] RuntimeTrace 可以解释每一轮判断
+- [x] 患者端和医生端输出不同（含 knowledge_context / next_action 诊断字段隔离）
+- [x] RuntimeTrace 基于 AOP 实际执行模块，不再虚报未运行步骤
+- [x] 静态规则读取失败触发 fail-safe，不再 fail-open
+- [x] WELLNESS_MODE 保持 wellness 状态，不跑临床管线
 - [x] 所有测试通过
 
 ---
@@ -356,7 +362,10 @@
 
 | 编号 | 问题 | 影响模块 | 状态 | 处理结论 |
 |---|---|---|---|---|
-| Q1 | 暂无 | - | - | - |
+| Q1 | RuntimeStore Trace 并发追加非线程安全 | storage | 待 Phase 2 | Phase 1 单线程 MVP 可接受 |
+| Q2 | version 字段未用于乐观锁 | storage | 待 Phase 2 | 当前内存 Store 无并发写 |
+| Q3 | CaseFrame「胸痛」同时命中 chest_discomfort / chest_pain | caseframe | 待优化 | 不影响 P0 验收主路径 |
+| Q4 | StaticRuleProvider 未抽象为 MedicalKnowledgeProvider | knowledge | 待 Phase 2 | 已通过 @Primary 替换测试验证可替换性 |
 
 ---
 
@@ -371,3 +380,4 @@
 | 2026-06-25 | 完成 Java MVP-P0-A | Spring Boot 状态骨架、RuntimeStore、AOP Trace 及 JUnit 测试 |
 | 2026-06-25 | 完成 Java MVP-P0-E | DecisionBoundary、PatientOutput、ClinicianReport、FailurePolicy 及分角色 API |
 | 2026-06-25 | 完成 Java MVP-P0-F | 12 个 YAML 集成病例与 RuntimeFlowIntegrationTest，Phase 1 MVP 闭环验收通过 |
+| 2026-06-26 | Phase 1 验收漏洞修复 | 封堵患者端诊断泄漏；AOP Trace 与 /trace 合并；StaticRule fail-closed；WELLNESS_MODE 隔离；DecisionBoundary fail-safe → ERROR_SAFE_HALTED；补充替换规则与专项集成测试 |

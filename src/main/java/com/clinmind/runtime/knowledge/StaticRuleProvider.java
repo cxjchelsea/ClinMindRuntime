@@ -16,19 +16,23 @@ import org.yaml.snakeyaml.Yaml;
 @Component
 public class StaticRuleProvider {
 
-    private static final String ASSETS_PREFIX = "assets/";
-
+    private final String assetsPrefix;
     private final Yaml yaml = new Yaml();
+
+    public StaticRuleProvider() {
+        this("assets/");
+    }
+
+    public StaticRuleProvider(String assetsPrefix) {
+        this.assetsPrefix = assetsPrefix.endsWith("/") ? assetsPrefix : assetsPrefix + "/";
+    }
 
     public SymptomGroupRule loadSymptomGroupRules(String symptomGroup) {
         String path = resolveSymptomGroupPath(symptomGroup);
         if (path == null) {
             return null;
         }
-        Map<String, Object> root = loadYaml(path);
-        if (root == null) {
-            return null;
-        }
+        Map<String, Object> root = loadYamlRequired(path);
         return new SymptomGroupRule(
                 stringValue(root.get("symptom_group")),
                 parseDiagnosisRefs(root.get("common_diagnoses")),
@@ -38,10 +42,7 @@ public class StaticRuleProvider {
     }
 
     public List<RedFlagRule> loadRedFlagRules(String symptomGroup) {
-        Map<String, Object> root = loadYaml("red-flag-rules.yml");
-        if (root == null) {
-            return List.of();
-        }
+        Map<String, Object> root = loadYamlRequired("red-flag-rules.yml");
         List<Map<String, Object>> rules = mapList(root.get("red_flag_rules"));
         List<RedFlagRule> result = new ArrayList<>();
         for (Map<String, Object> item : rules) {
@@ -61,10 +62,7 @@ public class StaticRuleProvider {
     }
 
     public List<TestRecommendationRule> loadTestRecommendationRules(String symptomGroup) {
-        Map<String, Object> root = loadYaml("test-recommendation-rules.yml");
-        if (root == null) {
-            return List.of();
-        }
+        Map<String, Object> root = loadYamlRequired("test-recommendation-rules.yml");
         List<Map<String, Object>> rules = mapList(root.get("test_recommendation_rules"));
         List<TestRecommendationRule> result = new ArrayList<>();
         for (Map<String, Object> item : rules) {
@@ -83,10 +81,7 @@ public class StaticRuleProvider {
     }
 
     public CapabilityProfile loadCapabilityProfile(String symptomGroup) {
-        Map<String, Object> root = loadYaml("capability-profiles.yml");
-        if (root == null) {
-            return null;
-        }
+        Map<String, Object> root = loadYamlRequired("capability-profiles.yml");
         for (Map<String, Object> item : mapList(root.get("capability_profiles"))) {
             if (symptomGroup != null && symptomGroup.equals(stringValue(item.get("symptom_group")))) {
                 return new CapabilityProfile(
@@ -111,22 +106,24 @@ public class StaticRuleProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> loadYaml(String relativePath) {
-        try {
-            ClassPathResource resource = new ClassPathResource(ASSETS_PREFIX + relativePath);
-            if (!resource.exists()) {
-                return null;
-            }
-            try (InputStream inputStream = resource.getInputStream()) {
-                Object loaded = yaml.load(inputStream);
-                if (loaded instanceof Map<?, ?> map) {
-                    return (Map<String, Object>) map;
-                }
-            }
-        } catch (Exception ignored) {
-            return null;
+    private Map<String, Object> loadYamlRequired(String relativePath) {
+        ClassPathResource resource = new ClassPathResource(assetsPrefix + relativePath);
+        if (!resource.exists()) {
+            throw new StaticRuleLoadException("Rule asset not found: " + assetsPrefix + relativePath);
         }
-        return null;
+        try (InputStream inputStream = resource.getInputStream()) {
+            Object loaded = yaml.load(inputStream);
+            if (loaded instanceof Map<?, ?> map) {
+                return (Map<String, Object>) map;
+            }
+            throw new StaticRuleLoadException("Invalid rule asset format: " + assetsPrefix + relativePath);
+        } catch (StaticRuleLoadException error) {
+            throw error;
+        } catch (Exception error) {
+            throw new StaticRuleLoadException(
+                    "Failed to load rule asset: " + assetsPrefix + relativePath,
+                    error);
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -73,14 +73,54 @@ class RuntimeFlowIntegrationTest {
                         .content("""
                                 {
                                   "session_id": "s_static",
-                                  "mode": "patient_facing",
+                                  "mode": "clinician_copilot",
                                   "input": {"text": "胸口闷，活动后更明显"}
                                 }
                                 """))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.knowledge_context.source_assets")
                         .isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.patient_output.allowed").value(true));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.clinician_report.allowed").value(true));
+    }
+
+    @org.junit.jupiter.api.Test
+    void continueTraceDoesNotIncludeEntryAssessment() throws Exception {
+        MvcResult start = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/runtime/start")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "session_id": "s_trace",
+                                  "mode": "patient_facing",
+                                  "input": {"text": "胸口闷"},
+                                  "basic_info": {"age": 58, "sex": "male"}
+                                }
+                                """))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String runtimeId = readData(start).get("runtime_id").asText();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/runtime/continue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "runtime_id": "%s",
+                                  "input": {"text": "有点出汗，走路快的时候更明显"}
+                                }
+                                """.formatted(runtimeId)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        MvcResult traceResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/runtime/" + runtimeId + "/trace"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        JsonNode traces = OBJECT_MAPPER.readTree(traceResult.getResponse().getContentAsString())
+                .path("data")
+                .path("traces");
+        JsonNode continueModules = traces.get(1).path("modules_executed");
+        assertThat(continueModules.toString()).doesNotContain("EntryAssessment");
+        assertThat(continueModules.toString()).contains("CaseFrameBuilder");
+        assertThat(continueModules.toString()).contains("SafetyGate");
     }
 
     private String buildStartPayload(IntegrationCase testCase) throws Exception {
@@ -149,6 +189,10 @@ class RuntimeFlowIntegrationTest {
         if ("patient_facing".equals(mode)) {
             assertThat(data.path("clinician_report").isMissingNode() || data.path("clinician_report").isNull()).isTrue();
             assertThat(data.path("differential_board").isMissingNode() || data.path("differential_board").isNull()).isTrue();
+            assertThat(data.path("evidence_graph").isMissingNode() || data.path("evidence_graph").isNull()).isTrue();
+            assertThat(data.path("knowledge_context").path("common_diagnoses").isMissingNode()).isTrue();
+            assertThat(data.path("knowledge_context").path("must_not_miss").isMissingNode()).isTrue();
+            assertThat(data.path("next_action").path("target_diagnosis").isMissingNode()).isTrue();
         }
     }
 

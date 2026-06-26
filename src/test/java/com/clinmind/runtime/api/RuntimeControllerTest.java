@@ -47,7 +47,10 @@ class RuntimeControllerTest {
                 .andExpect(jsonPath("$.data.next_action.type").value("ask_question"))
                 .andExpect(jsonPath("$.data.patient_output.allowed").value(true))
                 .andExpect(jsonPath("$.data.patient_output.content").isNotEmpty())
-                .andExpect(jsonPath("$.data.knowledge_context.symptom_group").value("chest_pain"));
+                .andExpect(jsonPath("$.data.knowledge_context.symptom_group").value("chest_pain"))
+                .andExpect(jsonPath("$.data.knowledge_context.common_diagnoses").doesNotExist())
+                .andExpect(jsonPath("$.data.knowledge_context.must_not_miss").doesNotExist())
+                .andExpect(jsonPath("$.data.next_action.target_diagnosis").doesNotExist());
     }
 
     @Test

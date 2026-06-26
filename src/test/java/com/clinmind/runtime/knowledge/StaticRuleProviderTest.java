@@ -1,8 +1,7 @@
 package com.clinmind.runtime.knowledge;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import com.clinmind.runtime.state.CandidateStatus;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.clinmind.runtime.state.DiagnosisRef;
 import com.clinmind.runtime.state.RiskLevel;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,7 @@ class StaticRuleProviderTest {
 
     @Test
     void loadsChestPainSymptomGroupRules() {
-        SymptomGroupRule rule = staticRuleProvider.loadSymptomGroupRules("chest_pain");
+        var rule = staticRuleProvider.loadSymptomGroupRules("chest_pain");
 
         assertThat(rule).isNotNull();
         assertThat(rule.symptomGroup()).isEqualTo("chest_pain");
@@ -41,7 +40,7 @@ class StaticRuleProviderTest {
         TestRecommendationRule rule = staticRuleProvider.loadTestRecommendationRules("chest_pain").get(0);
 
         assertThat(rule.ruleId()).isEqualTo("test_001");
-        assertThat(rule.targetStatus()).isEqualTo(CandidateStatus.NEED_TO_RULE_OUT);
+        assertThat(rule.targetStatus().name()).isEqualTo("NEED_TO_RULE_OUT");
         assertThat(rule.recommendedTests()).contains("心电图");
     }
 
@@ -60,8 +59,22 @@ class StaticRuleProviderTest {
     }
 
     @Test
-    void parsesRiskLevels() {
-        assertThat(staticRuleProvider.loadRedFlagRules("chest_pain").get(0).riskLevel())
-                .isEqualTo(RiskLevel.HIGH);
+    void throwsWhenRequiredAssetMissing() {
+        StaticRuleProvider brokenProvider = new StaticRuleProvider("assets-missing/");
+
+        assertThatThrownBy(() -> brokenProvider.loadRedFlagRules("chest_pain"))
+                .isInstanceOf(StaticRuleLoadException.class);
+    }
+
+    @Test
+    void alternateAssetPrefixLoadsDifferentRules() {
+        StaticRuleProvider altProvider = new StaticRuleProvider("assets-alt/");
+
+        var rule = altProvider.loadSymptomGroupRules("chest_pain");
+
+        assertThat(rule.mustNotMiss()).hasSize(1);
+        assertThat(rule.commonDiagnoses()).hasSize(1);
+        assertThat(altProvider.loadRedFlagRules("chest_pain")).extracting("ruleId")
+                .containsExactly("rf_alt_001");
     }
 }

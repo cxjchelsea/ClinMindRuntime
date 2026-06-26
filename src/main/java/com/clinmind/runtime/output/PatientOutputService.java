@@ -10,11 +10,13 @@ import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.SafetyGateResult;
 import java.util.ArrayList;
 import java.util.List;
+import com.clinmind.runtime.trace.TraceStep;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PatientOutputService {
 
+    @TraceStep("PatientOutput")
     public PatientOutput buildPatientOutput(RuntimeState state) {
         DecisionBoundaryResult boundary = state.getDecisionBoundary();
         if (boundary == null) {

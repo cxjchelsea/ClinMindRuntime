@@ -1,0 +1,8 @@
+red_flag_rules:
+  - rule_id: rf_alt_001
+    symptom_group: chest_pain
+    features:
+      - sweating
+    risk_level: high
+    action: urgent_evaluation
+    patient_constraint: no_low_risk_reassurance

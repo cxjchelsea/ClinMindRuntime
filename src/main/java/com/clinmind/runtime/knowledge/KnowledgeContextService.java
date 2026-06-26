@@ -5,6 +5,7 @@ import com.clinmind.runtime.state.EntryAssessmentResult;
 import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.RedFlagRule;
 import com.clinmind.runtime.state.WorkMode;
+import com.clinmind.runtime.trace.TraceStep;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class KnowledgeContextService {
         this.staticRuleProvider = staticRuleProvider;
     }
 
+    @TraceStep("KnowledgeContext")
     public KnowledgeContext buildKnowledgeContext(CaseFrame caseFrame, EntryAssessmentResult entryAssessment) {
         if (entryAssessment == null || entryAssessment.workMode() == WorkMode.UNSUPPORTED) {
             return new KnowledgeContext();

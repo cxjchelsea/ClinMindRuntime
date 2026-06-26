@@ -25,6 +25,14 @@ public class RuntimeTraceCollector {
                 .toList();
     }
 
+    public List<TraceStepLog> drainStepsForRuntime(String runtimeId) {
+        List<TraceStepLog> matched = steps.stream()
+                .filter(step -> runtimeId != null && runtimeId.equals(step.runtimeId()))
+                .toList();
+        steps.removeIf(step -> runtimeId != null && runtimeId.equals(step.runtimeId()));
+        return matched;
+    }
+
     public void clear() {
         steps.clear();
     }

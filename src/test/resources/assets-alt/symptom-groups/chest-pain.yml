@@ -1,0 +1,11 @@
+symptom_group: chest_pain
+common_diagnoses:
+  - name: musculoskeletal_chest_pain
+    risk_level: low
+must_not_miss:
+  - name: acute_coronary_syndrome
+    risk_level: high
+required_questions:
+  - 是否活动后加重？
+recommended_tests:
+  - 心电图

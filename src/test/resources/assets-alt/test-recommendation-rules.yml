@@ -1,0 +1,7 @@
+test_recommendation_rules:
+  - rule_id: test_alt_001
+    symptom_group: chest_pain
+    target_status: need_to_rule_out
+    recommended_tests:
+      - 心电图
+    purpose: rule_out_high_risk_diagnosis

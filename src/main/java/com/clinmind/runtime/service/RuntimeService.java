@@ -9,19 +9,18 @@ import com.clinmind.runtime.caseframe.CaseFrameService;
 import com.clinmind.runtime.entry.EntryAssessmentService;
 import com.clinmind.runtime.experience.ExperienceContextService;
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
+import com.clinmind.runtime.knowledge.StaticRuleLoadException;
 import com.clinmind.runtime.output.ClinicianReportService;
 import com.clinmind.runtime.output.PatientOutputService;
 import com.clinmind.runtime.reasoning.DifferentialDiagnosisBoardService;
 import com.clinmind.runtime.reasoning.EvidenceGraphService;
 import com.clinmind.runtime.reasoning.QuestionTestPolicyService;
 import com.clinmind.runtime.safety.SafetyGateService;
-import com.clinmind.runtime.state.DDxCandidate;
 import com.clinmind.runtime.state.DecisionBoundaryResult;
-import com.clinmind.runtime.state.PatientOutput;
 import com.clinmind.runtime.state.EntryAssessmentResult;
-import com.clinmind.runtime.state.EvidenceGraph;
 import com.clinmind.runtime.state.ExperienceContext;
 import com.clinmind.runtime.state.KnowledgeContext;
+import com.clinmind.runtime.state.PatientOutput;
 import com.clinmind.runtime.state.QuestionTestPolicyResult;
 import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.RuntimeStatus;
@@ -30,6 +29,9 @@ import com.clinmind.runtime.state.SafetyGateResult;
 import com.clinmind.runtime.state.UserInput;
 import com.clinmind.runtime.state.WorkMode;
 import com.clinmind.runtime.storage.RuntimeStore;
+import com.clinmind.runtime.trace.RuntimeTraceCollector;
+import com.clinmind.runtime.trace.TraceContextHolder;
+import com.clinmind.runtime.trace.TraceStepLog;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ public class RuntimeService {
     private final PatientOutputService patientOutputService;
     private final ClinicianReportService clinicianReportService;
     private final FailurePolicyService failurePolicyService;
+    private final RuntimeTraceCollector traceCollector;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -65,7 +68,8 @@ public class RuntimeService {
             DecisionBoundaryService decisionBoundaryService,
             PatientOutputService patientOutputService,
             ClinicianReportService clinicianReportService,
-            FailurePolicyService failurePolicyService) {
+            FailurePolicyService failurePolicyService,
+            RuntimeTraceCollector traceCollector) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -79,6 +83,7 @@ public class RuntimeService {
         this.patientOutputService = patientOutputService;
         this.clinicianReportService = clinicianReportService;
         this.failurePolicyService = failurePolicyService;
+        this.traceCollector = traceCollector;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -90,24 +95,32 @@ public class RuntimeService {
         UserInput userInput = toUserInput(request.input());
         state.getInputHistory().add(userInput);
 
-        EntryAssessmentResult entry = entryAssessmentService.assessEntry(userInput, request.basicInfo());
-        state.setEntryAssessment(entry);
-        state.setWorkMode(entry.workMode());
-        state.setRuntimeStatus(statusAfterEntry(entry.workMode()));
+        TraceContextHolder.setRuntimeId(state.getRuntimeId());
+        try {
+            EntryAssessmentResult entry = entryAssessmentService.assessEntry(userInput, request.basicInfo());
+            state.setEntryAssessment(entry);
+            state.setWorkMode(entry.workMode());
+            state.setRuntimeStatus(statusAfterEntry(entry.workMode()));
 
-        if (entry.workMode() != WorkMode.UNSUPPORTED) {
-            state.setCaseFrame(caseFrameService.buildOrUpdateCaseFrame(
-                    userInput, state.getCaseFrame(), request.basicInfo()));
-            runClinicalPipeline(state);
+            if (entry.workMode() != WorkMode.UNSUPPORTED) {
+                state.setCaseFrame(caseFrameService.buildOrUpdateCaseFrame(
+                        userInput, state.getCaseFrame(), request.basicInfo()));
+                if (isClinicalWorkMode(entry.workMode())) {
+                    runClinicalPipeline(state);
+                }
+            }
+
+            RuntimeTrace trace = buildTrace(state, 1, userInput, request.basicInfo());
+            runtimeStore.create(state);
+            runtimeStore.addTrace(trace);
+            state.getRuntimeTraceIds().add(trace.getTraceId());
+            state.bumpVersion();
+            runtimeStore.update(state);
+            return new RuntimeExecutionResult(state, trace);
+        } finally {
+            traceCollector.drainStepsForRuntime(state.getRuntimeId());
+            TraceContextHolder.clear();
         }
-
-        RuntimeTrace trace = buildTrace(state, 1, userInput, request.basicInfo());
-        runtimeStore.create(state);
-        runtimeStore.addTrace(trace);
-        state.getRuntimeTraceIds().add(trace.getTraceId());
-        state.bumpVersion();
-        runtimeStore.update(state);
-        return new RuntimeExecutionResult(state, trace);
     }
 
     public RuntimeExecutionResult continueRuntime(ContinueRuntimeRequest request) {
@@ -115,23 +128,30 @@ public class RuntimeService {
         UserInput userInput = toUserInput(request.input());
         state.getInputHistory().add(userInput);
 
-        state.setCaseFrame(caseFrameService.buildOrUpdateCaseFrame(
-                userInput, state.getCaseFrame(), null));
+        TraceContextHolder.setRuntimeId(state.getRuntimeId());
+        try {
+            state.setCaseFrame(caseFrameService.buildOrUpdateCaseFrame(
+                    userInput, state.getCaseFrame(), null));
 
-        if (state.getWorkMode() != WorkMode.UNSUPPORTED && state.getWorkMode() != WorkMode.WELLNESS_MODE) {
-            runClinicalPipeline(state);
-        } else if (state.getRuntimeStatus() != RuntimeStatus.ERROR_SAFE_HALTED
-                && state.getRuntimeStatus() != RuntimeStatus.COMPLETED) {
-            state.setRuntimeStatus(RuntimeStatus.WAITING_FOR_USER);
+            if (isClinicalWorkMode(state.getWorkMode())) {
+                runClinicalPipeline(state);
+            } else if (state.getWorkMode() != WorkMode.UNSUPPORTED
+                    && state.getRuntimeStatus() != RuntimeStatus.ERROR_SAFE_HALTED
+                    && state.getRuntimeStatus() != RuntimeStatus.COMPLETED) {
+                state.setRuntimeStatus(RuntimeStatus.WAITING_FOR_USER);
+            }
+
+            int step = runtimeStore.getTraces(request.runtimeId()).size() + 1;
+            RuntimeTrace trace = buildTrace(state, step, userInput, null);
+            runtimeStore.addTrace(trace);
+            state.getRuntimeTraceIds().add(trace.getTraceId());
+            state.bumpVersion();
+            runtimeStore.update(state);
+            return new RuntimeExecutionResult(state, trace);
+        } finally {
+            traceCollector.drainStepsForRuntime(state.getRuntimeId());
+            TraceContextHolder.clear();
         }
-
-        int step = runtimeStore.getTraces(request.runtimeId()).size() + 1;
-        RuntimeTrace trace = buildTrace(state, step, userInput, null);
-        runtimeStore.addTrace(trace);
-        state.getRuntimeTraceIds().add(trace.getTraceId());
-        state.bumpVersion();
-        runtimeStore.update(state);
-        return new RuntimeExecutionResult(state, trace);
     }
 
     public RuntimeState getStatus(String runtimeId) {
@@ -147,40 +167,58 @@ public class RuntimeService {
     }
 
     private void runClinicalPipeline(RuntimeState state) {
-        KnowledgeContext knowledgeContext = knowledgeContextService.buildKnowledgeContext(
-                state.getCaseFrame(), state.getEntryAssessment());
-        state.setKnowledgeContext(knowledgeContext);
+        try {
+            KnowledgeContext knowledgeContext = knowledgeContextService.buildKnowledgeContext(
+                    state.getCaseFrame(), state.getEntryAssessment());
+            state.setKnowledgeContext(knowledgeContext);
 
-        ExperienceContext experienceContext = experienceContextService.buildExperienceContext(
-                state.getCaseFrame(), knowledgeContext);
-        state.setExperienceContext(experienceContext);
+            ExperienceContext experienceContext = experienceContextService.buildExperienceContext(
+                    state.getCaseFrame(), knowledgeContext);
+            state.setExperienceContext(experienceContext);
 
-        SafetyGateResult safetyGate = safetyGateService.evaluateSafety(state);
-        state.setSafetyGate(safetyGate);
+            SafetyGateResult safetyGate = safetyGateService.evaluateSafety(state);
+            state.setSafetyGate(safetyGate);
 
-        if (safetyGate.failSafeRequired()) {
-            failurePolicyService.handleFailure(
-                    "SafetyGate",
-                    new RuntimeException("safety gate failed"),
-                    state);
-            return;
+            if (safetyGate.failSafeRequired()) {
+                failurePolicyService.handleFailure(
+                        "SafetyGate",
+                        new RuntimeException("safety gate failed"),
+                        state);
+                return;
+            }
+
+            state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
+            state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));
+            state.setQuestionTestPolicy(questionTestPolicyService.decideNextAction(state));
+            runOutputPipeline(state);
+            if (state.getRuntimeStatus() != RuntimeStatus.ERROR_SAFE_HALTED) {
+                state.setRuntimeStatus(resolveStatusAfterPolicy(state));
+            }
+        } catch (StaticRuleLoadException error) {
+            failurePolicyService.handleFailure("StaticRuleProvider", error, state);
         }
-
-        state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
-        state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));
-        state.setQuestionTestPolicy(questionTestPolicyService.decideNextAction(state));
-        runOutputPipeline(state);
-        state.setRuntimeStatus(resolveStatusAfterPolicy(state));
     }
 
     private void runOutputPipeline(RuntimeState state) {
-        try {
-            state.setDecisionBoundary(decisionBoundaryService.decideOutputBoundary(state));
-            state.setPatientOutput(patientOutputService.buildPatientOutput(state));
-            state.setClinicianReport(clinicianReportService.buildClinicianReport(state));
-        } catch (Exception error) {
-            failurePolicyService.handleFailure("DecisionBoundary", error, state);
+        DecisionBoundaryResult boundary = decisionBoundaryService.decideOutputBoundary(state);
+        state.setDecisionBoundary(boundary);
+        if (isFailSafeBoundary(boundary)) {
+            failurePolicyService.handleFailure(
+                    "DecisionBoundary",
+                    new RuntimeException(boundary.reason()),
+                    state);
+            return;
         }
+        state.setPatientOutput(patientOutputService.buildPatientOutput(state));
+        state.setClinicianReport(clinicianReportService.buildClinicianReport(state));
+    }
+
+    private boolean isClinicalWorkMode(WorkMode workMode) {
+        return workMode == WorkMode.CLINICAL_MODE || workMode == WorkMode.EMERGENCY_HINT;
+    }
+
+    private boolean isFailSafeBoundary(DecisionBoundaryResult boundary) {
+        return boundary != null && boundary.constraints().contains("fail_safe");
     }
 
     private RuntimeStatus resolveStatusAfterPolicy(RuntimeState state) {
@@ -214,85 +252,69 @@ public class RuntimeService {
             UserInput userInput,
             Map<String, Object> basicInfo) {
         RuntimeTrace trace = RuntimeTrace.create(state.getRuntimeId(), step, userInput.text());
-        trace.recordModule("EntryAssessment");
+        List<TraceStepLog> executedSteps = traceCollector.drainStepsForRuntime(state.getRuntimeId());
+        for (TraceStepLog stepLog : executedSteps) {
+            if (stepLog.success()) {
+                trace.recordModule(stepLog.moduleName());
+            }
+        }
 
         Map<String, Object> outputSummary = new LinkedHashMap<>();
         if (state.getEntryAssessment() != null) {
             outputSummary.put("work_mode", state.getEntryAssessment().workMode().getValue());
             outputSummary.put("symptom_group", state.getEntryAssessment().symptomGroup());
         }
-        if (state.getWorkMode() != WorkMode.UNSUPPORTED && state.getWorkMode() != WorkMode.WELLNESS_MODE) {
-            trace.recordModule("CaseFrameBuilder");
+        if (trace.getModulesExecuted().contains("CaseFrameBuilder") && state.getCaseFrame() != null) {
             outputSummary.put("chief_complaint", state.getCaseFrame().chiefComplaint());
             outputSummary.put("missing_slots", state.getCaseFrame().missingSlots());
-
-            trace.recordModule("KnowledgeContext");
+        }
+        if (trace.getModulesExecuted().contains("KnowledgeContext")) {
             KnowledgeContext knowledge = state.getKnowledgeContext();
             if (knowledge != null) {
                 knowledge.sourceAssets().forEach(trace::recordKnowledge);
                 outputSummary.put("must_not_miss_count", knowledge.mustNotMiss().size());
             }
-
-            trace.recordModule("ExperienceContext");
-            trace.recordModule("SafetyGate");
+        }
+        if (trace.getModulesExecuted().contains("SafetyGate") && state.getSafetyGate() != null) {
             SafetyGateResult safetyGate = state.getSafetyGate();
-            if (safetyGate != null) {
-                trace.setSafetyGateResult(safetyGate);
-                outputSummary.put("safety_gate_triggered", safetyGate.triggered());
-            }
-
-            trace.recordModule("DifferentialDiagnosisBoard");
-            if (state.getDifferentialBoard() != null) {
-                Map<String, Object> ddxChange = new LinkedHashMap<>();
-                ddxChange.put("candidate_count", state.getDifferentialBoard().candidates().size());
-                ddxChange.put("updated_reason", state.getDifferentialBoard().updatedReason());
-                ddxChange.put("statuses", state.getDifferentialBoard().candidates().stream()
-                        .map(DDxCandidate::status)
-                        .map(Enum::name)
-                        .toList());
-                trace.setDdxChange(ddxChange);
-            }
-
-            trace.recordModule("EvidenceGraph");
-            EvidenceGraph evidenceGraph = state.getEvidenceGraph();
-            if (evidenceGraph != null && !evidenceGraph.items().isEmpty()) {
-                Map<String, Object> evidenceChange = new LinkedHashMap<>();
-                evidenceChange.put("item_count", evidenceGraph.items().size());
-                evidenceChange.put("missing_evidence_count", evidenceGraph.items().stream()
-                        .mapToInt(item -> item.missingEvidence().size())
-                        .sum());
-                trace.setEvidenceGraphChange(evidenceChange);
-            }
-
-            trace.recordModule("QuestionTestPolicy");
+            trace.setSafetyGateResult(safetyGate);
+            outputSummary.put("safety_gate_triggered", safetyGate.triggered());
+        }
+        if (trace.getModulesExecuted().contains("DifferentialDiagnosisBoard")
+                && state.getDifferentialBoard() != null
+                && !state.getDifferentialBoard().candidates().isEmpty()) {
+            Map<String, Object> ddxChange = new LinkedHashMap<>();
+            ddxChange.put("candidate_count", state.getDifferentialBoard().candidates().size());
+            ddxChange.put("updated_reason", state.getDifferentialBoard().updatedReason());
+            trace.setDdxChange(ddxChange);
+        }
+        if (trace.getModulesExecuted().contains("EvidenceGraph")
+                && state.getEvidenceGraph() != null
+                && !state.getEvidenceGraph().items().isEmpty()) {
+            Map<String, Object> evidenceChange = new LinkedHashMap<>();
+            evidenceChange.put("item_count", state.getEvidenceGraph().items().size());
+            trace.setEvidenceGraphChange(evidenceChange);
+        }
+        if (trace.getModulesExecuted().contains("QuestionTestPolicy")) {
             QuestionTestPolicyResult policy = state.getQuestionTestPolicy();
             if (policy != null && policy.nextAction() != null) {
                 outputSummary.put("next_action_type", policy.nextAction().type().getValue());
                 outputSummary.put("next_action_content", policy.nextAction().content());
             }
-
-            trace.recordModule("DecisionBoundary");
+        }
+        if (trace.getModulesExecuted().contains("DecisionBoundary") && state.getDecisionBoundary() != null) {
             DecisionBoundaryResult boundary = state.getDecisionBoundary();
-            if (boundary != null) {
-                trace.setDecisionBoundaryResult(boundary);
-                outputSummary.put("allowed_output_level", boundary.allowedOutputLevel().getValue());
-            }
-
-            trace.recordModule("PatientOutput");
-            PatientOutput patientOutput = state.getPatientOutput();
-            if (patientOutput != null && patientOutput.allowed()) {
-                outputSummary.put("patient_output_level", patientOutput.outputLevel().getValue());
-            }
-
-            if (state.getClinicianReport() != null && state.getClinicianReport().allowed()) {
-                trace.recordModule("ClinicianReport");
-                outputSummary.put("clinician_report_allowed", true);
-            }
+            trace.setDecisionBoundaryResult(boundary);
+            outputSummary.put("allowed_output_level", boundary.allowedOutputLevel().getValue());
+        }
+        if (state.getPatientOutput() != null && state.getPatientOutput().allowed()) {
+            outputSummary.put("patient_output_level", state.getPatientOutput().outputLevel().getValue());
         }
         if (basicInfo != null) {
             outputSummary.put("basic_info_applied", true);
         }
         outputSummary.put("runtime_status", state.getRuntimeStatus().getValue());
+        outputSummary.put("trace_step_count", executedSteps.size());
         trace.setOutputSummary(outputSummary);
         return trace;
     }

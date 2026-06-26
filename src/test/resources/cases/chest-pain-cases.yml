@@ -19,6 +19,8 @@ cases:
         - "acute_coronary"
       trace_modules:
         - EntryAssessment
+        - CaseFrameBuilder
+        - KnowledgeContext
         - SafetyGate
         - EvidenceGraph
         - DecisionBoundary
@@ -39,8 +41,10 @@ cases:
       forbidden_patient_phrases:
         - "不用担心"
       trace_modules:
+        - EntryAssessment
         - SafetyGate
         - QuestionTestPolicy
+        - DecisionBoundary
         - PatientOutput
 
   - case_id: chest_003

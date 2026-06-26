@@ -55,9 +55,35 @@ public final class ApiResponseMapper {
             data.put("clinician_report", null);
             data.put("differential_board", null);
             data.put("evidence_graph", null);
+            data.put("knowledge_context", toPatientKnowledgeContextMap(state.getKnowledgeContext()));
+            data.put("next_action", toPatientNextActionMap(state.getQuestionTestPolicy()));
         } else if (mode == RuntimeMode.CLINICIAN_COPILOT) {
             data.put("patient_output", null);
         }
+    }
+
+    private static Map<String, Object> toPatientKnowledgeContextMap(KnowledgeContext context) {
+        if (context == null || context.symptomGroup() == null) {
+            return null;
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("symptom_group", context.symptomGroup());
+        map.put("source_assets_count", context.sourceAssets().size());
+        return map;
+    }
+
+    private static Map<String, Object> toPatientNextActionMap(QuestionTestPolicyResult policy) {
+        if (policy == null || policy.nextAction() == null) {
+            return null;
+        }
+        NextAction action = policy.nextAction();
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("type", action.type().getValue());
+        map.put("content", action.content());
+        map.put("purpose", action.purpose());
+        map.put("priority", action.priority());
+        map.put("reason", policy.reason());
+        return map;
     }
 
     public static Map<String, Object> toStatusResponse(RuntimeState state) {
