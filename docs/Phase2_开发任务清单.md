@@ -256,3 +256,4 @@
 | 2026-06-26 | 完成 Phase2-P0-D | Runtime 接入 Provider；sourceAssets 记录 asset_id@version；StartRuntimeRequest 支持 asset_context；StaticRuleProvider 降级为兼容类 |
 | 2026-06-26 | 完成 Phase2-P0-E | ExperienceContext 原型：triggerFeatures 匹配、Trace 记录 assetRef、集成测试验证不绕过 SafetyGate/DecisionBoundary |
 | 2026-06-26 | 完成 Phase2-P0-F | 资产调试只读 API（packages / assets-used）及 API 测试 |
+| 2026-06-26 | 完成 Phase2-P0-G | 集成测试与 Phase 1 回归；broken-package 启动 fail-safe；134 项测试全绿 |
