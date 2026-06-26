@@ -253,3 +253,4 @@
 | 2026-06-26 | 完成 Phase2-P0-A | 资产元数据、Provider 接口、AssetLoadException 及单元/Mock 测试；Runtime 主流程未改动 |
 | 2026-06-26 | 完成 Phase2-P0-B | phase2-default/alt/broken 资产包与 YamlAssetPackageRepository；Runtime 主流程未改动 |
 | 2026-06-26 | 完成 Phase2-P0-C | 6 个 YAML Provider 实现 + 5 个单元测试；共享 YamlAssetParsingSupport/YamlProviderSupport；Runtime 主流程未改动 |
+| 2026-06-26 | 完成 Phase2-P0-D | Runtime 接入 Provider；sourceAssets 记录 asset_id@version；StartRuntimeRequest 支持 asset_context；StaticRuleProvider 降级为兼容类 |
