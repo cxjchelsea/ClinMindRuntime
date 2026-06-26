@@ -2,6 +2,7 @@ package com.clinmind.runtime.evaluation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.clinmind.runtime.evaluation.EvaluationItemResult;
 import com.clinmind.runtime.state.RuntimeStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +35,19 @@ class RuntimeEvaluationRunnerIntegrationTest {
 
         assertThat(run.status()).isEqualTo(EvaluationRunStatus.COMPLETED);
         assertThat(run.itemResults()).hasSize(1);
-        assertThat(run.itemResults().get(0).passed()).isTrue();
-        assertThat(run.itemResults().get(0).runtimeId()).startsWith("rt_");
+        EvaluationItemResult item = run.itemResults().get(0);
+        assertThat(item.passed()).isTrue();
+        assertThat(item.runtimeId()).startsWith("rt_");
+        assertThat(item.metricResults()).isNotEmpty();
+        assertThat(item.score()).isGreaterThan(0.0);
 
-        RuntimeCaseExecution execution = runStore.getExecution(
-                run.runId(),
-                run.itemResults().get(0).caseId());
+        RuntimeCaseExecution execution = runStore.getExecution(run.runId(), item.caseId());
         assertThat(execution.traces()).isNotEmpty();
         assertThat(execution.operationResponses()).containsKey("start");
     }
 
     @Test
-    void errorSafeHaltedIsValidExecutionResult() {
+    void errorSafeHaltedStillProducesScoredExecution() {
         EvaluationRunConfig config = new EvaluationRunConfig(
                 "phase3-default",
                 "0.3.0",
@@ -61,12 +63,11 @@ class RuntimeEvaluationRunnerIntegrationTest {
         EvaluationRun run = evaluationRunner.run(config);
 
         assertThat(run.itemResults()).hasSize(1);
-        assertThat(run.itemResults().get(0).passed()).isTrue();
-        assertThat(run.itemResults().get(0).notes()).contains("runtime_error_safe_halted");
+        EvaluationItemResult item = run.itemResults().get(0);
+        assertThat(item.runtimeId()).isNotNull();
+        assertThat(item.metricResults()).isNotEmpty();
 
-        RuntimeCaseExecution execution = runStore.getExecution(
-                run.runId(),
-                "chest_pain_high_risk_001");
+        RuntimeCaseExecution execution = runStore.getExecution(run.runId(), "chest_pain_high_risk_001");
         assertThat(execution.finalState().getRuntimeStatus()).isEqualTo(RuntimeStatus.ERROR_SAFE_HALTED);
     }
 
@@ -87,6 +88,7 @@ class RuntimeEvaluationRunnerIntegrationTest {
         EvaluationRun run = evaluationRunner.run(config);
 
         assertThat(run.itemResults()).hasSize(1);
+        assertThat(run.itemResults().get(0).passed()).isTrue();
         RuntimeCaseExecution execution = runStore.getExecution(run.runId(), "chest_pain_multiturn_001");
         assertThat(execution.traces()).hasSizeGreaterThanOrEqualTo(2);
         assertThat(execution.operationResponses()).containsKeys("start", "continue_1");

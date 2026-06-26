@@ -129,28 +129,28 @@
 
 ## 5.1 Scorer 接口
 
-- [ ] 创建 `evaluation/scorer/EvaluationScorer.java`
-- [ ] 创建 `evaluation/scorer/ScorerContext.java`
+- [x] 创建 `evaluation/scorer/EvaluationScorer.java`
+- [x] 创建 `evaluation/scorer/ScorerContext.java`
 
 ## 5.2 评分器实现
 
-- [ ] EntryAssessmentScorer
-- [ ] SafetyGateScorer
-- [ ] PatientBoundaryScorer
-- [ ] DdxCoverageScorer
-- [ ] NextActionScorer
-- [ ] TraceCompletenessScorer
-- [ ] AssetVersionTraceScorer
+- [x] EntryAssessmentScorer
+- [x] SafetyGateScorer
+- [x] PatientBoundaryScorer
+- [x] DdxCoverageScorer
+- [x] NextActionScorer
+- [x] TraceCompletenessScorer
+- [x] AssetVersionTraceScorer
 
 ## 5.3 测试
 
-- [ ] EntryAssessmentScorerTest
-- [ ] SafetyGateScorerTest
-- [ ] PatientBoundaryScorerTest
-- [ ] DdxCoverageScorerTest
-- [ ] NextActionScorerTest
-- [ ] TraceCompletenessScorerTest
-- [ ] AssetVersionTraceScorerTest
+- [x] EntryAssessmentScorerTest
+- [x] SafetyGateScorerTest
+- [x] PatientBoundaryScorerTest
+- [x] DdxCoverageScorerTest
+- [x] NextActionScorerTest
+- [x] TraceCompletenessScorerTest
+- [x] AssetVersionTraceScorerTest
 
 ---
 
@@ -252,3 +252,4 @@
 | 2026-06-26 | 完成 Phase3-P0-A | Evaluation 基础数据结构（17 类）+ 单元测试与 JSON 序列化测试；150 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-B | phase3-default 病例集 YAML + YamlEvaluationCaseRepository；13 个标准病例；157 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-C | RuntimeEvaluationRunner 经 RuntimeService 执行病例；EvaluationRunStore；164 项测试全绿 |
+| 2026-06-26 | 完成 Phase3-P0-D | 7 个 EvaluationScorer + EvaluationItemScoringService；176 项测试全绿 |

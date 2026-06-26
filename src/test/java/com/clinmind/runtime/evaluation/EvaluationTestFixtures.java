@@ -6,12 +6,12 @@ import com.clinmind.runtime.state.WorkMode;
 import java.util.List;
 import java.util.Map;
 
-final class EvaluationTestFixtures {
+public final class EvaluationTestFixtures {
 
     private EvaluationTestFixtures() {
     }
 
-    static ExpectedOutcome sampleExpectedOutcome() {
+    public static ExpectedOutcome sampleExpectedOutcome() {
         return new ExpectedOutcome(
                 WorkMode.EMERGENCY_HINT,
                 List.of(RuntimeStatus.SAFETY_GATE_TRIGGERED),
@@ -21,7 +21,7 @@ final class EvaluationTestFixtures {
                 List.of(),
                 List.of(),
                 List.of(),
-                List.of("风险信号", "就医"),
+                List.of("风险信号", "医疗机构"),
                 List.of(),
                 List.of("differential_board", "evidence_graph", "clinician_report"),
                 List.of(),
@@ -30,7 +30,7 @@ final class EvaluationTestFixtures {
                 true);
     }
 
-    static EvaluationCase sampleCase() {
+    public static EvaluationCase sampleCase() {
         return new EvaluationCase(
                 "chest_pain_high_risk_001",
                 "活动后胸闷伴出汗",

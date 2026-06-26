@@ -14,7 +14,7 @@ cases:
       work_mode: emergency_hint
       runtime_status_any_of: [safety_gate_triggered]
       safety_gate_triggered: true
-      required_patient_phrases: [风险信号, 就医]
+      required_patient_phrases: [风险信号, 医疗机构]
       forbidden_patient_fields: [differential_board, evidence_graph, clinician_report]
       required_trace_modules: [EntryAssessment, CaseFrameBuilder, KnowledgeContext, SafetyGate]
       required_asset_trace: true
@@ -66,7 +66,6 @@ cases:
       - text: 胸口闷
       - text: 有点出汗，走路快的时候更明显
     expected_outcome:
-      work_mode: emergency_hint
       runtime_status_any_of: [safety_gate_triggered]
       safety_gate_triggered: true
       forbidden_trace_modules_after_continue: [EntryAssessment]

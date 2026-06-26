@@ -5,11 +5,11 @@ import com.clinmind.runtime.api.ContinueRuntimeRequest;
 import com.clinmind.runtime.api.StartRuntimeRequest;
 import com.clinmind.runtime.api.UserInputRequest;
 import com.clinmind.runtime.api.dto.ApiResponseMapper;
+import com.clinmind.runtime.evaluation.scorer.EvaluationItemScoringService;
 import com.clinmind.runtime.service.RuntimeExecutionResult;
 import com.clinmind.runtime.service.RuntimeService;
 import com.clinmind.runtime.state.IdGenerator;
 import com.clinmind.runtime.state.RuntimeState;
-import com.clinmind.runtime.state.RuntimeStatus;
 import com.clinmind.runtime.state.RuntimeTrace;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,14 +26,17 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
     private final RuntimeService runtimeService;
     private final EvaluationCaseRepository caseRepository;
     private final EvaluationRunStore runStore;
+    private final EvaluationItemScoringService scoringService;
 
     public RuntimeEvaluationRunner(
             RuntimeService runtimeService,
             EvaluationCaseRepository caseRepository,
-            EvaluationRunStore runStore) {
+            EvaluationRunStore runStore,
+            EvaluationItemScoringService scoringService) {
         this.runtimeService = runtimeService;
         this.caseRepository = caseRepository;
         this.runStore = runStore;
+        this.scoringService = scoringService;
     }
 
     @Override
@@ -108,7 +111,7 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
                     operationResponses,
                     errors);
             runStore.saveExecution(runId, evaluationCase.caseId(), execution);
-            return buildSuccessfulItemResult(runId, execution);
+            return scoringService.score(runId, evaluationCase, execution);
         } catch (Exception error) {
             errors.add(error.getMessage());
             EvaluationItemResult failed = buildFailedItemResult(runId, evaluationCase.caseId(), error.getMessage());
@@ -159,29 +162,6 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
                 .filter(evaluationCase -> config.excludeTags().isEmpty()
                         || config.excludeTags().stream().noneMatch(tag -> evaluationCase.tags().contains(tag)))
                 .toList();
-    }
-
-    private EvaluationItemResult buildSuccessfulItemResult(String runId, RuntimeCaseExecution execution) {
-        List<String> traceIds = execution.traces().stream()
-                .map(RuntimeTrace::getTraceId)
-                .toList();
-        List<String> notes = new ArrayList<>();
-        notes.add("runtime_execution_completed");
-        if (execution.finalState() != null
-                && execution.finalState().getRuntimeStatus() == RuntimeStatus.ERROR_SAFE_HALTED) {
-            notes.add("runtime_error_safe_halted");
-        }
-        return new EvaluationItemResult(
-                runId,
-                execution.caseId(),
-                execution.runtimeId(),
-                traceIds,
-                true,
-                0.0,
-                ScoreBreakdown.of(0, 0, 0, 0, 0, 0, 0),
-                List.of(),
-                List.of(),
-                notes);
     }
 
     private EvaluationItemResult buildFailedItemResult(String runId, String caseId, String message) {
