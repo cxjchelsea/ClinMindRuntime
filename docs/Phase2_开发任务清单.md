@@ -167,26 +167,26 @@
 
 ## 6.1 经验资产
 
-- [ ] 创建 `experience-units.yml`
-- [ ] 创建 `asset/ExperienceUnitAsset.java`
-- [ ] 支持 triggerFeatures
-- [ ] 支持 suggestedQuestions
-- [ ] 支持 suggestedCautions
-- [ ] 支持 affectedModules
-- [ ] 支持 reviewStatus
+- [x] 创建 `experience-units.yml`
+- [x] 创建 `asset/ExperienceUnitAsset.java`
+- [x] 支持 triggerFeatures
+- [x] 支持 suggestedQuestions
+- [x] 支持 suggestedCautions
+- [x] 支持 affectedModules
+- [x] 支持 reviewStatus
 
 ## 6.2 Runtime 接入
 
-- [ ] ExperienceContextService 调用 ClinicalExperienceProvider
-- [ ] ExperienceContext 写入 matchedExperienceUnits
-- [ ] RuntimeTrace 记录 experience asset id
-- [ ] 经验单元不能直接决定诊断
-- [ ] 经验单元不能绕过 SafetyGate / DecisionBoundary
+- [x] ExperienceContextService 调用 ClinicalExperienceProvider
+- [x] ExperienceContext 写入 matchedExperienceUnits
+- [x] RuntimeTrace 记录 experience asset id
+- [x] 经验单元不能直接决定诊断
+- [x] 经验单元不能绕过 SafetyGate / DecisionBoundary
 
 ## 6.3 测试
 
-- [ ] 编写 ClinicalExperienceProviderTest
-- [ ] 编写 ExperienceContextRuntimeIntegrationTest
+- [x] 编写 ClinicalExperienceProviderTest（YamlClinicalExperienceProviderTest）
+- [x] 编写 ExperienceContextRuntimeIntegrationTest
 
 ---
 
@@ -254,3 +254,4 @@
 | 2026-06-26 | 完成 Phase2-P0-B | phase2-default/alt/broken 资产包与 YamlAssetPackageRepository；Runtime 主流程未改动 |
 | 2026-06-26 | 完成 Phase2-P0-C | 6 个 YAML Provider 实现 + 5 个单元测试；共享 YamlAssetParsingSupport/YamlProviderSupport；Runtime 主流程未改动 |
 | 2026-06-26 | 完成 Phase2-P0-D | Runtime 接入 Provider；sourceAssets 记录 asset_id@version；StartRuntimeRequest 支持 asset_context；StaticRuleProvider 降级为兼容类 |
+| 2026-06-26 | 完成 Phase2-P0-E | ExperienceContext 原型：triggerFeatures 匹配、Trace 记录 assetRef、集成测试验证不绕过 SafetyGate/DecisionBoundary |

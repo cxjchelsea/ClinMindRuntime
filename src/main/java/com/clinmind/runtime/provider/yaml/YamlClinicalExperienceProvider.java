@@ -9,6 +9,7 @@ import com.clinmind.runtime.asset.ReviewStatus;
 import com.clinmind.runtime.provider.ClinicalExperienceProvider;
 import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.KnowledgeContext;
+import com.clinmind.runtime.state.SymptomItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,10 @@ public class YamlClinicalExperienceProvider implements ClinicalExperienceProvide
             if (!reviewStatus.isExperienceUsable()) {
                 continue;
             }
+            List<String> triggerFeatures = YamlAssetParsingSupport.stringList(item.get("trigger_features"));
+            if (!matchesTriggerFeatures(triggerFeatures, caseFrame)) {
+                continue;
+            }
             String experienceId = YamlAssetParsingSupport.stringValue(item.get("experience_id"), null);
             AssetMetadata metadata = YamlAssetParsingSupport.resolveMetadata(
                     item,
@@ -75,5 +80,64 @@ public class YamlClinicalExperienceProvider implements ClinicalExperienceProvide
             return 0.0;
         }
         return Double.parseDouble(String.valueOf(value));
+    }
+
+    private boolean matchesTriggerFeatures(List<String> features, CaseFrame caseFrame) {
+        if (features == null || features.isEmpty()) {
+            return true;
+        }
+        String text = caseFrameText(caseFrame);
+        for (String feature : features) {
+            if (!matchesFeature(feature, text, caseFrame)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String caseFrameText(CaseFrame caseFrame) {
+        if (caseFrame == null) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        if (caseFrame.chiefComplaint() != null) {
+            builder.append(caseFrame.chiefComplaint()).append(' ');
+        }
+        for (SymptomItem symptom : caseFrame.symptoms()) {
+            if (symptom.name() != null) {
+                builder.append(symptom.name()).append(' ');
+            }
+            if (symptom.trigger() != null) {
+                builder.append(symptom.trigger()).append(' ');
+            }
+        }
+        return builder.toString();
+    }
+
+    private boolean matchesFeature(String feature, String text, CaseFrame caseFrame) {
+        return switch (feature) {
+            case "activity_related" -> text.contains("活动后") || text.contains("走路")
+                    || hasSymptomTrigger(caseFrame, "活动后");
+            case "sweating" -> text.contains("出汗") || hasSymptomName(caseFrame, "sweating");
+            case "severe_pain" -> text.contains("剧烈") || text.contains("严重");
+            case "high_fever" -> text.contains("高烧") || text.contains("高热");
+            case "altered_consciousness" -> text.contains("意识") || text.contains("昏迷");
+            default -> text.contains(feature);
+        };
+    }
+
+    private boolean hasSymptomName(CaseFrame caseFrame, String name) {
+        if (caseFrame == null) {
+            return false;
+        }
+        return caseFrame.symptoms().stream().anyMatch(item -> name.equals(item.name()));
+    }
+
+    private boolean hasSymptomTrigger(CaseFrame caseFrame, String trigger) {
+        if (caseFrame == null) {
+            return false;
+        }
+        return caseFrame.symptoms().stream()
+                .anyMatch(item -> trigger.equals(item.trigger()) || "活动后".equals(item.trigger()));
     }
 }

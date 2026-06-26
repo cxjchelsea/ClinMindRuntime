@@ -35,7 +35,7 @@ class ExperienceContextServiceTest {
     void returnsVerifiedExperienceUnitsForChestPain() {
         EntryAssessmentResult entry = new EntryAssessmentResult(
                 WorkMode.CLINICAL_MODE, "chest_pain", "clinical", 0.8);
-        CaseFrame caseFrame = new CaseFrame("胸口闷", null, null, null, null, null, null, null);
+        CaseFrame caseFrame = new CaseFrame("胸口闷，活动后更明显", null, null, null, null, null, null, null);
         KnowledgeContext knowledge = knowledgeContextService.buildKnowledgeContext(caseFrame, entry);
 
         ExperienceContext context = experienceContextService.buildExperienceContext(caseFrame, knowledge);

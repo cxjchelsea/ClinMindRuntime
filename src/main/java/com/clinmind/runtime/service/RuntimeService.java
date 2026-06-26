@@ -337,9 +337,11 @@ public class RuntimeService {
             outputSummary.put("asset_package_id", state.getAssetPackageId());
             outputSummary.put("asset_package_version", state.getAssetPackageVersion());
         }
-        if (trace.getModulesExecuted().contains("ExperienceContext") && state.getExperienceContext() != null) {
-            state.getExperienceContext().matchedExperienceUnits()
-                    .forEach(unit -> trace.recordExperience(unit.unitId()));
+        if (trace.getModulesExecuted().contains("ExperienceContext") && state.getAssetsUsed() != null) {
+            state.getAssetsUsed().stream()
+                    .filter(record -> "ExperienceContext".equals(record.moduleName()))
+                    .map(com.clinmind.runtime.asset.AssetUsedRecord::assetRef)
+                    .forEach(trace::recordExperience);
         }
         outputSummary.put("runtime_status", state.getRuntimeStatus().getValue());
         outputSummary.put("trace_step_count", executedSteps.size());
