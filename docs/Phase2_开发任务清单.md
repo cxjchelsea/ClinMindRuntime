@@ -217,23 +217,23 @@
 
 ## 8.1 集成测试
 
-- [ ] RuntimeWithDefaultAssetPackageTest
-- [ ] RuntimeWithAlternateAssetPackageTest
-- [ ] RuntimeWithBrokenAssetPackageTest
-- [ ] RuntimeAssetTraceIntegrationTest
-- [ ] PatientOutputAssetIsolationTest
-- [ ] Phase1RegressionTest 或直接运行 Phase 1 现有测试
+- [x] RuntimeWithDefaultAssetPackageTest
+- [x] RuntimeWithAlternateAssetPackageTest
+- [x] RuntimeWithBrokenAssetPackageTest
+- [x] RuntimeAssetTraceIntegrationTest
+- [x] PatientOutputAssetIsolationTest
+- [x] Phase1RegressionTest 或直接运行 Phase 1 现有测试
 
 ## 8.2 验收项
 
-- [ ] 默认资产包 Runtime 跑通
-- [ ] 替代资产包 Runtime 跑通
-- [ ] broken package 触发 fail-safe
-- [ ] RuntimeTrace 记录 asset_id / version
-- [ ] ExperienceContext 返回 mock/verified experience units
-- [ ] 患者端不泄露 DDx / must_not_miss / target_diagnosis
-- [ ] 医生端仍能看到 DDx / EvidenceGraph
-- [ ] Phase 1 所有测试继续通过
+- [x] 默认资产包 Runtime 跑通
+- [x] 替代资产包 Runtime 跑通
+- [x] broken package 触发 fail-safe
+- [x] RuntimeTrace 记录 asset_id / version
+- [x] ExperienceContext 返回 mock/verified experience units
+- [x] 患者端不泄露 DDx / must_not_miss / target_diagnosis
+- [x] 医生端仍能看到 DDx / EvidenceGraph
+- [x] Phase 1 所有测试继续通过
 
 ---
 
@@ -255,3 +255,4 @@
 | 2026-06-26 | 完成 Phase2-P0-C | 6 个 YAML Provider 实现 + 5 个单元测试；共享 YamlAssetParsingSupport/YamlProviderSupport；Runtime 主流程未改动 |
 | 2026-06-26 | 完成 Phase2-P0-D | Runtime 接入 Provider；sourceAssets 记录 asset_id@version；StartRuntimeRequest 支持 asset_context；StaticRuleProvider 降级为兼容类 |
 | 2026-06-26 | 完成 Phase2-P0-E | ExperienceContext 原型：triggerFeatures 匹配、Trace 记录 assetRef、集成测试验证不绕过 SafetyGate/DecisionBoundary |
+| 2026-06-26 | 完成 Phase2-P0-F | 资产调试只读 API（packages / assets-used）及 API 测试 |

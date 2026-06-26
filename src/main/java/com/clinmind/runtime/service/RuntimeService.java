@@ -38,7 +38,6 @@ import com.clinmind.runtime.trace.TraceStepLog;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -97,14 +96,15 @@ public class RuntimeService {
         RuntimeState state = RuntimeState.createDefault(request.sessionId());
         state.setUserId(request.userId());
         state.setMode(request.mode());
-        bindAssetPackage(state, request.assetContext());
-        state.setRuntimeStatus(RuntimeStatus.ENTRY_ASSESSING);
 
         UserInput userInput = toUserInput(request.input());
         state.getInputHistory().add(userInput);
 
         TraceContextHolder.setRuntimeId(state.getRuntimeId());
         try {
+            bindAssetPackage(state, request.assetContext());
+            state.setRuntimeStatus(RuntimeStatus.ENTRY_ASSESSING);
+
             EntryAssessmentResult entry = entryAssessmentService.assessEntry(userInput, request.basicInfo());
             state.setEntryAssessment(entry);
             state.setWorkMode(entry.workMode());
@@ -118,17 +118,28 @@ public class RuntimeService {
                 }
             }
 
-            RuntimeTrace trace = buildTrace(state, 1, userInput, request.basicInfo());
-            runtimeStore.create(state);
-            runtimeStore.addTrace(trace);
-            state.getRuntimeTraceIds().add(trace.getTraceId());
-            state.bumpVersion();
-            runtimeStore.update(state);
-            return new RuntimeExecutionResult(state, trace);
+            return persistStartResult(state, 1, userInput, request.basicInfo());
+        } catch (AssetLoadException error) {
+            failurePolicyService.handleFailure("AssetProvider", error, state);
+            return persistStartResult(state, 1, userInput, request.basicInfo());
         } finally {
             traceCollector.drainStepsForRuntime(state.getRuntimeId());
             TraceContextHolder.clear();
         }
+    }
+
+    private RuntimeExecutionResult persistStartResult(
+            RuntimeState state,
+            int step,
+            UserInput userInput,
+            Map<String, Object> basicInfo) {
+        RuntimeTrace trace = buildTrace(state, step, userInput, basicInfo);
+        runtimeStore.create(state);
+        runtimeStore.addTrace(trace);
+        state.getRuntimeTraceIds().add(trace.getTraceId());
+        state.bumpVersion();
+        runtimeStore.update(state);
+        return new RuntimeExecutionResult(state, trace);
     }
 
     public RuntimeExecutionResult continueRuntime(ContinueRuntimeRequest request) {
