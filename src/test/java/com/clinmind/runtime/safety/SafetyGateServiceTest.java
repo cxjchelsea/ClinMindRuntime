@@ -1,12 +1,13 @@
 package com.clinmind.runtime.safety;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
-import com.clinmind.runtime.knowledge.StaticRuleProvider;
+import com.clinmind.runtime.provider.CapabilityProfileProvider;
 import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.EntryAssessmentResult;
 import com.clinmind.runtime.state.RuntimeState;
@@ -60,8 +61,9 @@ class SafetyGateServiceTest {
 
     @Test
     void failSafeOnException() {
-        StaticRuleProvider brokenProvider = mock(StaticRuleProvider.class);
-        when(brokenProvider.loadCapabilityProfile(anyString())).thenThrow(new RuntimeException("broken"));
+        CapabilityProfileProvider brokenProvider = mock(CapabilityProfileProvider.class);
+        when(brokenProvider.loadCapabilityProfile(anyString(), any()))
+                .thenThrow(new RuntimeException("broken"));
         SafetyGateService service = new SafetyGateService(brokenProvider);
 
         RuntimeState state = buildChestPainState("胸口闷，活动后加重，出汗");

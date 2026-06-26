@@ -1,7 +1,8 @@
 package com.clinmind.runtime.reasoning;
 
-import com.clinmind.runtime.knowledge.StaticRuleProvider;
-import com.clinmind.runtime.knowledge.TestRecommendationRule;
+import com.clinmind.runtime.asset.AssetRuntimeSupport;
+import com.clinmind.runtime.asset.TestRecommendationAsset;
+import com.clinmind.runtime.provider.TestRecommendationProvider;
 import com.clinmind.runtime.state.CandidateStatus;
 import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.DDxCandidate;
@@ -21,10 +22,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class EvidenceGraphService {
 
-    private final StaticRuleProvider staticRuleProvider;
+    private final TestRecommendationProvider testRecommendationProvider;
 
-    public EvidenceGraphService(StaticRuleProvider staticRuleProvider) {
-        this.staticRuleProvider = staticRuleProvider;
+    public EvidenceGraphService(TestRecommendationProvider testRecommendationProvider) {
+        this.testRecommendationProvider = testRecommendationProvider;
     }
 
     @TraceStep("EvidenceGraph")
@@ -38,7 +39,7 @@ public class EvidenceGraphService {
             List<String> supporting = buildSupportingEvidence(caseFrame, candidate);
             List<String> missing = buildMissingEvidence(caseFrame, knowledge, candidate, combinedText);
             List<String> nextQuestions = buildNextQuestions(knowledge, combinedText);
-            List<String> recommendedTests = buildRecommendedTests(knowledge, candidate);
+            List<String> recommendedTests = buildRecommendedTests(state, knowledge, candidate);
 
             items.add(new EvidenceGraphItem(
                     candidate.name(),
@@ -110,12 +111,17 @@ public class EvidenceGraphService {
         return questions;
     }
 
-    private List<String> buildRecommendedTests(KnowledgeContext knowledge, DDxCandidate candidate) {
+    private List<String> buildRecommendedTests(
+            RuntimeState state,
+            KnowledgeContext knowledge,
+            DDxCandidate candidate) {
         if (candidate.status() != CandidateStatus.NEED_TO_RULE_OUT) {
             return List.of();
         }
-        List<TestRecommendationRule> rules = staticRuleProvider.loadTestRecommendationRules(knowledge.symptomGroup());
-        for (TestRecommendationRule rule : rules) {
+        List<TestRecommendationAsset> rules = testRecommendationProvider.loadTestRecommendations(
+                knowledge.symptomGroup(), AssetRuntimeSupport.queryContext(state));
+        for (TestRecommendationAsset rule : rules) {
+            AssetRuntimeSupport.recordAssetUsed(state, rule.metadata(), "EvidenceGraph");
             if (rule.targetStatus() == CandidateStatus.NEED_TO_RULE_OUT) {
                 return rule.recommendedTests();
             }

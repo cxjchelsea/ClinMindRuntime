@@ -9,7 +9,10 @@ import com.clinmind.runtime.caseframe.CaseFrameService;
 import com.clinmind.runtime.entry.EntryAssessmentService;
 import com.clinmind.runtime.experience.ExperienceContextService;
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
-import com.clinmind.runtime.knowledge.StaticRuleLoadException;
+import com.clinmind.runtime.api.AssetContextRequest;
+import com.clinmind.runtime.asset.AssetLoadException;
+import com.clinmind.runtime.asset.AssetPackageManifest;
+import com.clinmind.runtime.provider.yaml.YamlAssetPackageRepository;
 import com.clinmind.runtime.output.ClinicianReportService;
 import com.clinmind.runtime.output.PatientOutputService;
 import com.clinmind.runtime.reasoning.DifferentialDiagnosisBoardService;
@@ -54,6 +57,7 @@ public class RuntimeService {
     private final ClinicianReportService clinicianReportService;
     private final FailurePolicyService failurePolicyService;
     private final RuntimeTraceCollector traceCollector;
+    private final YamlAssetPackageRepository assetPackageRepository;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -69,7 +73,8 @@ public class RuntimeService {
             PatientOutputService patientOutputService,
             ClinicianReportService clinicianReportService,
             FailurePolicyService failurePolicyService,
-            RuntimeTraceCollector traceCollector) {
+            RuntimeTraceCollector traceCollector,
+            YamlAssetPackageRepository assetPackageRepository) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -84,12 +89,14 @@ public class RuntimeService {
         this.clinicianReportService = clinicianReportService;
         this.failurePolicyService = failurePolicyService;
         this.traceCollector = traceCollector;
+        this.assetPackageRepository = assetPackageRepository;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
         RuntimeState state = RuntimeState.createDefault(request.sessionId());
         state.setUserId(request.userId());
         state.setMode(request.mode());
+        bindAssetPackage(state, request.assetContext());
         state.setRuntimeStatus(RuntimeStatus.ENTRY_ASSESSING);
 
         UserInput userInput = toUserInput(request.input());
@@ -169,11 +176,11 @@ public class RuntimeService {
     private void runClinicalPipeline(RuntimeState state) {
         try {
             KnowledgeContext knowledgeContext = knowledgeContextService.buildKnowledgeContext(
-                    state.getCaseFrame(), state.getEntryAssessment());
+                    state.getCaseFrame(), state.getEntryAssessment(), state);
             state.setKnowledgeContext(knowledgeContext);
 
             ExperienceContext experienceContext = experienceContextService.buildExperienceContext(
-                    state.getCaseFrame(), knowledgeContext);
+                    state.getCaseFrame(), knowledgeContext, state);
             state.setExperienceContext(experienceContext);
 
             SafetyGateResult safetyGate = safetyGateService.evaluateSafety(state);
@@ -194,9 +201,22 @@ public class RuntimeService {
             if (state.getRuntimeStatus() != RuntimeStatus.ERROR_SAFE_HALTED) {
                 state.setRuntimeStatus(resolveStatusAfterPolicy(state));
             }
-        } catch (StaticRuleLoadException error) {
-            failurePolicyService.handleFailure("StaticRuleProvider", error, state);
+        } catch (AssetLoadException error) {
+            failurePolicyService.handleFailure("AssetProvider", error, state);
         }
+    }
+
+    private void bindAssetPackage(RuntimeState state, AssetContextRequest assetContext) {
+        String packageId = assetContext != null && assetContext.packageId() != null
+                && !assetContext.packageId().isBlank()
+                ? assetContext.packageId()
+                : assetPackageRepository.getDefaultPackageId();
+        AssetPackageManifest manifest = assetPackageRepository.loadRuntimeManifest(packageId);
+        state.setAssetPackageId(packageId);
+        state.setAssetPackageVersion(
+                assetContext != null && assetContext.version() != null
+                        ? assetContext.version()
+                        : manifest.version());
     }
 
     private void runOutputPipeline(RuntimeState state) {
@@ -312,6 +332,14 @@ public class RuntimeService {
         }
         if (basicInfo != null) {
             outputSummary.put("basic_info_applied", true);
+        }
+        if (state.getAssetPackageId() != null) {
+            outputSummary.put("asset_package_id", state.getAssetPackageId());
+            outputSummary.put("asset_package_version", state.getAssetPackageVersion());
+        }
+        if (trace.getModulesExecuted().contains("ExperienceContext") && state.getExperienceContext() != null) {
+            state.getExperienceContext().matchedExperienceUnits()
+                    .forEach(unit -> trace.recordExperience(unit.unitId()));
         }
         outputSummary.put("runtime_status", state.getRuntimeStatus().getValue());
         outputSummary.put("trace_step_count", executedSteps.size());

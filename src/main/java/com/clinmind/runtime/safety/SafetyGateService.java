@@ -1,7 +1,8 @@
 package com.clinmind.runtime.safety;
 
-import com.clinmind.runtime.knowledge.CapabilityProfile;
-import com.clinmind.runtime.knowledge.StaticRuleProvider;
+import com.clinmind.runtime.asset.AssetRuntimeSupport;
+import com.clinmind.runtime.asset.CapabilityProfileAsset;
+import com.clinmind.runtime.provider.CapabilityProfileProvider;
 import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.RedFlagRule;
@@ -17,10 +18,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class SafetyGateService {
 
-    private final StaticRuleProvider staticRuleProvider;
+    private final CapabilityProfileProvider capabilityProfileProvider;
 
-    public SafetyGateService(StaticRuleProvider staticRuleProvider) {
-        this.staticRuleProvider = staticRuleProvider;
+    public SafetyGateService(CapabilityProfileProvider capabilityProfileProvider) {
+        this.capabilityProfileProvider = capabilityProfileProvider;
     }
 
     @TraceStep("SafetyGate")
@@ -62,9 +63,12 @@ public class SafetyGateService {
             return new SafetyGateResult();
         }
 
-        CapabilityProfile profile = staticRuleProvider.loadCapabilityProfile(knowledge.symptomGroup());
+        CapabilityProfileAsset profile = capabilityProfileProvider.loadCapabilityProfile(
+                knowledge.symptomGroup(), AssetRuntimeSupport.queryContext(state));
+        AssetRuntimeSupport.recordAssetUsed(state, profile.metadata(), "SafetyGate");
+
         String requiredAction = highestRule.action();
-        if (requiredAction == null && profile != null) {
+        if (requiredAction == null) {
             requiredAction = "urgent_evaluation";
         }
 

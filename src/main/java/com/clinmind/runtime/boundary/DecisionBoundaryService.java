@@ -1,6 +1,9 @@
 package com.clinmind.runtime.boundary;
 
+import com.clinmind.runtime.asset.AssetRuntimeSupport;
+import com.clinmind.runtime.asset.CapabilityProfileAsset;
 import com.clinmind.runtime.knowledge.CapabilityProfile;
+import com.clinmind.runtime.provider.CapabilityProfileProvider;
 import com.clinmind.runtime.state.DecisionBoundaryResult;
 import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.NextAction;
@@ -35,9 +38,13 @@ public class DecisionBoundaryService {
 
     private DecisionBoundaryResult decideInternal(RuntimeState state) {
         KnowledgeContext knowledge = state.getKnowledgeContext();
-        CapabilityProfile profile = knowledge == null
-                ? null
-                : capabilityProfileProvider.loadProfile(knowledge.symptomGroup());
+        CapabilityProfile profile = null;
+        if (knowledge != null && knowledge.symptomGroup() != null) {
+            CapabilityProfileAsset profileAsset = capabilityProfileProvider.loadCapabilityProfile(
+                    knowledge.symptomGroup(), AssetRuntimeSupport.queryContext(state));
+            AssetRuntimeSupport.recordAssetUsed(state, profileAsset.metadata(), "DecisionBoundary");
+            profile = AssetRuntimeSupport.toCapabilityProfile(profileAsset);
+        }
 
         SafetyGateResult safetyGate = state.getSafetyGate();
         QuestionTestPolicyResult policy = state.getQuestionTestPolicy();

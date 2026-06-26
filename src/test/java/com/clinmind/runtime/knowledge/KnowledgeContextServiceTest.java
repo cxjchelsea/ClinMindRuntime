@@ -28,7 +28,8 @@ class KnowledgeContextServiceTest {
         assertThat(context.mustNotMiss()).hasSize(2);
         assertThat(context.redFlags()).isNotEmpty();
         assertThat(context.sourceAssets())
-                .contains("assets/symptom-groups/chest-pain.yml", "assets/red-flag-rules.yml");
+                .isNotEmpty()
+                .allMatch(ref -> ref.contains("@"));
     }
 
     @Test

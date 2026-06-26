@@ -138,26 +138,26 @@
 
 ## 5.1 模块改造
 
-- [ ] KnowledgeContextService 改为依赖 MedicalKnowledgeProvider / RedFlagRuleProvider / TestRecommendationProvider
-- [ ] SafetyGateService 不再直接依赖 StaticRuleProvider
-- [ ] EvidenceGraphService 不再直接依赖 StaticRuleProvider
-- [ ] DecisionBoundaryService 使用标准化 CapabilityProfileProvider 接口
-- [ ] ExperienceContextService 使用 ClinicalExperienceProvider
-- [ ] 删除或降级 StaticRuleProvider 为兼容 Adapter，不再作为 Runtime 主依赖
+- [x] KnowledgeContextService 改为依赖 MedicalKnowledgeProvider / RedFlagRuleProvider / TestRecommendationProvider
+- [x] SafetyGateService 不再直接依赖 StaticRuleProvider
+- [x] EvidenceGraphService 不再直接依赖 StaticRuleProvider
+- [x] DecisionBoundaryService 使用标准化 CapabilityProfileProvider 接口
+- [x] ExperienceContextService 使用 ClinicalExperienceProvider
+- [x] 删除或降级 StaticRuleProvider 为兼容 Adapter，不再作为 Runtime 主依赖
 
 ## 5.2 Trace 接入
 
-- [ ] RuntimeTrace 记录 packageId
-- [ ] RuntimeTrace 记录 assetId
-- [ ] RuntimeTrace 记录 assetVersion
-- [ ] KnowledgeContext.sourceAssets 记录 asset_id@version
-- [ ] 新增 AssetUsedRecord 或等价结构
+- [x] RuntimeTrace 记录 packageId
+- [x] RuntimeTrace 记录 assetId
+- [x] RuntimeTrace 记录 assetVersion
+- [x] KnowledgeContext.sourceAssets 记录 asset_id@version
+- [x] 新增 AssetUsedRecord 或等价结构
 
 ## 5.3 Phase2-P0-D 验收
 
-- [ ] Runtime 核心服务不再注入 StaticRuleProvider
-- [ ] 替换资产包不需要改 Runtime 核心代码
-- [ ] Phase 1 测试继续通过
+- [x] Runtime 核心服务不再注入 StaticRuleProvider
+- [x] 替换资产包不需要改 Runtime 核心代码
+- [x] Phase 1 测试继续通过
 
 ---
 

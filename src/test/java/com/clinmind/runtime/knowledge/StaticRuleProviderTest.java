@@ -3,16 +3,17 @@ package com.clinmind.runtime.knowledge;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.clinmind.runtime.state.DiagnosisRef;
-import com.clinmind.runtime.state.RiskLevel;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 class StaticRuleProviderTest {
 
-    @Autowired
     private StaticRuleProvider staticRuleProvider;
+
+    @BeforeEach
+    void setUp() {
+        staticRuleProvider = new StaticRuleProvider();
+    }
 
     @Test
     void loadsChestPainSymptomGroupRules() {

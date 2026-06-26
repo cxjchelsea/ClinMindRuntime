@@ -1,5 +1,6 @@
 package com.clinmind.runtime.state;
 
+import com.clinmind.runtime.asset.AssetUsedRecord;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class RuntimeState {
     private PatientOutput patientOutput;
     private ClinicianReport clinicianReport;
     private List<String> runtimeTraceIds;
+    private String assetPackageId;
+    private String assetPackageVersion;
+    private List<AssetUsedRecord> assetsUsed;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -47,6 +51,8 @@ public class RuntimeState {
         state.differentialBoard = new DifferentialDiagnosisBoard();
         state.evidenceGraph = new EvidenceGraph();
         state.runtimeTraceIds = new ArrayList<>();
+        state.assetsUsed = new ArrayList<>();
+        state.assetPackageId = "phase2-default";
         state.createdAt = now;
         state.updatedAt = now;
         return state;
@@ -219,6 +225,30 @@ public class RuntimeState {
 
     public void setRuntimeTraceIds(List<String> runtimeTraceIds) {
         this.runtimeTraceIds = runtimeTraceIds;
+    }
+
+    public String getAssetPackageId() {
+        return assetPackageId;
+    }
+
+    public void setAssetPackageId(String assetPackageId) {
+        this.assetPackageId = assetPackageId;
+    }
+
+    public String getAssetPackageVersion() {
+        return assetPackageVersion;
+    }
+
+    public void setAssetPackageVersion(String assetPackageVersion) {
+        this.assetPackageVersion = assetPackageVersion;
+    }
+
+    public List<AssetUsedRecord> getAssetsUsed() {
+        return assetsUsed;
+    }
+
+    public void setAssetsUsed(List<AssetUsedRecord> assetsUsed) {
+        this.assetsUsed = assetsUsed;
     }
 
     public Instant getCreatedAt() {

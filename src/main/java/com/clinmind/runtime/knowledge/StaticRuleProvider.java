@@ -10,10 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
-@Component
 public class StaticRuleProvider {
 
     private final String assetsPrefix;

@@ -12,6 +12,7 @@ public record StartRuntimeRequest(
         @JsonProperty("user_id") String userId,
         @NotNull RuntimeMode mode,
         @NotNull @Valid UserInputRequest input,
-        @JsonProperty("basic_info") Map<String, Object> basicInfo
+        @JsonProperty("basic_info") Map<String, Object> basicInfo,
+        @JsonProperty("asset_context") AssetContextRequest assetContext
 ) {
 }
