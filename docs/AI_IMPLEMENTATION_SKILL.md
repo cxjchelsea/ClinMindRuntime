@@ -37,6 +37,7 @@ EvaluationCaseSet
 ```text
 Phase 3 的“训练”不是训练基础大模型。
 Phase 3 的训练含义是：用标准病例集和评估指标校准 Runtime 能力、资产质量和 CapabilityProfile 边界。
+真实模型训练、后训练、Python AI Provider、RAG / GraphRAG、MCP 等能力均后置。
 ```
 
 ---
@@ -56,19 +57,20 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 8. docs/Phase3_API与测试设计.md
 9. docs/全局技术栈与架构选型.md
 10. docs/AI前沿技术选型与接入规划.md
-11. docs/Phase2_开发任务清单.md
-12. docs/Phase2_共享能力资产原型_实现规格.md
-13. docs/Phase2_Provider接口设计.md
-14. docs/Phase2_资产数据结构与版本设计.md
-15. docs/Phase2_Runtime接入改造设计.md
-16. docs/Phase2_API与测试设计.md
-17. docs/Phase1_技术栈与工程架构决策.md
-18. docs/Phase1_Runtime_MVP_实现规格.md
-19. docs/Phase1_数据结构与状态设计.md
-20. docs/Phase1_模块接口设计.md
-21. docs/Phase1_API与测试设计.md
-22. docs/ClinMindRuntime阶段拆分路线图.md
-23. docs/ClinMindRuntime完整系统设计.md
+11. docs/模型训练与后训练规划.md
+12. docs/Phase2_开发任务清单.md
+13. docs/Phase2_共享能力资产原型_实现规格.md
+14. docs/Phase2_Provider接口设计.md
+15. docs/Phase2_资产数据结构与版本设计.md
+16. docs/Phase2_Runtime接入改造设计.md
+17. docs/Phase2_API与测试设计.md
+18. docs/Phase1_技术栈与工程架构决策.md
+19. docs/Phase1_Runtime_MVP_实现规格.md
+20. docs/Phase1_数据结构与状态设计.md
+21. docs/Phase1_模块接口设计.md
+22. docs/Phase1_API与测试设计.md
+23. docs/ClinMindRuntime阶段拆分路线图.md
+24. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
@@ -77,6 +79,7 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 Phase 3 文档优先指导当前新增能力。
 全局技术栈文档约束前端、数据库、向量库、图数据库、Python Provider、部署和权限等长期技术选型。
 AI 前沿技术文档约束 MCP、Agent SDK、LangGraph、GraphRAG、LLM-as-a-Judge、Skills、Agent Memory 等技术的接入阶段和边界。
+模型训练与后训练规划约束意图识别、病例抽取、证据检索、安全表达、后训练、模型部署和 Model Provider 的长期路线。
 Phase 2 文档仍然约束 Provider、Asset Package、资产版本和 debug API 边界。
 Phase 1 文档仍然约束 Runtime Core、安全门、输出边界和患者端安全表达。
 总设计文档描述完整愿景，但不能作为提前实现 Phase 4–5 能力的理由。
@@ -98,6 +101,7 @@ Evaluation Storage Phase 3：in-memory store
 Testing：JUnit 5 + AssertJ / Mockito + SpringBootTest
 Python：不作为 Phase 3 主工程
 AI 框架：不作为 Phase 3 主控
+Model Training：不属于 Phase 3-P0
 ```
 
 ---
@@ -185,23 +189,26 @@ POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal
 
 ```text
 1. 不训练基础大模型。
-2. 不实现 SFT / RLHF / DPO / 蒸馏训练链路。
-3. 不做真实临床有效性认证。
-4. 不自动上线 CapabilityProfile。
-5. 不自动修改 phase2-default 生产资产包。
-6. 不做真实医生审核流。
-7. 不做完整 Training Center 前端。
-8. 不做复杂权限系统。
-9. 不做经验自动进化。
-10. 不把 RuntimeTrace 自动沉淀为 Clinical Experience Memory。
-11. 不引入向量数据库。
-12. 不做完整 RAG 评估平台。
-13. 不让 LLM-as-judge 成为唯一评分依据。
-14. 不绕过 RuntimeService 直接评估底层模块。
-15. 不改变患者端输出边界。
-16. 不绕过 SafetyGate 或 DecisionBoundary。
-17. 不引入 MCP / LangGraph / Agent SDK 作为 Runtime 主控。
-18. 不提前接入 PostgreSQL / Redis / Neo4j / Milvus / 前端平台。
+2. 不实现 SFT / RLHF / DPO / RFT / 蒸馏训练链路。
+3. 不训练 intent / symptom_group / risk_signal 生产模型。
+4. 不接 Python AI Provider。
+5. 不接真实 RAG / GraphRAG。
+6. 不接 MCP / LangGraph / Agent SDK 作为 Runtime 主控。
+7. 不做真实临床有效性认证。
+8. 不自动上线 CapabilityProfile。
+9. 不自动修改 phase2-default 生产资产包。
+10. 不做真实医生审核流。
+11. 不做完整 Training Center 前端。
+12. 不做复杂权限系统。
+13. 不做经验自动进化。
+14. 不把 RuntimeTrace 自动沉淀为 Clinical Experience Memory。
+15. 不引入向量数据库。
+16. 不做完整 RAG 评估平台。
+17. 不让 LLM-as-judge 成为唯一评分依据。
+18. 不绕过 RuntimeService 直接评估底层模块。
+19. 不改变患者端输出边界。
+20. 不绕过 SafetyGate 或 DecisionBoundary。
+21. 不提前接入 PostgreSQL / Redis / Neo4j / Milvus / 前端平台。
 ```
 
 如果任务中出现上述需求，AI 必须回复：
@@ -307,6 +314,16 @@ MCP / Agent SDK / LangGraph / LangChain / GraphRAG / Skills / LLM-as-a-Judge 不
 如果需要引入，必须先查阅 docs/AI前沿技术选型与接入规划.md。
 ```
 
+## 8.7 模型训练只能增强 Provider
+
+```text
+模型训练 / 后训练只能提升可替换 Provider 的能力。
+模型不能直接决定患者端最终输出。
+模型不能直接修改 RuntimeState。
+模型不能绕过 SafetyGate / DecisionBoundary。
+如果需要引入训练能力，必须先查阅 docs/模型训练与后训练规划.md。
+```
+
 ---
 
 # 九、测试约束
@@ -362,6 +379,7 @@ broken-package fail-safe 测试通过。
 8. 是否会自动修改资产包或 CapabilityProfile？如果会，则禁止。
 9. 是否违反 docs/全局技术栈与架构选型.md 的接入阶段？
 10. 是否违反 docs/AI前沿技术选型与接入规划.md 的 AI 技术边界？
+11. 是否违反 docs/模型训练与后训练规划.md 的训练接入边界？
 ```
 
 ---
@@ -399,6 +417,7 @@ Agent SDK
 LLM-as-a-Judge
 Python AI Provider
 RAG / GraphRAG
+模型训练 / 后训练
 数据库持久化
 ```
 
@@ -412,5 +431,5 @@ RAG / GraphRAG
 Phase 1 Runtime Core 和 Phase 2 Asset Provider 必须保持稳定。
 Evaluation 只能评估 Runtime，并生成 EvaluationResult 与 CapabilityProfileUpdateProposal。
 Phase 3 的目标是让能力边界有评估依据，而不是继续堆问诊功能。
-全局技术栈和 AI 前沿技术可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
+全局技术栈、AI 前沿技术和模型训练规划可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
 ```
