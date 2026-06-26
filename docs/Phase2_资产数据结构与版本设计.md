@@ -21,6 +21,8 @@
 
 # 二、资产包结构
 
+正式默认资产包放在 `main/resources`，用于 Runtime 默认运行；替代资产包和错误资产包放在 `test/resources`，只用于替换测试和 fail-safe 测试。
+
 推荐目录：
 
 ```text
@@ -35,9 +37,26 @@ src/main/resources/assets/packages/phase2-default/
   experience-units.yml
   evidence-refs.yml
 
-src/main/resources/assets/packages/phase2-alt/
+src/test/resources/assets/packages/phase2-alt/
   manifest.yml
-  ...
+  symptom-groups/
+  red-flag-rules.yml
+  test-recommendation-rules.yml
+  capability-profiles.yml
+  experience-units.yml
+  evidence-refs.yml
+
+src/test/resources/assets/packages/broken-package/
+  manifest.yml
+  缺失或损坏的安全关键资产，用于验证 fail-safe
+```
+
+约束：
+
+```text
+phase2-default：正式默认资产包，进入 main/resources。
+phase2-alt：替代资产包，只用于测试 Runtime 不改代码也能切换资产。
+broken-package：错误资产包，只用于测试安全关键资产加载失败时 fail-closed。
 ```
 
 ---
@@ -354,6 +373,13 @@ Phase 2 迁移后：
 
 ```text
 src/main/resources/assets/packages/phase2-default/...
+```
+
+测试替代资产和错误资产放在：
+
+```text
+src/test/resources/assets/packages/phase2-alt/...
+src/test/resources/assets/packages/broken-package/...
 ```
 
 迁移过程允许短期保留旧目录，但 Runtime 模块应逐步改为读取资产包。
