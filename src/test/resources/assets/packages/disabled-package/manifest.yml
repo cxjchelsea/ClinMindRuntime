@@ -1,0 +1,12 @@
+package_id: disabled-package
+version: 0.0.1-disabled
+status: disabled
+display_name: Disabled Asset Package
+description: Disabled package for runtime rejection testing
+created_at: 2026-06-26T00:00:00Z
+updated_at: 2026-06-26T00:00:00Z
+source: internal_phase2_yaml_test
+owner: ClinMindRuntime
+supported_symptom_groups:
+  - chest_pain
+default_package: false

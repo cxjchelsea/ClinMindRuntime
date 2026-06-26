@@ -69,34 +69,34 @@
 
 ## 3.1 资产包目录
 
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/manifest.yml`
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/symptom-groups/chest-pain.yml`
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/symptom-groups/fever.yml`
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/red-flag-rules.yml`
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/test-recommendation-rules.yml`
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/capability-profiles.yml`
-- [ ] 创建 `src/main/resources/assets/packages/phase2-default/experience-units.yml`
-- [ ] 创建 `src/test/resources/assets/packages/phase2-alt/` 替代资产包
-- [ ] 创建 `src/test/resources/assets/packages/broken-package/` 错误资产包
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/manifest.yml`
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/symptom-groups/chest-pain.yml`
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/symptom-groups/fever.yml`
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/red-flag-rules.yml`
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/test-recommendation-rules.yml`
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/capability-profiles.yml`
+- [x] 创建 `src/main/resources/assets/packages/phase2-default/experience-units.yml`
+- [x] 创建 `src/test/resources/assets/packages/phase2-alt/` 替代资产包
+- [x] 创建 `src/test/resources/assets/packages/broken-package/` 错误资产包
 
 ## 3.2 Repository 实现
 
-- [ ] 创建 `provider/yaml/YamlAssetPackageRepository.java`
-- [ ] 实现 `loadManifest(packageId)`
-- [ ] 实现 `listPackages()`
-- [ ] 实现 `loadResource(packageId, relativePath)`
-- [ ] 支持默认 active package
-- [ ] disabled / deprecated package 不能被 Runtime 使用
-- [ ] 缺失安全关键资产时抛出 AssetLoadException
-- [ ] 编写 YamlAssetPackageRepository 单元测试
+- [x] 创建 `provider/yaml/YamlAssetPackageRepository.java`
+- [x] 实现 `loadManifest(packageId)`
+- [x] 实现 `listPackages()`
+- [x] 实现 `loadResource(packageId, relativePath)`
+- [x] 支持默认 active package
+- [x] disabled / deprecated package 不能被 Runtime 使用
+- [x] 缺失安全关键资产时抛出 AssetLoadException
+- [x] 编写 YamlAssetPackageRepository 单元测试
 
 ## 3.3 Phase2-P0-B 验收
 
-- [ ] 默认资产包能加载
-- [ ] 替代资产包能加载
-- [ ] broken package 能触发错误
-- [ ] manifest 字段能被解析
-- [ ] 所有测试通过
+- [x] 默认资产包能加载
+- [x] 替代资产包能加载
+- [x] broken package 能触发错误
+- [x] manifest 字段能被解析
+- [x] 所有测试通过
 
 ---
 
@@ -251,3 +251,4 @@
 |---|---|---|
 | 2026-06-26 | 创建 Phase 2 任务清单 | 用于约束共享能力资产原型实现 |
 | 2026-06-26 | 完成 Phase2-P0-A | 资产元数据、Provider 接口、AssetLoadException 及单元/Mock 测试；Runtime 主流程未改动 |
+| 2026-06-26 | 完成 Phase2-P0-B | phase2-default/alt/broken 资产包与 YamlAssetPackageRepository；Runtime 主流程未改动 |

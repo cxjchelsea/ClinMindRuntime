@@ -1,0 +1,14 @@
+experience_units:
+  - experience_id: exp_chest_activity_001
+    symptom_group: chest_pain
+    trigger_features:
+      - activity_related
+    summary: 活动相关胸痛应优先排除高风险原因
+    suggested_questions:
+      - 是否伴随出汗或呼吸困难？
+    suggested_cautions:
+      - 不要给出低风险安抚
+    affected_modules:
+      - QuestionTestPolicy
+    confidence: 0.7
+    review_status: mock_verified

@@ -1,0 +1,7 @@
+capability_profiles:
+  - symptom_group: chest_pain
+    level: L2
+    patient_allowed_outputs:
+      - O1_continue_questioning
+    clinician_allowed_outputs:
+      - O3_clinician_candidate_diagnosis

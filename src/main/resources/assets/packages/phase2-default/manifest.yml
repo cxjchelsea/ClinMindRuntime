@@ -1,0 +1,13 @@
+package_id: phase2-default
+version: 0.2.0
+status: active
+display_name: Phase 2 Default Asset Package
+description: Minimal shared assets for Phase 2 prototype
+created_at: 2026-06-26T00:00:00Z
+updated_at: 2026-06-26T00:00:00Z
+source: internal_phase2_yaml
+owner: ClinMindRuntime
+supported_symptom_groups:
+  - chest_pain
+  - fever
+default_package: true

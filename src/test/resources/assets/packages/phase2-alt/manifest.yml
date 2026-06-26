@@ -1,0 +1,12 @@
+package_id: phase2-alt
+version: 0.2.1-alt
+status: active
+display_name: Phase 2 Alternate Asset Package
+description: Alternate package for replacement testing
+created_at: 2026-06-26T00:00:00Z
+updated_at: 2026-06-26T00:00:00Z
+source: internal_phase2_yaml_test
+owner: ClinMindRuntime
+supported_symptom_groups:
+  - chest_pain
+default_package: false

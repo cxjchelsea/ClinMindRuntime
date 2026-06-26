@@ -1,0 +1,17 @@
+symptom_group: fever
+common_diagnoses:
+  - name: viral_upper_respiratory_infection
+    risk_level: low
+  - name: common_cold
+    risk_level: low
+must_not_miss:
+  - name: severe_bacterial_infection
+    risk_level: high
+  - name: sepsis
+    risk_level: high
+required_questions:
+  - 发热持续了多久？
+  - 是否伴随寒战或意识改变？
+recommended_tests:
+  - 血常规
+  - C反应蛋白

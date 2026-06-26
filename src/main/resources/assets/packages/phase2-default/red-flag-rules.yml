@@ -1,0 +1,24 @@
+red_flag_rules:
+  - rule_id: rf_001
+    symptom_group: chest_pain
+    features:
+      - activity_related
+      - sweating
+    risk_level: high
+    action: urgent_evaluation
+    patient_constraint: no_low_risk_reassurance
+  - rule_id: rf_002
+    symptom_group: chest_pain
+    features:
+      - severe_pain
+    risk_level: high
+    action: urgent_evaluation
+    patient_constraint: no_low_risk_reassurance
+  - rule_id: rf_003
+    symptom_group: fever
+    features:
+      - high_fever
+      - altered_consciousness
+    risk_level: high
+    action: urgent_evaluation
+    patient_constraint: no_low_risk_reassurance

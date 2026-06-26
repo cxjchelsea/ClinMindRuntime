@@ -1,0 +1,10 @@
+capability_profiles:
+  - symptom_group: chest_pain
+    level: L2
+    patient_allowed_outputs:
+      - O1_continue_questioning
+      - O2_risk_hint
+      - O5_visit_or_urgent_care_recommendation
+    clinician_allowed_outputs:
+      - O3_clinician_candidate_diagnosis
+      - O7_clinician_full_report

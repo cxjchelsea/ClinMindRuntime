@@ -1,0 +1,12 @@
+package_id: broken-package
+version: 0.0.1-broken
+status: active
+display_name: Broken Asset Package
+description: Missing security-critical assets for fail-closed testing
+created_at: 2026-06-26T00:00:00Z
+updated_at: 2026-06-26T00:00:00Z
+source: internal_phase2_yaml_test
+owner: ClinMindRuntime
+supported_symptom_groups:
+  - chest_pain
+default_package: false
