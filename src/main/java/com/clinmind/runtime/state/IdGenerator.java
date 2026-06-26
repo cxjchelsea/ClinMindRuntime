@@ -14,4 +14,8 @@ public final class IdGenerator {
     public static String traceId() {
         return "trace_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String evalRunId() {
+        return "eval_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

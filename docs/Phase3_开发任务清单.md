@@ -104,22 +104,22 @@
 
 ## 4.1 Runner
 
-- [/] 创建 `evaluation/EvaluationRunner.java`
-- [/] 创建 `evaluation/RuntimeEvaluationRunner.java`
-- [/] 创建 `evaluation/EvaluationRunStore.java`
-- [/] 实现单轮病例 startRuntime
-- [/] 实现多轮病例 continueRuntime
-- [/] 收集 RuntimeState
-- [/] 收集 RuntimeTrace
-- [/] 捕获 Runtime 异常并转为 EvaluationItemResult
-- [/] 支持 failFast=false 继续执行
+- [x] 创建 `evaluation/EvaluationRunner.java`
+- [x] 创建 `evaluation/RuntimeEvaluationRunner.java`
+- [x] 创建 `evaluation/EvaluationRunStore.java`
+- [x] 实现单轮病例 startRuntime
+- [x] 实现多轮病例 continueRuntime
+- [x] 收集 RuntimeState
+- [x] 收集 RuntimeTrace
+- [x] 捕获 Runtime 异常并转为 EvaluationItemResult
+- [x] 支持 failFast=false 继续执行
 
 ## 4.2 测试
 
-- [/] 编写 EvaluationRunnerTest
-- [/] 编写 RuntimeEvaluationRunnerIntegrationTest
-- [/] 测试 ERROR_SAFE_HALTED 可作为有效评估结果
-- [/] 测试多轮病例不会重复 EntryAssessment
+- [x] 编写 EvaluationRunnerTest
+- [x] 编写 RuntimeEvaluationRunnerIntegrationTest
+- [x] 测试 ERROR_SAFE_HALTED 可作为有效评估结果
+- [x] 测试多轮病例不会重复 EntryAssessment
 
 ---
 
@@ -251,3 +251,4 @@
 | 2026-06-26 | 创建 Phase 3 任务清单 | 用于约束训练与评估闭环 MVP 实现 |
 | 2026-06-26 | 完成 Phase3-P0-A | Evaluation 基础数据结构（17 类）+ 单元测试与 JSON 序列化测试；150 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-B | phase3-default 病例集 YAML + YamlEvaluationCaseRepository；13 个标准病例；157 项测试全绿 |
+| 2026-06-26 | 完成 Phase3-P0-C | RuntimeEvaluationRunner 经 RuntimeService 执行病例；EvaluationRunStore；164 项测试全绿 |
