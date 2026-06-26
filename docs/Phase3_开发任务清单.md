@@ -71,30 +71,30 @@
 
 ## 3.1 资源文件
 
-- [ ] 创建 `src/main/resources/evaluation/case-sets/phase3-default/manifest.yml`
-- [ ] 创建 `chest-pain-cases.yml`
-- [ ] 创建 `fever-cases.yml`
-- [ ] 创建 `wellness-regression-cases.yml`
-- [ ] 创建 `unsupported-regression-cases.yml`
-- [ ] 创建 `patient-boundary-cases.yml`
-- [ ] 创建 `trace-asset-cases.yml`
+- [x] 创建 `src/main/resources/evaluation/case-sets/phase3-default/manifest.yml`
+- [x] 创建 `chest-pain-cases.yml`
+- [x] 创建 `fever-cases.yml`
+- [x] 创建 `wellness-regression-cases.yml`
+- [x] 创建 `unsupported-regression-cases.yml`
+- [x] 创建 `patient-boundary-cases.yml`
+- [x] 创建 `trace-asset-cases.yml`
 
 ## 3.2 Repository
 
-- [ ] 创建 `evaluation/EvaluationCaseRepository.java`
-- [ ] 创建 `evaluation/yaml/YamlEvaluationCaseRepository.java`
-- [ ] 实现 `loadCaseSet(caseSetId)`
-- [ ] 实现 `loadCases(caseSetId)`
-- [ ] 支持按 symptomGroup 过滤
-- [ ] 支持按 tag 过滤
-- [ ] 病例格式错误时抛出明确异常
+- [x] 创建 `evaluation/EvaluationCaseRepository.java`
+- [x] 创建 `evaluation/yaml/YamlEvaluationCaseRepository.java`
+- [x] 实现 `loadCaseSet(caseSetId)`
+- [x] 实现 `loadCases(caseSetId)`
+- [x] 支持按 symptomGroup 过滤
+- [x] 支持按 tag 过滤
+- [x] 病例格式错误时抛出明确异常
 
 ## 3.3 测试
 
-- [ ] 编写 YamlEvaluationCaseRepositoryTest
-- [ ] 测试未知 case_set
-- [ ] 测试格式错误病例
-- [ ] 测试病例过滤
+- [x] 编写 YamlEvaluationCaseRepositoryTest
+- [x] 测试未知 case_set
+- [x] 测试格式错误病例
+- [x] 测试病例过滤
 
 ---
 
@@ -104,22 +104,22 @@
 
 ## 4.1 Runner
 
-- [ ] 创建 `evaluation/EvaluationRunner.java`
-- [ ] 创建 `evaluation/RuntimeEvaluationRunner.java`
-- [ ] 创建 `evaluation/EvaluationRunStore.java`
-- [ ] 实现单轮病例 startRuntime
-- [ ] 实现多轮病例 continueRuntime
-- [ ] 收集 RuntimeState
-- [ ] 收集 RuntimeTrace
-- [ ] 捕获 Runtime 异常并转为 EvaluationItemResult
-- [ ] 支持 failFast=false 继续执行
+- [/] 创建 `evaluation/EvaluationRunner.java`
+- [/] 创建 `evaluation/RuntimeEvaluationRunner.java`
+- [/] 创建 `evaluation/EvaluationRunStore.java`
+- [/] 实现单轮病例 startRuntime
+- [/] 实现多轮病例 continueRuntime
+- [/] 收集 RuntimeState
+- [/] 收集 RuntimeTrace
+- [/] 捕获 Runtime 异常并转为 EvaluationItemResult
+- [/] 支持 failFast=false 继续执行
 
 ## 4.2 测试
 
-- [ ] 编写 EvaluationRunnerTest
-- [ ] 编写 RuntimeEvaluationRunnerIntegrationTest
-- [ ] 测试 ERROR_SAFE_HALTED 可作为有效评估结果
-- [ ] 测试多轮病例不会重复 EntryAssessment
+- [/] 编写 EvaluationRunnerTest
+- [/] 编写 RuntimeEvaluationRunnerIntegrationTest
+- [/] 测试 ERROR_SAFE_HALTED 可作为有效评估结果
+- [/] 测试多轮病例不会重复 EntryAssessment
 
 ---
 
@@ -250,3 +250,4 @@
 |---|---|---|
 | 2026-06-26 | 创建 Phase 3 任务清单 | 用于约束训练与评估闭环 MVP 实现 |
 | 2026-06-26 | 完成 Phase3-P0-A | Evaluation 基础数据结构（17 类）+ 单元测试与 JSON 序列化测试；150 项测试全绿 |
+| 2026-06-26 | 完成 Phase3-P0-B | phase3-default 病例集 YAML + YamlEvaluationCaseRepository；13 个标准病例；157 项测试全绿 |

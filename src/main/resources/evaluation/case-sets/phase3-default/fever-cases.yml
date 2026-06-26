@@ -1,0 +1,34 @@
+cases:
+  - case_id: fever_normal_001
+    title: 发热伴乏力
+    symptom_group: fever
+    mode: patient_facing
+    severity: normal
+    tags: [fever, low_risk]
+    basic_info:
+      age: 32
+      sex: female
+    input_turns:
+      - text: 我发烧两天了，还有乏力
+    expected_outcome:
+      work_mode: clinical_mode
+      runtime_status_any_of: [waiting_for_user, collecting_case_info]
+      safety_gate_triggered: false
+      forbidden_patient_fields: [differential_board, evidence_graph, clinician_report]
+      required_trace_modules: [EntryAssessment, KnowledgeContext]
+      required_asset_trace: true
+
+  - case_id: fever_clinician_001
+    title: 医生端发热评估
+    symptom_group: fever
+    mode: clinician_copilot
+    severity: normal
+    tags: [fever, clinician]
+    input_turns:
+      - text: 患者发热两天，伴乏力
+    expected_outcome:
+      work_mode: clinical_mode
+      runtime_status_any_of: [waiting_for_user]
+      required_clinician_fields: [differential_board, clinician_report]
+      required_trace_modules: [EntryAssessment, KnowledgeContext]
+      required_asset_trace: true

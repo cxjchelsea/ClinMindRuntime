@@ -1,0 +1,15 @@
+case_set_id: phase3-default
+version: 0.3.0
+description: Phase 3 default evaluation case set
+asset_package_id: phase2-default
+asset_package_version: 0.2.0
+symptom_groups:
+  - chest_pain
+  - fever
+case_files:
+  - chest-pain-cases.yml
+  - fever-cases.yml
+  - wellness-regression-cases.yml
+  - unsupported-regression-cases.yml
+  - patient-boundary-cases.yml
+  - trace-asset-cases.yml

@@ -1,0 +1,25 @@
+cases:
+  - case_id: unsupported_regression_001
+    title: 非医疗话题回归
+    symptom_group: unsupported
+    mode: patient_facing
+    severity: info
+    tags: [unsupported, regression]
+    input_turns:
+      - text: 帮我写一份工作报告
+    expected_outcome:
+      work_mode: unsupported
+      runtime_status_any_of: [completed]
+      forbidden_patient_fields: [differential_board, evidence_graph, clinician_report]
+
+  - case_id: unsupported_regression_002
+    title: 闲聊话题不支持
+    symptom_group: unsupported
+    mode: patient_facing
+    severity: info
+    tags: [unsupported, regression]
+    input_turns:
+      - text: 今天天气怎么样
+    expected_outcome:
+      work_mode: unsupported
+      runtime_status_any_of: [completed]

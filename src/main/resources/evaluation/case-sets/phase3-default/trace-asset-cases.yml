@@ -1,0 +1,26 @@
+cases:
+  - case_id: trace_asset_001
+    title: Trace 应记录资产包信息
+    symptom_group: chest_pain
+    mode: clinician_copilot
+    severity: major
+    tags: [trace_asset, asset_version]
+    input_turns:
+      - text: 胸口闷，活动后更明显
+    expected_outcome:
+      work_mode: clinical_mode
+      required_trace_modules: [KnowledgeContext, SafetyGate]
+      required_asset_trace: true
+
+  - case_id: trace_asset_002
+    title: 经验资产 Trace 记录
+    symptom_group: chest_pain
+    mode: clinician_copilot
+    severity: major
+    tags: [trace_asset, experience]
+    input_turns:
+      - text: 胸口闷，活动后更明显，走路快的时候加重
+    expected_outcome:
+      work_mode: clinical_mode
+      required_trace_modules: [KnowledgeContext, ExperienceContext]
+      required_asset_trace: true

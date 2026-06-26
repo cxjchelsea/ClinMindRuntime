@@ -1,0 +1,28 @@
+cases:
+  - case_id: wellness_regression_001
+    title: 养生咨询回归
+    symptom_group: wellness
+    mode: patient_facing
+    severity: info
+    tags: [wellness, regression]
+    input_turns:
+      - text: 我想了解养生建议，怎么锻炼比较好
+    expected_outcome:
+      work_mode: wellness_mode
+      runtime_status_any_of: [wellness_mode]
+      safety_gate_triggered: false
+      forbidden_patient_fields: [differential_board, evidence_graph, clinician_report]
+      required_trace_modules: [EntryAssessment]
+
+  - case_id: wellness_regression_002
+    title: 保健话题不应进入临床管线
+    symptom_group: wellness
+    mode: patient_facing
+    severity: info
+    tags: [wellness, regression]
+    input_turns:
+      - text: 平时怎么保养身体，有什么锻炼建议
+    expected_outcome:
+      work_mode: wellness_mode
+      runtime_status_any_of: [wellness_mode]
+      forbidden_patient_fields: [differential_board, evidence_graph]

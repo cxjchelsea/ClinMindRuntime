@@ -1,0 +1,10 @@
+cases:
+  - case_id: broken_case_001
+    title: 缺少 input_turns
+    symptom_group: chest_pain
+    mode: patient_facing
+    severity: normal
+    tags: [broken]
+    expected_outcome:
+      work_mode: clinical_mode
+      runtime_status_any_of: [waiting_for_user]
