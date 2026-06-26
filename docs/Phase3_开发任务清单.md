@@ -34,34 +34,34 @@
 
 ## 2.1 病例结构
 
-- [ ] 创建 `evaluation/EvaluationCase.java`
-- [ ] 创建 `evaluation/EvaluationCaseSet.java`
-- [ ] 创建 `evaluation/EvaluationInputTurn.java`
-- [ ] 创建 `evaluation/ExpectedOutcome.java`
-- [ ] 创建 `evaluation/CaseSeverity.java`
+- [x] 创建 `evaluation/EvaluationCase.java`
+- [x] 创建 `evaluation/EvaluationCaseSet.java`
+- [x] 创建 `evaluation/EvaluationInputTurn.java`
+- [x] 创建 `evaluation/ExpectedOutcome.java`
+- [x] 创建 `evaluation/CaseSeverity.java`
 
 ## 2.2 评估运行结构
 
-- [ ] 创建 `evaluation/EvaluationRunConfig.java`
-- [ ] 创建 `evaluation/EvaluationRun.java`
-- [ ] 创建 `evaluation/EvaluationRunStatus.java`
-- [ ] 创建 `evaluation/RuntimeCaseExecution.java`
+- [x] 创建 `evaluation/EvaluationRunConfig.java`
+- [x] 创建 `evaluation/EvaluationRun.java`
+- [x] 创建 `evaluation/EvaluationRunStatus.java`
+- [x] 创建 `evaluation/RuntimeCaseExecution.java`
 
 ## 2.3 结果结构
 
-- [ ] 创建 `evaluation/EvaluationItemResult.java`
-- [ ] 创建 `evaluation/EvaluationResult.java`
-- [ ] 创建 `evaluation/ScoreBreakdown.java`
-- [ ] 创建 `evaluation/MetricResult.java`
-- [ ] 创建 `evaluation/MetricSeverity.java`
-- [ ] 创建 `evaluation/SafetyViolation.java`
-- [ ] 创建 `evaluation/SafetyViolationType.java`
-- [ ] 创建 `evaluation/RegressionFinding.java`
+- [x] 创建 `evaluation/EvaluationItemResult.java`
+- [x] 创建 `evaluation/EvaluationResult.java`
+- [x] 创建 `evaluation/ScoreBreakdown.java`
+- [x] 创建 `evaluation/MetricResult.java`
+- [x] 创建 `evaluation/MetricSeverity.java`
+- [x] 创建 `evaluation/SafetyViolation.java`
+- [x] 创建 `evaluation/SafetyViolationType.java`
+- [x] 创建 `evaluation/RegressionFinding.java`
 
 ## 2.4 测试
 
-- [ ] 编写 Evaluation 数据结构单元测试
-- [ ] 编写 JSON 序列化 / 反序列化测试
+- [x] 编写 Evaluation 数据结构单元测试
+- [x] 编写 JSON 序列化 / 反序列化测试
 
 ---
 
@@ -249,3 +249,4 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-06-26 | 创建 Phase 3 任务清单 | 用于约束训练与评估闭环 MVP 实现 |
+| 2026-06-26 | 完成 Phase3-P0-A | Evaluation 基础数据结构（17 类）+ 单元测试与 JSON 序列化测试；150 项测试全绿 |
