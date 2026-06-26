@@ -55,28 +55,30 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 6. docs/Phase3_Runtime评估接入设计.md
 7. docs/Phase3_CapabilityProfile更新机制设计.md
 8. docs/Phase3_API与测试设计.md
-9. docs/全局技术栈与架构选型.md
-10. docs/AI前沿技术选型与接入规划.md
-11. docs/模型训练与后训练规划.md
-12. docs/Phase2_开发任务清单.md
-13. docs/Phase2_共享能力资产原型_实现规格.md
-14. docs/Phase2_Provider接口设计.md
-15. docs/Phase2_资产数据结构与版本设计.md
-16. docs/Phase2_Runtime接入改造设计.md
-17. docs/Phase2_API与测试设计.md
-18. docs/Phase1_技术栈与工程架构决策.md
-19. docs/Phase1_Runtime_MVP_实现规格.md
-20. docs/Phase1_数据结构与状态设计.md
-21. docs/Phase1_模块接口设计.md
-22. docs/Phase1_API与测试设计.md
-23. docs/ClinMindRuntime阶段拆分路线图.md
-24. docs/ClinMindRuntime完整系统设计.md
+9. docs/ClinMindRuntime技术实现总方案.md
+10. docs/全局技术栈与架构选型.md
+11. docs/AI前沿技术选型与接入规划.md
+12. docs/模型训练与后训练规划.md
+13. docs/Phase2_开发任务清单.md
+14. docs/Phase2_共享能力资产原型_实现规格.md
+15. docs/Phase2_Provider接口设计.md
+16. docs/Phase2_资产数据结构与版本设计.md
+17. docs/Phase2_Runtime接入改造设计.md
+18. docs/Phase2_API与测试设计.md
+19. docs/Phase1_技术栈与工程架构决策.md
+20. docs/Phase1_Runtime_MVP_实现规格.md
+21. docs/Phase1_数据结构与状态设计.md
+22. docs/Phase1_模块接口设计.md
+23. docs/Phase1_API与测试设计.md
+24. docs/ClinMindRuntime阶段拆分路线图.md
+25. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
 
 ```text
 Phase 3 文档优先指导当前新增能力。
+技术实现总方案约束包结构、依赖方向、Runtime 主链路、Provider 边界、Evaluation 实现、存储演进、测试和部署演进。
 全局技术栈文档约束前端、数据库、向量库、图数据库、Python Provider、部署和权限等长期技术选型。
 AI 前沿技术文档约束 MCP、Agent SDK、LangGraph、GraphRAG、LLM-as-a-Judge、Skills、Agent Memory 等技术的接入阶段和边界。
 模型训练与后训练规划约束意图识别、病例抽取、证据检索、安全表达、后训练、模型部署和 Model Provider 的长期路线。
@@ -324,6 +326,13 @@ MCP / Agent SDK / LangGraph / LangChain / GraphRAG / Skills / LLM-as-a-Judge 不
 如果需要引入训练能力，必须先查阅 docs/模型训练与后训练规划.md。
 ```
 
+## 8.8 技术实现必须遵守总方案
+
+```text
+代码包结构、依赖方向、API 分层、Provider 边界、Evaluation 架构、存储演进、测试策略必须遵守 docs/ClinMindRuntime技术实现总方案.md。
+如需偏离，必须先更新文档说明原因。
+```
+
 ---
 
 # 九、测试约束
@@ -377,9 +386,10 @@ broken-package fail-safe 测试通过。
 6. 是否需要新增或更新 JUnit 测试？
 7. 是否会影响患者端输出边界？
 8. 是否会自动修改资产包或 CapabilityProfile？如果会，则禁止。
-9. 是否违反 docs/全局技术栈与架构选型.md 的接入阶段？
-10. 是否违反 docs/AI前沿技术选型与接入规划.md 的 AI 技术边界？
-11. 是否违反 docs/模型训练与后训练规划.md 的训练接入边界？
+9. 是否违反 docs/ClinMindRuntime技术实现总方案.md 的代码分层和依赖方向？
+10. 是否违反 docs/全局技术栈与架构选型.md 的接入阶段？
+11. 是否违反 docs/AI前沿技术选型与接入规划.md 的 AI 技术边界？
+12. 是否违反 docs/模型训练与后训练规划.md 的训练接入边界？
 ```
 
 ---
@@ -431,5 +441,5 @@ RAG / GraphRAG
 Phase 1 Runtime Core 和 Phase 2 Asset Provider 必须保持稳定。
 Evaluation 只能评估 Runtime，并生成 EvaluationResult 与 CapabilityProfileUpdateProposal。
 Phase 3 的目标是让能力边界有评估依据，而不是继续堆问诊功能。
-全局技术栈、AI 前沿技术和模型训练规划可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
+技术实现总方案、全局技术栈、AI 前沿技术和模型训练规划可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
 ```
