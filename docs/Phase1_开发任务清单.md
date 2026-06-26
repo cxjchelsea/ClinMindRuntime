@@ -365,7 +365,7 @@
 | 验收方式 | `java -jar target/clinmind-runtime-0.1.0-SNAPSHOT.jar` 启动后，Postman 调用 REST API |
 | 服务地址 | `http://localhost:8080` |
 | 运行环境 | Java 21.0.9（Temurin），Spring Boot 3.3.5 |
-| 详细记录 | [`docs/API测试.md`](API测试.md) |
+| 详细记录 | [`docs/Phase1_人工测试API结果.md`](Phase1_人工测试API结果.md) |
 | 代码基线 | commit `2abe52d`（验收漏洞修复） |
 
 | 用例 | 场景 | 结论 |
@@ -410,4 +410,4 @@
 | 2026-06-25 | 完成 Java MVP-P0-E | DecisionBoundary、PatientOutput、ClinicianReport、FailurePolicy 及分角色 API |
 | 2026-06-25 | 完成 Java MVP-P0-F | 12 个 YAML 集成病例与 RuntimeFlowIntegrationTest，Phase 1 MVP 闭环验收通过 |
 | 2026-06-26 | Phase 1 验收漏洞修复 | 封堵患者端诊断泄漏；AOP Trace 与 /trace 合并；StaticRule fail-closed；WELLNESS_MODE 隔离；DecisionBoundary fail-safe → ERROR_SAFE_HALTED；补充替换规则与专项集成测试 |
-| 2026-06-26 | Phase 1 人工 Postman 验收通过 | 6 条 API 冒烟用例全部通过；记录见 `docs/API测试.md`；Phase 1 后端 MVP 正式结项 |
+| 2026-06-26 | Phase 1 人工 Postman 验收通过 | 6 条 API 冒烟用例全部通过；记录见 `docs/Phase1_人工测试API结果.md`；Phase 1 后端 MVP 正式结项 |
