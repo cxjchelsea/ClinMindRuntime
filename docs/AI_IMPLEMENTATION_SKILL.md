@@ -54,25 +54,29 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 6. docs/Phase3_Runtime评估接入设计.md
 7. docs/Phase3_CapabilityProfile更新机制设计.md
 8. docs/Phase3_API与测试设计.md
-9. docs/Phase2_开发任务清单.md
-10. docs/Phase2_共享能力资产原型_实现规格.md
-11. docs/Phase2_Provider接口设计.md
-12. docs/Phase2_资产数据结构与版本设计.md
-13. docs/Phase2_Runtime接入改造设计.md
-14. docs/Phase2_API与测试设计.md
-15. docs/Phase1_技术栈与工程架构决策.md
-16. docs/Phase1_Runtime_MVP_实现规格.md
-17. docs/Phase1_数据结构与状态设计.md
-18. docs/Phase1_模块接口设计.md
-19. docs/Phase1_API与测试设计.md
-20. docs/ClinMindRuntime阶段拆分路线图.md
-21. docs/ClinMindRuntime完整系统设计.md
+9. docs/全局技术栈与架构选型.md
+10. docs/AI前沿技术选型与接入规划.md
+11. docs/Phase2_开发任务清单.md
+12. docs/Phase2_共享能力资产原型_实现规格.md
+13. docs/Phase2_Provider接口设计.md
+14. docs/Phase2_资产数据结构与版本设计.md
+15. docs/Phase2_Runtime接入改造设计.md
+16. docs/Phase2_API与测试设计.md
+17. docs/Phase1_技术栈与工程架构决策.md
+18. docs/Phase1_Runtime_MVP_实现规格.md
+19. docs/Phase1_数据结构与状态设计.md
+20. docs/Phase1_模块接口设计.md
+21. docs/Phase1_API与测试设计.md
+22. docs/ClinMindRuntime阶段拆分路线图.md
+23. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
 
 ```text
 Phase 3 文档优先指导当前新增能力。
+全局技术栈文档约束前端、数据库、向量库、图数据库、Python Provider、部署和权限等长期技术选型。
+AI 前沿技术文档约束 MCP、Agent SDK、LangGraph、GraphRAG、LLM-as-a-Judge、Skills、Agent Memory 等技术的接入阶段和边界。
 Phase 2 文档仍然约束 Provider、Asset Package、资产版本和 debug API 边界。
 Phase 1 文档仍然约束 Runtime Core、安全门、输出边界和患者端安全表达。
 总设计文档描述完整愿景，但不能作为提前实现 Phase 4–5 能力的理由。
@@ -196,6 +200,8 @@ POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal
 14. 不绕过 RuntimeService 直接评估底层模块。
 15. 不改变患者端输出边界。
 16. 不绕过 SafetyGate 或 DecisionBoundary。
+17. 不引入 MCP / LangGraph / Agent SDK 作为 Runtime 主控。
+18. 不提前接入 PostgreSQL / Redis / Neo4j / Milvus / 前端平台。
 ```
 
 如果任务中出现上述需求，AI 必须回复：
@@ -294,6 +300,13 @@ Evaluation 必须检查 RuntimeTrace 中的 asset_package_id、asset_package_ver
 缺失资产版本记录时，不能认为该症状群能力可升级。
 ```
 
+## 8.6 前沿 AI 技术只能作为 Provider / Adapter / 辅助评估
+
+```text
+MCP / Agent SDK / LangGraph / LangChain / GraphRAG / Skills / LLM-as-a-Judge 不能替代 Runtime 主控。
+如果需要引入，必须先查阅 docs/AI前沿技术选型与接入规划.md。
+```
+
 ---
 
 # 九、测试约束
@@ -347,6 +360,8 @@ broken-package fail-safe 测试通过。
 6. 是否需要新增或更新 JUnit 测试？
 7. 是否会影响患者端输出边界？
 8. 是否会自动修改资产包或 CapabilityProfile？如果会，则禁止。
+9. 是否违反 docs/全局技术栈与架构选型.md 的接入阶段？
+10. 是否违反 docs/AI前沿技术选型与接入规划.md 的 AI 技术边界？
 ```
 
 ---
@@ -369,7 +384,23 @@ Phase3-P0-A：Evaluation 数据结构
 5. 同步更新 docs/Phase3_开发任务清单.md。
 ```
 
-不要在这个任务中实现 EvaluationRunner、Scorer、CapabilityProfile 更新、前端后台、真实审核流或经验进化。
+不应在这个任务中实现：
+
+```text
+EvaluationRunner
+Scorer
+CapabilityProfile 更新
+前端后台
+真实审核流
+经验进化
+MCP
+LangGraph
+Agent SDK
+LLM-as-a-Judge
+Python AI Provider
+RAG / GraphRAG
+数据库持久化
+```
 
 ---
 
@@ -381,4 +412,5 @@ Phase3-P0-A：Evaluation 数据结构
 Phase 1 Runtime Core 和 Phase 2 Asset Provider 必须保持稳定。
 Evaluation 只能评估 Runtime，并生成 EvaluationResult 与 CapabilityProfileUpdateProposal。
 Phase 3 的目标是让能力边界有评估依据，而不是继续堆问诊功能。
+全局技术栈和 AI 前沿技术可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
 ```
