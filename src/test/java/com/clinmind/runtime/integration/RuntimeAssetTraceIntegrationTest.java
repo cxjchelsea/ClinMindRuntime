@@ -51,7 +51,7 @@ class RuntimeAssetTraceIntegrationTest {
                 .andExpect(jsonPath("$.data.traces[0].modules_executed")
                         .value(org.hamcrest.Matchers.hasItem("KnowledgeContext")));
 
-        mockMvc.perform(get("/api/v1/runtime/" + runtimeId + "/assets-used"))
+        mockMvc.perform(get("/api/v1/debug/runtime/" + runtimeId + "/assets-used"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.package_id").value("phase2-default"))
                 .andExpect(jsonPath("$.data.assets[?(@.module_name=='KnowledgeContext')]").exists())

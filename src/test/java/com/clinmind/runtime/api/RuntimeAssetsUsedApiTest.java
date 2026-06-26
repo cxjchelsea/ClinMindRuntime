@@ -41,7 +41,7 @@ class RuntimeAssetsUsedApiTest {
         JsonNode data = OBJECT_MAPPER.readTree(startResult.getResponse().getContentAsString()).get("data");
         String runtimeId = data.get("runtime_id").asText();
 
-        mockMvc.perform(get("/api/v1/runtime/" + runtimeId + "/assets-used"))
+        mockMvc.perform(get("/api/v1/debug/runtime/" + runtimeId + "/assets-used"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.runtime_id").value(runtimeId))
                 .andExpect(jsonPath("$.data.package_id").value("phase2-default"))
@@ -64,5 +64,11 @@ class RuntimeAssetsUsedApiTest {
                 .andExpect(jsonPath("$.data.knowledge_context.source_assets_count").exists())
                 .andExpect(jsonPath("$.data.knowledge_context.common_diagnoses").doesNotExist())
                 .andExpect(jsonPath("$.data.knowledge_context.must_not_miss").doesNotExist());
+    }
+
+    @Test
+    void legacyAssetsUsedPathIsNotExposed() throws Exception {
+        mockMvc.perform(get("/api/v1/runtime/rt_not_exist/assets-used"))
+                .andExpect(status().isNotFound());
     }
 }

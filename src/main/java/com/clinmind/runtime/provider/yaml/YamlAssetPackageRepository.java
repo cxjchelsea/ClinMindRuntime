@@ -42,6 +42,7 @@ public class YamlAssetPackageRepository implements AssetPackageRepository {
         this.resourcePatternResolver = resourcePatternResolver;
     }
 
+    @Override
     public String getDefaultPackageId() {
         return listPackages().stream()
                 .filter(AssetPackageManifest::defaultPackage)
@@ -50,6 +51,7 @@ public class YamlAssetPackageRepository implements AssetPackageRepository {
                 .orElse(DEFAULT_PACKAGE_ID);
     }
 
+    @Override
     public AssetPackageManifest loadRuntimeManifest(String packageId) {
         AssetPackageManifest manifest = loadManifest(packageId);
         assertRuntimeUsable(manifest);

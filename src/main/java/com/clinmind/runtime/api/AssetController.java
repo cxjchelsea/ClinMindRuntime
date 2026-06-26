@@ -6,7 +6,7 @@ import com.clinmind.runtime.asset.AssetPackageManifest;
 import com.clinmind.runtime.asset.AssetQueryContext;
 import com.clinmind.runtime.asset.MedicalKnowledgeAsset;
 import com.clinmind.runtime.provider.MedicalKnowledgeProvider;
-import com.clinmind.runtime.provider.yaml.YamlAssetPackageRepository;
+import com.clinmind.runtime.asset.AssetPackageRepository;
 import com.clinmind.runtime.state.RuntimeMode;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/assets")
 public class AssetController {
 
-    private final YamlAssetPackageRepository assetPackageRepository;
+    private final AssetPackageRepository assetPackageRepository;
     private final MedicalKnowledgeProvider medicalKnowledgeProvider;
 
     public AssetController(
-            YamlAssetPackageRepository assetPackageRepository,
+            AssetPackageRepository assetPackageRepository,
             MedicalKnowledgeProvider medicalKnowledgeProvider) {
         this.assetPackageRepository = assetPackageRepository;
         this.medicalKnowledgeProvider = medicalKnowledgeProvider;

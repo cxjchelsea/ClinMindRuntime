@@ -44,7 +44,7 @@ class RuntimeWithAlternateAssetPackageTest {
         JsonNode data = OBJECT_MAPPER.readTree(result.getResponse().getContentAsString()).get("data");
         String runtimeId = data.get("runtime_id").asText();
 
-        mockMvc.perform(get("/api/v1/runtime/" + runtimeId + "/assets-used"))
+        mockMvc.perform(get("/api/v1/debug/runtime/" + runtimeId + "/assets-used"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.package_id").value("phase2-alt"));
     }

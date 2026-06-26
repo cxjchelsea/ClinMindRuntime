@@ -67,8 +67,4 @@ public class RuntimeController {
         return ApiResponse.ok(ApiResponseMapper.toTraceResponse(runtimeId, traces));
     }
 
-    @GetMapping("/{runtime_id}/assets-used")
-    public ApiResponse<?> getAssetsUsed(@PathVariable("runtime_id") String runtimeId) {
-        return ApiResponse.ok(runtimeService.getAssetsUsed(runtimeId));
-    }
 }

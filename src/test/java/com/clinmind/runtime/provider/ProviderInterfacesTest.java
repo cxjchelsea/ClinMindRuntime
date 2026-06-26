@@ -149,8 +149,18 @@ class ProviderInterfacesTest {
 
     private static final class InMemoryAssetPackageRepository implements AssetPackageRepository {
         @Override
+        public String getDefaultPackageId() {
+            return "phase2-default";
+        }
+
+        @Override
         public AssetPackageManifest loadManifest(String packageId) {
             return AssetTestFixtures.sampleManifest();
+        }
+
+        @Override
+        public AssetPackageManifest loadRuntimeManifest(String packageId) {
+            return loadManifest(packageId);
         }
 
         @Override

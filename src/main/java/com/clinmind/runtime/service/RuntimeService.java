@@ -10,9 +10,10 @@ import com.clinmind.runtime.entry.EntryAssessmentService;
 import com.clinmind.runtime.experience.ExperienceContextService;
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
 import com.clinmind.runtime.api.AssetContextRequest;
+import com.clinmind.runtime.asset.AssetLoadErrorCode;
 import com.clinmind.runtime.asset.AssetLoadException;
 import com.clinmind.runtime.asset.AssetPackageManifest;
-import com.clinmind.runtime.provider.yaml.YamlAssetPackageRepository;
+import com.clinmind.runtime.asset.AssetPackageRepository;
 import com.clinmind.runtime.output.ClinicianReportService;
 import com.clinmind.runtime.output.PatientOutputService;
 import com.clinmind.runtime.reasoning.DifferentialDiagnosisBoardService;
@@ -57,7 +58,7 @@ public class RuntimeService {
     private final ClinicianReportService clinicianReportService;
     private final FailurePolicyService failurePolicyService;
     private final RuntimeTraceCollector traceCollector;
-    private final YamlAssetPackageRepository assetPackageRepository;
+    private final AssetPackageRepository assetPackageRepository;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -74,7 +75,7 @@ public class RuntimeService {
             ClinicianReportService clinicianReportService,
             FailurePolicyService failurePolicyService,
             RuntimeTraceCollector traceCollector,
-            YamlAssetPackageRepository assetPackageRepository) {
+            AssetPackageRepository assetPackageRepository) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -229,11 +230,20 @@ public class RuntimeService {
                 ? assetContext.packageId()
                 : assetPackageRepository.getDefaultPackageId();
         AssetPackageManifest manifest = assetPackageRepository.loadRuntimeManifest(packageId);
+        String requestedVersion = assetContext != null ? assetContext.version() : null;
+        if (requestedVersion != null && !requestedVersion.isBlank()) {
+            if (!requestedVersion.equals(manifest.version())) {
+                throw new AssetLoadException(
+                        AssetLoadErrorCode.ASSET_VERSION_MISMATCH,
+                        "Requested asset package version mismatch: requested="
+                                + requestedVersion + ", actual=" + manifest.version(),
+                        true,
+                        packageId,
+                        null);
+            }
+        }
         state.setAssetPackageId(packageId);
-        state.setAssetPackageVersion(
-                assetContext != null && assetContext.version() != null
-                        ? assetContext.version()
-                        : manifest.version());
+        state.setAssetPackageVersion(manifest.version());
     }
 
     private void runOutputPipeline(RuntimeState state) {
