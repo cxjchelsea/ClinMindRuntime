@@ -38,6 +38,7 @@ import com.clinmind.runtime.trace.TraceStepLog;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -171,6 +172,11 @@ public class RuntimeService {
 
     public List<RuntimeTrace> getTraces(String runtimeId) {
         return runtimeStore.getTraces(runtimeId);
+    }
+
+    public Map<String, Object> getAssetsUsed(String runtimeId) {
+        RuntimeState state = runtimeStore.get(runtimeId);
+        return com.clinmind.runtime.api.dto.AssetApiMapper.toAssetsUsedResponse(state);
     }
 
     private void runClinicalPipeline(RuntimeState state) {

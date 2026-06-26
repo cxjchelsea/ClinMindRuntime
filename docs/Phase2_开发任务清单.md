@@ -196,18 +196,18 @@
 
 ## 7.1 API
 
-- [ ] 创建 `api/AssetController.java`
-- [ ] 实现 `GET /api/v1/assets/packages`
-- [ ] 实现 `GET /api/v1/assets/packages/{package_id}`
-- [ ] 实现 `GET /api/v1/assets/packages/{package_id}/symptom-groups/{symptom_group}`
-- [ ] 实现 `GET /api/v1/runtime/{runtime_id}/assets-used`
-- [ ] 不提供资产编辑 API
+- [x] 创建 `api/AssetController.java`
+- [x] 实现 `GET /api/v1/assets/packages`
+- [x] 实现 `GET /api/v1/assets/packages/{package_id}`
+- [x] 实现 `GET /api/v1/assets/packages/{package_id}/symptom-groups/{symptom_group}`
+- [x] 实现 `GET /api/v1/runtime/{runtime_id}/assets-used`
+- [x] 不提供资产编辑 API
 
 ## 7.2 测试
 
-- [ ] 编写 AssetControllerTest
-- [ ] 编写 RuntimeAssetsUsedApiTest
-- [ ] 患者端输出仍不泄露内部资产细节
+- [x] 编写 AssetControllerTest
+- [x] 编写 RuntimeAssetsUsedApiTest
+- [x] 患者端输出仍不泄露内部资产细节
 
 ---
 
