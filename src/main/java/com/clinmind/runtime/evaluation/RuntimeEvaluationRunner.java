@@ -27,16 +27,19 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
     private final EvaluationCaseRepository caseRepository;
     private final EvaluationRunStore runStore;
     private final EvaluationItemScoringService scoringService;
+    private final EvaluationResultAggregator resultAggregator;
 
     public RuntimeEvaluationRunner(
             RuntimeService runtimeService,
             EvaluationCaseRepository caseRepository,
             EvaluationRunStore runStore,
-            EvaluationItemScoringService scoringService) {
+            EvaluationItemScoringService scoringService,
+            EvaluationResultAggregator resultAggregator) {
         this.runtimeService = runtimeService;
         this.caseRepository = caseRepository;
         this.runStore = runStore;
         this.scoringService = scoringService;
+        this.resultAggregator = resultAggregator;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
         }
 
         EvaluationRunStatus status = resolveStatus(itemResults, aborted);
-        EvaluationRun completed = new EvaluationRun(
+        EvaluationRun completedWithoutResult = new EvaluationRun(
                 runId,
                 config,
                 status,
@@ -75,6 +78,15 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
                 Instant.now(),
                 List.copyOf(itemResults),
                 null);
+        EvaluationResult result = resultAggregator.aggregate(completedWithoutResult);
+        EvaluationRun completed = new EvaluationRun(
+                runId,
+                config,
+                status,
+                startedAt,
+                completedWithoutResult.completedAt(),
+                List.copyOf(itemResults),
+                result);
         runStore.save(completed);
         return completed;
     }

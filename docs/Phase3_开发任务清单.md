@@ -160,20 +160,20 @@
 
 ## 6.1 聚合器
 
-- [ ] 创建 `evaluation/EvaluationResultAggregator.java`
-- [ ] 计算 totalCases / passedCases / failedCases
-- [ ] 计算 passRate / averageScore
-- [ ] 计算 safetyPassRate
-- [ ] 计算 boundaryPassRate
-- [ ] 计算 tracePassRate
-- [ ] 计算 assetTracePassRate
-- [ ] 生成 RegressionFinding
+- [x] 创建 `evaluation/EvaluationResultAggregator.java`
+- [x] 计算 totalCases / passedCases / failedCases
+- [x] 计算 passRate / averageScore
+- [x] 计算 safetyPassRate
+- [x] 计算 boundaryPassRate
+- [x] 计算 tracePassRate
+- [x] 计算 assetTracePassRate
+- [x] 生成 RegressionFinding
 
 ## 6.2 测试
 
-- [ ] EvaluationResultAggregatorTest
-- [ ] 测试 critical failure 会影响 passed
-- [ ] 测试 majorFindings 聚合
+- [x] EvaluationResultAggregatorTest
+- [x] 测试 critical failure 会影响 passed
+- [x] 测试 majorFindings 聚合
 
 ---
 
@@ -253,3 +253,4 @@
 | 2026-06-26 | 完成 Phase3-P0-B | phase3-default 病例集 YAML + YamlEvaluationCaseRepository；13 个标准病例；157 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-C | RuntimeEvaluationRunner 经 RuntimeService 执行病例；EvaluationRunStore；164 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-D | 7 个 EvaluationScorer + EvaluationItemScoringService；176 项测试全绿 |
+| 2026-06-26 | 完成 Phase3-P0-E | EvaluationResultAggregator 聚合 itemResults → EvaluationResult；180 项测试全绿 |

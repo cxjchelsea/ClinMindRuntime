@@ -54,7 +54,7 @@ public final class EvaluationTestFixtures {
                 List.of(sampleCase()));
     }
 
-    static EvaluationRunConfig sampleRunConfig() {
+    public static EvaluationRunConfig sampleRunConfig() {
         return new EvaluationRunConfig(
                 "phase3-default",
                 "0.3.0",
