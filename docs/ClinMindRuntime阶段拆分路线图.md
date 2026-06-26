@@ -43,7 +43,7 @@ MVP-P0 / MVP-P1 / MVP-P2
 |---|---|---|---|
 | Phase 0 | 项目骨架与设计冻结 | 固化总设计、建立工程骨架、准备最小资产 | 项目可启动，架构边界清楚 |
 | Phase 1 | Runtime MVP | 跑通一次受控问诊 Runtime | 状态、风险、候选诊断、证据图、输出边界可运行 |
-| Phase 2 | 共享能力资产原型 | 把静态规则升级为可管理的知识和能力资产 | Knowledge Context / Capability Profile / Experience Context 有真实资产来源 |
+| Phase 2 | 共享能力资产原型 | 把静态规则升级为可管理、可替换、可版本化、可追踪的资产包和 Provider | Knowledge Context / Capability Profile / Experience Context 能通过 Provider 读取资产 |
 | Phase 3 | 训练与评估闭环 | 建立症状群训练、病例考试和能力授权机制 | Evaluation Results 能驱动 Capability Profile |
 | Phase 4 | 经验进化闭环 | 从 RuntimeTrace、反馈和结局中沉淀经验 | Experience Candidates 能被审核并进入 Clinical Experience Memory |
 | Phase 5 | 平台化与企业级治理 | 建立管理后台、权限、审计、版本、回滚和企业级运行模式 | 系统具备平台化运行和治理能力 |
@@ -114,7 +114,7 @@ README.md
 
 ## 6.1 阶段目标
 
-Phase 1 是整个项目最关键的阶段。目标是跑通一次“受控诊断 Runtime”的最小闭环。
+Phase 1 的目标是跑通一次“受控诊断 Runtime”的最小闭环。
 
 核心链路：
 
@@ -212,31 +212,59 @@ Phase 1 暂不单独实现 Redis 级别 ShortTermContextStore，而是由 `Runti
 
 ## 7.1 阶段目标
 
-把 Phase 1 中的静态配置升级为可管理、可版本化、可检索的共享能力资产原型。
+把 Phase 1 中的静态配置升级为可管理、可版本化、可检索、可替换、可追踪的共享能力资产原型。
+
+Phase 2 的重点是：
+
+```text
+Provider 接口
+Asset Package Manifest
+AssetMetadata / AssetVersion
+YAML Provider 实现
+Runtime 接入 Provider
+RuntimeTrace 记录资产使用
+```
 
 ## 7.2 本阶段要做什么
 
 ```text
-Symptom Rotation Library 原型
-Clinical Pathway 原型
-Red Flag Rules 配置管理
-Test Recommendation Rules 配置管理
-RAG Evidence Library 原型
-KG-lite 原型
-Capability Profile 原型
-Clinical Experience Memory 原型
-资产版本管理字段
 Provider 读取机制
+资产版本管理字段
+Symptom Rotation Library 的资产包原型
+Clinical Pathway 静态引用 / Provider 接口原型
+Red Flag Rules 资产化
+Test Recommendation Rules 资产化
+RAG Evidence 静态引用 / Provider 接口原型
+KG-lite 静态引用 / Provider 接口原型
+Capability Profile 资产化
+Clinical Experience Memory 的 mock / verified experience unit 原型
 ```
 
-## 7.3 完成标准
+## 7.3 本阶段不做什么
 
 ```text
-1. Runtime 不再直接读取硬编码规则，而是通过 Provider 读取资产
-2. Knowledge Context 能聚合多类知识资产
-3. Experience Context 能返回少量已验证经验单元
-4. Capability Profile 能被 DecisionBoundary 读取
-5. Phase 1 测试病例继续通过
+不做完整 RAG Evidence Library
+不引入向量数据库
+不做完整 KG-lite 引擎
+不做真实 Clinical Experience Memory 后台
+不做自动经验学习
+不做医生审核流
+不做前端资产管理后台
+不做复杂数据库治理
+不引入 Spring Cloud、Nacos、消息队列或复杂微服务
+```
+
+## 7.4 完成标准
+
+```text
+1. Runtime 不再直接读取硬编码规则，而是通过 Provider 读取资产。
+2. Knowledge Context 能聚合带 AssetMetadata 的多类知识资产。
+3. Experience Context 能返回少量 mock / verified experience units。
+4. Capability Profile 能被 DecisionBoundary 读取，并带 asset version。
+5. RuntimeTrace 能记录 package_id、asset_id、asset_type、version、module_name。
+6. 替代资产包可以在不修改 Runtime 核心代码的情况下运行。
+7. 错误资产包能触发 fail-safe。
+8. Phase 1 测试病例继续通过。
 ```
 
 ---
@@ -359,7 +387,9 @@ Phase 5：平台化与企业级治理
 
 ---
 
-# 十二、第一阶段优先级
+# 十二、阶段内部优先级
+
+## 12.1 Phase 1 优先级
 
 ```text
 MVP-P0-A：Runtime 状态骨架
@@ -368,6 +398,18 @@ MVP-P0-C：安全门和候选诊断
 MVP-P0-D：证据图与下一步动作
 MVP-P0-E：输出边界与分角色表达
 MVP-P0-F：最小测试集与集成验证
+```
+
+## 12.2 Phase 2 优先级
+
+```text
+Phase2-P0-A：资产元数据与 Provider 接口
+Phase2-P0-B：YAML Asset Package Repository
+Phase2-P0-C：YAML Provider 实现
+Phase2-P0-D：Runtime 接入 Provider
+Phase2-P0-E：ExperienceContext 原型
+Phase2-P0-F：资产调试 API
+Phase2-P0-G：集成测试与回归验收
 ```
 
 ---
@@ -391,20 +433,24 @@ MVP-P0-F：最小测试集与集成验证
 
 # 十四、当前最应该开始的工作
 
-当前不应继续扩充完整愿景，而应进入 Phase 1 的实现。
+当前应进入 Phase 2，但不能继续扩充完整愿景，也不能提前做 Phase 3–5。
 
-当前 Phase 1 文档已经拆分为：
+当前 Phase 2 文档已经拆分为：
 
 ```text
-docs/Phase1_技术栈与工程架构决策.md
-docs/Phase1_Runtime_MVP_实现规格.md
-docs/Phase1_数据结构与状态设计.md
-docs/Phase1_模块接口设计.md
-docs/Phase1_API与测试设计.md
-docs/Phase1_开发任务清单.md
+docs/Phase2_共享能力资产原型_实现规格.md
+docs/Phase2_Provider接口设计.md
+docs/Phase2_资产数据结构与版本设计.md
+docs/Phase2_Runtime接入改造设计.md
+docs/Phase2_API与测试设计.md
+docs/Phase2_开发任务清单.md
 ```
 
-下一步应该根据这些文档建立 Java Spring Boot 工程骨架，并优先实现 Runtime 状态骨架。
+下一步应该优先实现：
+
+```text
+Phase2-P0-A：资产元数据与 Provider 接口
+```
 
 ---
 
@@ -412,7 +458,7 @@ docs/Phase1_开发任务清单.md
 
 ```text
 Phase 1：证明受控诊断 Runtime 能跑通。
-Phase 2：证明 Runtime 能调用共享能力资产。
+Phase 2：证明 Runtime 能调用可替换、可版本化、可追踪的共享能力资产。
 Phase 3：证明能力不是口头声明，而能通过评估授权。
 Phase 4：证明经验不是自动记忆，而能通过治理进化。
 Phase 5：证明系统可以平台化、权限化、审计化、企业级运行。
