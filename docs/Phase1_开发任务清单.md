@@ -355,7 +355,7 @@
 - [x] 静态规则读取失败触发 fail-safe，不再 fail-open
 - [x] WELLNESS_MODE 保持 wellness 状态，不跑临床管线
 - [x] 所有测试通过
-- [x] 人工 Postman API 验收通过（见 7.4、`docs/API测试.md`）
+- [x] 人工 Postman API 验收通过（见 7.4、`docs/Phase1_人工测试API结果.md`）
 
 ## 7.4 人工 API 验收（Postman）
 
