@@ -44,20 +44,22 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 3. docs/Phase2_共享能力资产原型_实现规格.md
 4. docs/Phase2_Provider接口设计.md
 5. docs/Phase2_资产数据结构与版本设计.md
-6. docs/Phase2_API与测试设计.md
-7. docs/Phase1_技术栈与工程架构决策.md
-8. docs/Phase1_Runtime_MVP_实现规格.md
-9. docs/Phase1_数据结构与状态设计.md
-10. docs/Phase1_模块接口设计.md
-11. docs/Phase1_API与测试设计.md
-12. docs/ClinMindRuntime阶段拆分路线图.md
-13. docs/ClinMindRuntime完整系统设计.md
+6. docs/Phase2_Runtime接入改造设计.md
+7. docs/Phase2_API与测试设计.md
+8. docs/Phase1_技术栈与工程架构决策.md
+9. docs/Phase1_Runtime_MVP_实现规格.md
+10. docs/Phase1_数据结构与状态设计.md
+11. docs/Phase1_模块接口设计.md
+12. docs/Phase1_API与测试设计.md
+13. docs/ClinMindRuntime阶段拆分路线图.md
+14. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
 
 ```text
 Phase 2 文档优先于 Phase 1 文档，用于指导当前新增能力。
+Phase2_Runtime接入改造设计.md 是 Phase2-P0-D Runtime 接入 Provider 时的关键约束文档。
 Phase 1 文档仍然约束 Runtime Core、安全门、输出边界和患者端安全表达。
 总设计文档描述完整愿景，但不能作为提前实现 Phase 3–5 能力的理由。
 ```
@@ -137,6 +139,12 @@ EvidenceGraphService 通过 Provider 获得检查建议
 DecisionBoundaryService 通过 CapabilityProfileProvider 获得能力档案
 ExperienceContextService 通过 ClinicalExperienceProvider 获得经验单元
 RuntimeTrace 记录 asset_id / version / package_id
+```
+
+Runtime 接入 Provider 时必须参考：
+
+```text
+docs/Phase2_Runtime接入改造设计.md
 ```
 
 ## 4.5 只读调试 API
