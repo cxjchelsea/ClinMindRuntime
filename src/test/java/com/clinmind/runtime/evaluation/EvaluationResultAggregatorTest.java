@@ -184,6 +184,7 @@ class EvaluationResultAggregatorTest {
                 severity,
                 "expected",
                 passed ? "actual" : "violation",
-                passed ? "ok" : "failed");
+                passed ? "ok" : "failed",
+                true);
     }
 }

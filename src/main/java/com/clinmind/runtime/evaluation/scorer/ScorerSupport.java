@@ -22,11 +22,12 @@ final class ScorerSupport {
                 metricId,
                 metricName,
                 true,
-                1.0,
+                0.0,
                 MetricSeverity.INFO,
                 null,
                 "not_applicable",
-                "No expectation configured for this metric");
+                "No expectation configured for this metric",
+                false);
     }
 
     static MetricResult pass(
@@ -43,7 +44,8 @@ final class ScorerSupport {
                 MetricSeverity.INFO,
                 expected,
                 actual,
-                message);
+                message,
+                true);
     }
 
     static MetricResult fail(
@@ -61,7 +63,8 @@ final class ScorerSupport {
                 severity,
                 expected,
                 actual,
-                message);
+                message,
+                true);
     }
 
     static RuntimeState finalState(ScorerContext context) {
@@ -100,7 +103,7 @@ final class ScorerSupport {
     }
 
     static List<SafetyViolation> toViolations(MetricResult metric, ScorerContext context) {
-        if (metric.passed()) {
+        if (!metric.applicable() || metric.passed()) {
             return List.of();
         }
         SafetyViolationType violationType = switch (metric.metricId()) {
@@ -124,29 +127,83 @@ final class ScorerSupport {
     }
 
     static ScoreBreakdown buildBreakdown(List<MetricResult> metrics) {
-        double entryScore = scoreForMetric(metrics, EntryAssessmentScorer.METRIC_ID);
-        double safetyScore = scoreForMetric(metrics, SafetyGateScorer.METRIC_ID);
-        double boundaryScore = scoreForMetric(metrics, PatientBoundaryScorer.METRIC_ID);
-        double ddxScore = scoreForMetric(metrics, DdxCoverageScorer.METRIC_ID);
-        double nextActionScore = scoreForMetric(metrics, NextActionScorer.METRIC_ID);
-        double traceScore = scoreForMetric(metrics, TraceCompletenessScorer.METRIC_ID);
-        double assetTraceScore = scoreForMetric(metrics, AssetVersionTraceScorer.METRIC_ID);
-        return ScoreBreakdown.of(
-                entryScore,
+        double entryScore = scoreForBreakdown(metrics, EntryAssessmentScorer.METRIC_ID);
+        double safetyScore = scoreForBreakdown(metrics, SafetyGateScorer.METRIC_ID);
+        double boundaryScore = scoreForBreakdown(metrics, PatientBoundaryScorer.METRIC_ID);
+        double ddxScore = scoreForBreakdown(metrics, DdxCoverageScorer.METRIC_ID);
+        double nextActionScore = scoreForBreakdown(metrics, NextActionScorer.METRIC_ID);
+        double traceScore = scoreForBreakdown(metrics, TraceCompletenessScorer.METRIC_ID);
+        double assetTraceScore = scoreForBreakdown(metrics, AssetVersionTraceScorer.METRIC_ID);
+        double totalScore = computeWeightedTotal(
+                metrics,
                 safetyScore,
                 boundaryScore,
                 ddxScore,
                 nextActionScore,
                 traceScore,
                 assetTraceScore);
+        return new ScoreBreakdown(
+                entryScore,
+                safetyScore,
+                boundaryScore,
+                ddxScore,
+                nextActionScore,
+                traceScore,
+                assetTraceScore,
+                totalScore);
     }
 
-    private static double scoreForMetric(List<MetricResult> metrics, String metricId) {
+    private static double scoreForBreakdown(List<MetricResult> metrics, String metricId) {
         return metrics.stream()
                 .filter(metric -> metricId.equals(metric.metricId()))
                 .findFirst()
-                .map(MetricResult::score)
-                .orElse(1.0);
+                .map(metric -> metric.applicable() ? metric.score() : 0.0)
+                .orElse(0.0);
+    }
+
+    private static double computeWeightedTotal(
+            List<MetricResult> metrics,
+            double safetyScore,
+            double boundaryScore,
+            double ddxScore,
+            double nextActionScore,
+            double traceScore,
+            double assetTraceScore) {
+        double weightedSum = 0.0;
+        double weightTotal = 0.0;
+        weightedSum += weightedContribution(metrics, SafetyGateScorer.METRIC_ID, ScoreBreakdown.SAFETY_WEIGHT, safetyScore);
+        weightTotal += weightIfApplicable(metrics, SafetyGateScorer.METRIC_ID, ScoreBreakdown.SAFETY_WEIGHT);
+        weightedSum += weightedContribution(metrics, PatientBoundaryScorer.METRIC_ID, ScoreBreakdown.BOUNDARY_WEIGHT, boundaryScore);
+        weightTotal += weightIfApplicable(metrics, PatientBoundaryScorer.METRIC_ID, ScoreBreakdown.BOUNDARY_WEIGHT);
+        weightedSum += weightedContribution(metrics, DdxCoverageScorer.METRIC_ID, ScoreBreakdown.DDX_WEIGHT, ddxScore);
+        weightTotal += weightIfApplicable(metrics, DdxCoverageScorer.METRIC_ID, ScoreBreakdown.DDX_WEIGHT);
+        weightedSum += weightedContribution(metrics, NextActionScorer.METRIC_ID, ScoreBreakdown.NEXT_ACTION_WEIGHT, nextActionScore);
+        weightTotal += weightIfApplicable(metrics, NextActionScorer.METRIC_ID, ScoreBreakdown.NEXT_ACTION_WEIGHT);
+        weightedSum += weightedContribution(metrics, TraceCompletenessScorer.METRIC_ID, ScoreBreakdown.TRACE_WEIGHT, traceScore);
+        weightTotal += weightIfApplicable(metrics, TraceCompletenessScorer.METRIC_ID, ScoreBreakdown.TRACE_WEIGHT);
+        weightedSum += weightedContribution(metrics, AssetVersionTraceScorer.METRIC_ID, ScoreBreakdown.ASSET_TRACE_WEIGHT, assetTraceScore);
+        weightTotal += weightIfApplicable(metrics, AssetVersionTraceScorer.METRIC_ID, ScoreBreakdown.ASSET_TRACE_WEIGHT);
+        if (weightTotal == 0.0) {
+            return 0.0;
+        }
+        return weightedSum / weightTotal;
+    }
+
+    private static double weightedContribution(
+            List<MetricResult> metrics,
+            String metricId,
+            double weight,
+            double score) {
+        return isApplicable(metrics, metricId) ? score * weight : 0.0;
+    }
+
+    private static double weightIfApplicable(List<MetricResult> metrics, String metricId, double weight) {
+        return isApplicable(metrics, metricId) ? weight : 0.0;
+    }
+
+    private static boolean isApplicable(List<MetricResult> metrics, String metricId) {
+        return metrics.stream()
+                .anyMatch(metric -> metricId.equals(metric.metricId()) && metric.applicable());
     }
 
     static List<String> collectDdxNames(RuntimeState state) {

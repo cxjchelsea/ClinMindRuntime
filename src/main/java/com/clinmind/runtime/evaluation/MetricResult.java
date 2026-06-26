@@ -10,7 +10,8 @@ public record MetricResult(
         MetricSeverity severity,
         Object expected,
         Object actual,
-        String message
+        String message,
+        boolean applicable
 ) {
     public MetricResult {
         if (metricId == null || metricId.isBlank()) {
@@ -19,9 +20,13 @@ public record MetricResult(
         if (metricName == null || metricName.isBlank()) {
             throw new IllegalArgumentException("metricName must not be blank");
         }
-        if (score < 0.0 || score > 1.0) {
+        if (applicable && (score < 0.0 || score > 1.0)) {
             throw new IllegalArgumentException("score must be between 0.0 and 1.0");
         }
         severity = severity == null ? MetricSeverity.INFO : severity;
+    }
+
+    public boolean notApplicable() {
+        return !applicable;
     }
 }

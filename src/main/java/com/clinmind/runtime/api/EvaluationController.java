@@ -78,7 +78,7 @@ public class EvaluationController {
                 .findFirst()
                 .orElseThrow(() -> new ApiException(
                         HttpStatus.NOT_FOUND,
-                        "EVALUATION_RUN_NOT_FOUND",
+                        "EVALUATION_ITEM_NOT_FOUND",
                         "Evaluation item not found: " + caseId));
         RuntimeCaseExecution execution = runStore.getExecution(runId, caseId);
         Map<String, Object> response = new LinkedHashMap<>();

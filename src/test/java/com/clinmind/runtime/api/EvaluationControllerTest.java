@@ -112,6 +112,24 @@ class EvaluationControllerTest {
                 .andExpect(jsonPath("$.error.code").value("EVALUATION_RUN_NOT_FOUND"));
     }
 
+    @Test
+    void unknownItemReturnsItemNotFound() throws Exception {
+        String runId = createRun("""
+                {
+                  "case_set_id": "phase3-default",
+                  "case_set_version": "0.3.0",
+                  "asset_package_id": "phase2-default",
+                  "asset_package_version": "0.2.0",
+                  "include_tags": ["high_risk"],
+                  "fail_fast": false
+                }
+                """);
+
+        mockMvc.perform(get("/api/v1/debug/evaluations/runs/" + runId + "/items/nonexistent_case"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error.code").value("EVALUATION_ITEM_NOT_FOUND"));
+    }
+
     private String createRun(String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/debug/evaluations/runs")
                         .contentType(MediaType.APPLICATION_JSON)

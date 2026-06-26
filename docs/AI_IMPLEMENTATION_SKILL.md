@@ -36,11 +36,16 @@ EvaluationCaseSet
 当前最优任务不是继续堆新功能，而是：
 
 ```text
-1. 修正文档状态不一致。
-2. 完成文档导航和项目展示导读。
-3. 做 Phase3-P0 freeze 前小型质量清理。
-4. 保持 Phase 1 / Phase 2 / Phase 3 回归测试通过。
-5. 暂不进入 Phase 4。
+1. 保持 Phase 1 / Phase 2 / Phase 3 回归测试通过。
+2. 按需同步文档与 README。
+3. 暂不进入 Phase 4，除非用户明确要求。
+```
+
+Phase 3-P0 freeze cleanup 已完成项（供参考）：
+
+```text
+case_set_version 校验、MetricResult.applicable、EVALUATION_ITEM_NOT_FOUND、
+根目录 README、pom 描述更新、phase3-p0-freeze tag。
 ```
 
 重要说明：
@@ -228,22 +233,44 @@ EvaluationEndToEndIntegrationTest 通过。
 
 ---
 
-# 八、当前最优下一步
+# 八、当前阶段说明
 
-当前最优任务是：
+**Phase 3-P0 已实现完成，处于 freeze / release polish 阶段。**
+
+已完成 cleanup（勿重复实现）：
 
 ```text
-Phase3-P0 freeze cleanup
+1. 文档状态同步（本文档、README、项目导读、pom 描述）
+2. case_set_version 与 manifest.version 严格校验
+3. MetricResult.applicable，notApplicable 不参与加权总分
+4. Evaluation item not found → EVALUATION_ITEM_NOT_FOUND
+5. Evaluation 边界测试增强
+6. phase3-p0-freeze tag
 ```
 
-建议顺序：
+**不应在此阶段实现：**
 
 ```text
-1. 文档状态同步：docs/README.md、docs/项目展示导读.md、AI_IMPLEMENTATION_SKILL、架构文档缺口审查清单。
-2. 小型一致性修复：case_set_version 校验、notApplicable 语义、Evaluation item 错误码。
-3. 更新 pom.xml description。
-4. 运行测试或记录未运行原因。
-5. 冻结 Phase3-P0。
+Phase 4 经验进化 / 审核流
+Phase 5 平台后台 / 发布流程
+数据库持久化
+前端 Training Center
+MCP / LangGraph / Agent SDK
+LLM-as-a-Judge
+模型训练 / 后训练
+自动上线 CapabilityProfile
+```
+
+Phase 3-P0 已完成内容（供参考，勿重复实现）：
+
+```text
+Phase3-P0-A：Evaluation 数据结构
+Phase3-P0-B：YAML 病例集 + Repository
+Phase3-P0-C：RuntimeEvaluationRunner
+Phase3-P0-D：Scorer 评分器体系
+Phase3-P0-E：EvaluationResult 聚合
+Phase3-P0-F：CapabilityProfile 更新建议
+Phase3-P0-G：Evaluation debug API + 人工验收
 ```
 
 ---
@@ -252,7 +279,8 @@ Phase3-P0 freeze cleanup
 
 ```text
 当前不是在实现完整训练平台。
-当前不是在进入 Phase 4。
-当前是在完成 Phase 3-P0 freeze / cleanup / release polish。
-新增规划文档只能指导后续 Phase 4/5，不能成为提前实现 Phase 4/5 的理由。
+Phase 3-P0 训练与评估闭环 MVP 已完成，当前处于冻结验收与质量清理阶段。
+Phase 1 Runtime Core 和 Phase 2 Asset Provider 必须保持稳定。
+Evaluation 只能评估 Runtime，并生成 EvaluationResult 与 CapabilityProfileUpdateProposal。
+不要在此阶段进入 Phase 4/5，除非用户明确要求。
 ```

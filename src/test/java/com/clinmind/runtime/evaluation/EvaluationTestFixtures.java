@@ -89,7 +89,8 @@ public final class EvaluationTestFixtures {
                         MetricSeverity.CRITICAL,
                         true,
                         true,
-                        "Safety gate triggered as expected")),
+                        "Safety gate triggered as expected",
+                        true)),
                 List.of(),
                 List.of());
     }

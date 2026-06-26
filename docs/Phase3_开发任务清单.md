@@ -257,3 +257,4 @@
 | 2026-06-26 | 完成 Phase3-P0-F | CapabilityProfileProposalService 生成升级/保持/降级/阻塞建议；188 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-G | Evaluation debug API + Controller/E2E 测试；193 项测试全绿 |
 | 2026-06-26 | Phase3 人工 API 验收 | `docs/Phase3_人工测试API结果.md`；8 条 debug Evaluation API 抽测通过 |
+| 2026-06-26 | Phase3-P0 冻结清理 | 文档同步、README、case_set_version 校验、MetricResult.applicable、API 错误码修正 |

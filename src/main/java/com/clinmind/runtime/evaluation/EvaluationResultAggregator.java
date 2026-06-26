@@ -52,15 +52,25 @@ public class EvaluationResultAggregator {
         if (itemResults.isEmpty()) {
             return 0.0;
         }
-        long passedCount = itemResults.stream()
-                .filter(item -> findMetric(item, metricId).map(MetricResult::passed).orElse(true))
+        long applicableCount = itemResults.stream()
+                .filter(item -> findMetric(item, metricId).map(MetricResult::applicable).orElse(false))
                 .count();
-        return (double) passedCount / itemResults.size();
+        if (applicableCount == 0) {
+            return 1.0;
+        }
+        long passedCount = itemResults.stream()
+                .filter(item -> findMetric(item, metricId)
+                        .filter(MetricResult::applicable)
+                        .map(MetricResult::passed)
+                        .orElse(false))
+                .count();
+        return (double) passedCount / applicableCount;
     }
 
     public static double metricAverageScore(List<EvaluationItemResult> itemResults, String metricId) {
         return itemResults.stream()
                 .flatMap(item -> findMetric(item, metricId).stream())
+                .filter(MetricResult::applicable)
                 .mapToDouble(MetricResult::score)
                 .average()
                 .orElse(0.0);

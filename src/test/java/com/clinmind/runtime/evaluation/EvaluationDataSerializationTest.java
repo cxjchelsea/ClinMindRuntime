@@ -68,6 +68,26 @@ class EvaluationDataSerializationTest {
     }
 
     @Test
+    void metricResultRoundTripIncludesApplicable() throws Exception {
+        MetricResult metric = new MetricResult(
+                "ddx_coverage",
+                "DDx Coverage",
+                true,
+                0.0,
+                MetricSeverity.INFO,
+                null,
+                "not_applicable",
+                "No expectation configured",
+                false);
+
+        String json = objectMapper.writeValueAsString(metric);
+        MetricResult restored = objectMapper.readValue(json, MetricResult.class);
+
+        assertThat(restored.applicable()).isFalse();
+        assertThat(json).contains("\"applicable\":false");
+    }
+
+    @Test
     void enumsDeserializeFromJsonValue() {
         assertThat(CaseSeverity.fromValue("critical")).isEqualTo(CaseSeverity.CRITICAL);
         assertThat(MetricSeverity.fromValue("major")).isEqualTo(MetricSeverity.MAJOR);

@@ -56,7 +56,9 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
                 null);
         runStore.save(running);
 
-        List<EvaluationCase> cases = filterCases(config, caseRepository.loadCases(config.caseSetId()));
+        EvaluationCaseSet caseSet = caseRepository.loadCaseSet(config.caseSetId());
+        validateCaseSetVersion(config, caseSet);
+        List<EvaluationCase> cases = filterCases(config, caseSet.cases());
         List<EvaluationItemResult> itemResults = new ArrayList<>();
         boolean aborted = false;
 
@@ -176,6 +178,20 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
                 .toList();
     }
 
+    static void validateCaseSetVersion(EvaluationRunConfig config, EvaluationCaseSet caseSet) {
+        if (config.caseSetVersion() == null || config.caseSetVersion().isBlank()) {
+            return;
+        }
+        if (!config.caseSetVersion().equals(caseSet.version())) {
+            throw new EvaluationLoadException(
+                    "Evaluation case set version mismatch: expected "
+                            + config.caseSetVersion()
+                            + ", actual "
+                            + caseSet.version(),
+                    config.caseSetId());
+        }
+    }
+
     private EvaluationItemResult buildFailedItemResult(String runId, String caseId, String message) {
         return new EvaluationItemResult(
                 runId,
@@ -193,7 +209,8 @@ public class RuntimeEvaluationRunner implements EvaluationRunner {
                         MetricSeverity.CRITICAL,
                         "successful execution",
                         message,
-                        message)),
+                        message,
+                        true)),
                 List.of(),
                 List.of(message));
     }
