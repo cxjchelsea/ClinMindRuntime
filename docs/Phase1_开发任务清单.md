@@ -355,6 +355,35 @@
 - [x] 静态规则读取失败触发 fail-safe，不再 fail-open
 - [x] WELLNESS_MODE 保持 wellness 状态，不跑临床管线
 - [x] 所有测试通过
+- [x] 人工 Postman API 验收通过（见 7.4、`docs/API测试.md`）
+
+## 7.4 人工 API 验收（Postman）
+
+| 项目 | 内容 |
+|---|---|
+| 验收日期 | 2026-06-26 |
+| 验收方式 | `java -jar target/clinmind-runtime-0.1.0-SNAPSHOT.jar` 启动后，Postman 调用 REST API |
+| 服务地址 | `http://localhost:8080` |
+| 运行环境 | Java 21.0.9（Temurin），Spring Boot 3.3.5 |
+| 详细记录 | [`docs/API测试.md`](API测试.md) |
+| 代码基线 | commit `2abe52d`（验收漏洞修复） |
+
+| 用例 | 场景 | 结论 |
+|---|---|---|
+| 1 | 患者端 · 普通胸痛 | ✅ 通过 |
+| 2 | 患者端 · 高风险胸痛 | ✅ 通过 |
+| 3 | 医生端 · 可见 DDx / 证据图 | ✅ 通过 |
+| 4 | continue + `/trace` 模块真实性 | ✅ 通过 |
+| 5 | WELLNESS_MODE 不进临床管线 | ✅ 通过 |
+| 6 | `/status` `/result` `/trace` / 404 | ✅ 通过 |
+
+**验收结论：** Phase 1 后端 MVP 人工 API 验收通过，可与自动化测试（`mvn test`）一并作为 Phase 1 正式结项依据。
+
+**Phase 2 遗留观察（不阻塞结项）：**
+
+- `/result` 对患者端 session 仍返回 `clinician_report`（`allowed: false`），Phase 2 可按角色统一过滤
+- 高风险场景 `constraints_applied` 中 `no_low_risk_reassurance` 可能重复
+- `wellness_mode` 暂无专用 `patient_output` 引导文案
 
 ---
 
@@ -381,3 +410,4 @@
 | 2026-06-25 | 完成 Java MVP-P0-E | DecisionBoundary、PatientOutput、ClinicianReport、FailurePolicy 及分角色 API |
 | 2026-06-25 | 完成 Java MVP-P0-F | 12 个 YAML 集成病例与 RuntimeFlowIntegrationTest，Phase 1 MVP 闭环验收通过 |
 | 2026-06-26 | Phase 1 验收漏洞修复 | 封堵患者端诊断泄漏；AOP Trace 与 /trace 合并；StaticRule fail-closed；WELLNESS_MODE 隔离；DecisionBoundary fail-safe → ERROR_SAFE_HALTED；补充替换规则与专项集成测试 |
+| 2026-06-26 | Phase 1 人工 Postman 验收通过 | 6 条 API 冒烟用例全部通过；记录见 `docs/API测试.md`；Phase 1 后端 MVP 正式结项 |
