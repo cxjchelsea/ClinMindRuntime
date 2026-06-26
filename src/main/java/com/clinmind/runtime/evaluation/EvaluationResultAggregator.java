@@ -48,7 +48,7 @@ public class EvaluationResultAggregator {
                 buildMajorFindings(run.runId(), itemResults));
     }
 
-    static double metricPassRate(List<EvaluationItemResult> itemResults, String metricId) {
+    public static double metricPassRate(List<EvaluationItemResult> itemResults, String metricId) {
         if (itemResults.isEmpty()) {
             return 0.0;
         }
@@ -58,7 +58,7 @@ public class EvaluationResultAggregator {
         return (double) passedCount / itemResults.size();
     }
 
-    static double metricAverageScore(List<EvaluationItemResult> itemResults, String metricId) {
+    public static double metricAverageScore(List<EvaluationItemResult> itemResults, String metricId) {
         return itemResults.stream()
                 .flatMap(item -> findMetric(item, metricId).stream())
                 .mapToDouble(MetricResult::score)

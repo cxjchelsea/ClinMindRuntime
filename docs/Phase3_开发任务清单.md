@@ -183,25 +183,25 @@
 
 ## 7.1 数据结构
 
-- [ ] 创建 `evaluation/capability/CapabilityEvaluationPolicy.java`
-- [ ] 创建 `evaluation/capability/CapabilityProfileUpdateProposal.java`
-- [ ] 创建 `evaluation/capability/ProposalStatus.java`
+- [x] 创建 `evaluation/capability/CapabilityEvaluationPolicy.java`
+- [x] 创建 `evaluation/capability/CapabilityProfileUpdateProposal.java`
+- [x] 创建 `evaluation/capability/ProposalStatus.java`
 
 ## 7.2 服务
 
-- [ ] 创建 `evaluation/capability/CapabilityProfileProposalService.java`
-- [ ] 安全不达标禁止升级
-- [ ] 患者端泄漏禁止升级
-- [ ] asset trace 不达标禁止升级
-- [ ] 指标达标生成升级建议
-- [ ] 指标一般生成保持建议
-- [ ] 严重失败生成降级建议
-- [ ] 不写入正式 assets/packages/phase2-default
+- [x] 创建 `evaluation/capability/CapabilityProfileProposalService.java`
+- [x] 安全不达标禁止升级
+- [x] 患者端泄漏禁止升级
+- [x] asset trace 不达标禁止升级
+- [x] 指标达标生成升级建议
+- [x] 指标一般生成保持建议
+- [x] 严重失败生成降级建议
+- [x] 不写入正式 assets/packages/phase2-default
 
 ## 7.3 测试
 
-- [ ] CapabilityProfileProposalServiceTest
-- [ ] 测试升级 / 保持 / 降级 / 阻塞四类情况
+- [x] CapabilityProfileProposalServiceTest
+- [x] 测试升级 / 保持 / 降级 / 阻塞四类情况
 
 ---
 
@@ -254,3 +254,4 @@
 | 2026-06-26 | 完成 Phase3-P0-C | RuntimeEvaluationRunner 经 RuntimeService 执行病例；EvaluationRunStore；164 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-D | 7 个 EvaluationScorer + EvaluationItemScoringService；176 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-E | EvaluationResultAggregator 聚合 itemResults → EvaluationResult；180 项测试全绿 |
+| 2026-06-26 | 完成 Phase3-P0-F | CapabilityProfileProposalService 生成升级/保持/降级/阻塞建议；188 项测试全绿 |
