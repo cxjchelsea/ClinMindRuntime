@@ -1,0 +1,251 @@
+# Phase 3 开发任务清单
+
+> 本文档用于跟踪 ClinMindRuntime Phase 3 训练与评估闭环的实现进度。  
+> Phase 3 的目标是病例集考试、评估指标、EvaluationResult 和 CapabilityProfile 更新建议。  
+> AI / Cursor / Claude Code / Codex 每完成一个实现任务后，必须同步更新本文档。
+
+---
+
+# 一、使用规则
+
+```text
+[ ] 未开始
+[/] 进行中
+[x] 已完成
+[!] 阻塞 / 需要人工确认
+```
+
+```text
+1. 每次只实现一个小任务或一个小模块。
+2. 每次实现前，先确认任务属于 Phase3-P0-A 到 Phase3-P0-G 的哪一项。
+3. 每次实现后，必须更新任务状态。
+4. 不允许把 Phase 4–5 的经验进化、审核流、平台后台提前塞进 Phase 3。
+5. 不允许训练基础大模型。
+6. 不允许自动上线 CapabilityProfile。
+7. 标记完成前，必须有对应代码和 JUnit 测试，或在备注中说明原因。
+8. Phase 3 修改不能破坏 Phase 1 / Phase 2 测试。
+```
+
+---
+
+# 二、Phase3-P0-A：Evaluation 数据结构
+
+目标：建立评估闭环所需基础数据结构，不改 Runtime 主流程。
+
+## 2.1 病例结构
+
+- [ ] 创建 `evaluation/EvaluationCase.java`
+- [ ] 创建 `evaluation/EvaluationCaseSet.java`
+- [ ] 创建 `evaluation/EvaluationInputTurn.java`
+- [ ] 创建 `evaluation/ExpectedOutcome.java`
+- [ ] 创建 `evaluation/CaseSeverity.java`
+
+## 2.2 评估运行结构
+
+- [ ] 创建 `evaluation/EvaluationRunConfig.java`
+- [ ] 创建 `evaluation/EvaluationRun.java`
+- [ ] 创建 `evaluation/EvaluationRunStatus.java`
+- [ ] 创建 `evaluation/RuntimeCaseExecution.java`
+
+## 2.3 结果结构
+
+- [ ] 创建 `evaluation/EvaluationItemResult.java`
+- [ ] 创建 `evaluation/EvaluationResult.java`
+- [ ] 创建 `evaluation/ScoreBreakdown.java`
+- [ ] 创建 `evaluation/MetricResult.java`
+- [ ] 创建 `evaluation/MetricSeverity.java`
+- [ ] 创建 `evaluation/SafetyViolation.java`
+- [ ] 创建 `evaluation/SafetyViolationType.java`
+- [ ] 创建 `evaluation/RegressionFinding.java`
+
+## 2.4 测试
+
+- [ ] 编写 Evaluation 数据结构单元测试
+- [ ] 编写 JSON 序列化 / 反序列化测试
+
+---
+
+# 三、Phase3-P0-B：病例集 Repository 与 YAML 病例格式
+
+目标：从 YAML 加载标准病例集。
+
+## 3.1 资源文件
+
+- [ ] 创建 `src/main/resources/evaluation/case-sets/phase3-default/manifest.yml`
+- [ ] 创建 `chest-pain-cases.yml`
+- [ ] 创建 `fever-cases.yml`
+- [ ] 创建 `wellness-regression-cases.yml`
+- [ ] 创建 `unsupported-regression-cases.yml`
+- [ ] 创建 `patient-boundary-cases.yml`
+- [ ] 创建 `trace-asset-cases.yml`
+
+## 3.2 Repository
+
+- [ ] 创建 `evaluation/EvaluationCaseRepository.java`
+- [ ] 创建 `evaluation/yaml/YamlEvaluationCaseRepository.java`
+- [ ] 实现 `loadCaseSet(caseSetId)`
+- [ ] 实现 `loadCases(caseSetId)`
+- [ ] 支持按 symptomGroup 过滤
+- [ ] 支持按 tag 过滤
+- [ ] 病例格式错误时抛出明确异常
+
+## 3.3 测试
+
+- [ ] 编写 YamlEvaluationCaseRepositoryTest
+- [ ] 测试未知 case_set
+- [ ] 测试格式错误病例
+- [ ] 测试病例过滤
+
+---
+
+# 四、Phase3-P0-C：EvaluationRunner 执行 Runtime
+
+目标：让评估器通过 RuntimeService 运行病例，不绕过 Runtime。
+
+## 4.1 Runner
+
+- [ ] 创建 `evaluation/EvaluationRunner.java`
+- [ ] 创建 `evaluation/RuntimeEvaluationRunner.java`
+- [ ] 创建 `evaluation/EvaluationRunStore.java`
+- [ ] 实现单轮病例 startRuntime
+- [ ] 实现多轮病例 continueRuntime
+- [ ] 收集 RuntimeState
+- [ ] 收集 RuntimeTrace
+- [ ] 捕获 Runtime 异常并转为 EvaluationItemResult
+- [ ] 支持 failFast=false 继续执行
+
+## 4.2 测试
+
+- [ ] 编写 EvaluationRunnerTest
+- [ ] 编写 RuntimeEvaluationRunnerIntegrationTest
+- [ ] 测试 ERROR_SAFE_HALTED 可作为有效评估结果
+- [ ] 测试多轮病例不会重复 EntryAssessment
+
+---
+
+# 五、Phase3-P0-D：Scorer 评分器体系
+
+目标：对 RuntimeCaseExecution 进行结构化评分。
+
+## 5.1 Scorer 接口
+
+- [ ] 创建 `evaluation/scorer/EvaluationScorer.java`
+- [ ] 创建 `evaluation/scorer/ScorerContext.java`
+
+## 5.2 评分器实现
+
+- [ ] EntryAssessmentScorer
+- [ ] SafetyGateScorer
+- [ ] PatientBoundaryScorer
+- [ ] DdxCoverageScorer
+- [ ] NextActionScorer
+- [ ] TraceCompletenessScorer
+- [ ] AssetVersionTraceScorer
+
+## 5.3 测试
+
+- [ ] EntryAssessmentScorerTest
+- [ ] SafetyGateScorerTest
+- [ ] PatientBoundaryScorerTest
+- [ ] DdxCoverageScorerTest
+- [ ] NextActionScorerTest
+- [ ] TraceCompletenessScorerTest
+- [ ] AssetVersionTraceScorerTest
+
+---
+
+# 六、Phase3-P0-E：EvaluationResult 聚合与报告
+
+目标：把多个病例结果聚合为一次评估报告。
+
+## 6.1 聚合器
+
+- [ ] 创建 `evaluation/EvaluationResultAggregator.java`
+- [ ] 计算 totalCases / passedCases / failedCases
+- [ ] 计算 passRate / averageScore
+- [ ] 计算 safetyPassRate
+- [ ] 计算 boundaryPassRate
+- [ ] 计算 tracePassRate
+- [ ] 计算 assetTracePassRate
+- [ ] 生成 RegressionFinding
+
+## 6.2 测试
+
+- [ ] EvaluationResultAggregatorTest
+- [ ] 测试 critical failure 会影响 passed
+- [ ] 测试 majorFindings 聚合
+
+---
+
+# 七、Phase3-P0-F：CapabilityProfile 更新建议
+
+目标：根据 EvaluationResult 生成 CapabilityProfileUpdateProposal，不自动上线。
+
+## 7.1 数据结构
+
+- [ ] 创建 `evaluation/capability/CapabilityEvaluationPolicy.java`
+- [ ] 创建 `evaluation/capability/CapabilityProfileUpdateProposal.java`
+- [ ] 创建 `evaluation/capability/ProposalStatus.java`
+
+## 7.2 服务
+
+- [ ] 创建 `evaluation/capability/CapabilityProfileProposalService.java`
+- [ ] 安全不达标禁止升级
+- [ ] 患者端泄漏禁止升级
+- [ ] asset trace 不达标禁止升级
+- [ ] 指标达标生成升级建议
+- [ ] 指标一般生成保持建议
+- [ ] 严重失败生成降级建议
+- [ ] 不写入正式 assets/packages/phase2-default
+
+## 7.3 测试
+
+- [ ] CapabilityProfileProposalServiceTest
+- [ ] 测试升级 / 保持 / 降级 / 阻塞四类情况
+
+---
+
+# 八、Phase3-P0-G：Evaluation API 与验收测试
+
+目标：提供内部 debug API 和完整回归验收。
+
+## 8.1 API
+
+- [ ] 创建 `api/EvaluationController.java`
+- [ ] 实现 `POST /api/v1/debug/evaluations/runs`
+- [ ] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}`
+- [ ] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}/result`
+- [ ] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}/items/{case_id}`
+- [ ] 实现 `POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal`
+
+## 8.2 测试
+
+- [ ] EvaluationControllerTest
+- [ ] EvaluationEndToEndIntegrationTest
+- [ ] Phase1RegressionTest 继续通过
+- [ ] Phase2 Asset Provider 回归继续通过
+- [ ] PatientOutputAssetIsolationTest 继续通过
+- [ ] RuntimeAssetVersionMismatchTest 继续通过
+
+## 8.3 人工验收
+
+- [ ] 创建 `docs/Phase3_人工测试API结果.md`
+- [ ] 记录默认病例集评估运行结果
+- [ ] 记录失败病例 MetricResult
+- [ ] 记录 CapabilityProfileUpdateProposal
+
+---
+
+# 九、问题记录
+
+| 编号 | 问题 | 影响模块 | 状态 | 处理结论 |
+|---|---|---|---|---|
+| Q1 | 暂无 | - | - | - |
+
+---
+
+# 十、变更记录
+
+| 日期 | 变更 | 说明 |
+|---|---|---|
+| 2026-06-26 | 创建 Phase 3 任务清单 | 用于约束训练与评估闭环 MVP 实现 |
