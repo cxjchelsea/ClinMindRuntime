@@ -55,29 +55,31 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 6. docs/Phase3_Runtime评估接入设计.md
 7. docs/Phase3_CapabilityProfile更新机制设计.md
 8. docs/Phase3_API与测试设计.md
-9. docs/ClinMindRuntime技术实现总方案.md
-10. docs/全局技术栈与架构选型.md
-11. docs/AI前沿技术选型与接入规划.md
-12. docs/模型训练与后训练规划.md
-13. docs/Phase2_开发任务清单.md
-14. docs/Phase2_共享能力资产原型_实现规格.md
-15. docs/Phase2_Provider接口设计.md
-16. docs/Phase2_资产数据结构与版本设计.md
-17. docs/Phase2_Runtime接入改造设计.md
-18. docs/Phase2_API与测试设计.md
-19. docs/Phase1_技术栈与工程架构决策.md
-20. docs/Phase1_Runtime_MVP_实现规格.md
-21. docs/Phase1_数据结构与状态设计.md
-22. docs/Phase1_模块接口设计.md
-23. docs/Phase1_API与测试设计.md
-24. docs/ClinMindRuntime阶段拆分路线图.md
-25. docs/ClinMindRuntime完整系统设计.md
+9. docs/架构文档缺口审查清单.md
+10. docs/ClinMindRuntime技术实现总方案.md
+11. docs/全局技术栈与架构选型.md
+12. docs/AI前沿技术选型与接入规划.md
+13. docs/模型训练与后训练规划.md
+14. docs/Phase2_开发任务清单.md
+15. docs/Phase2_共享能力资产原型_实现规格.md
+16. docs/Phase2_Provider接口设计.md
+17. docs/Phase2_资产数据结构与版本设计.md
+18. docs/Phase2_Runtime接入改造设计.md
+19. docs/Phase2_API与测试设计.md
+20. docs/Phase1_技术栈与工程架构决策.md
+21. docs/Phase1_Runtime_MVP_实现规格.md
+22. docs/Phase1_数据结构与状态设计.md
+23. docs/Phase1_模块接口设计.md
+24. docs/Phase1_API与测试设计.md
+25. docs/ClinMindRuntime阶段拆分路线图.md
+26. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
 
 ```text
 Phase 3 文档优先指导当前新增能力。
+架构文档缺口审查清单用于判断哪些专项文档已经充分、哪些仍需补齐，避免继续凭感觉判断文档体系是否完整。
 技术实现总方案约束包结构、依赖方向、Runtime 主链路、Provider 边界、Evaluation 实现、存储演进、测试和部署演进。
 全局技术栈文档约束前端、数据库、向量库、图数据库、Python Provider、部署和权限等长期技术选型。
 AI 前沿技术文档约束 MCP、Agent SDK、LangGraph、GraphRAG、LLM-as-a-Judge、Skills、Agent Memory 等技术的接入阶段和边界。
@@ -333,6 +335,14 @@ MCP / Agent SDK / LangGraph / LangChain / GraphRAG / Skills / LLM-as-a-Judge 不
 如需偏离，必须先更新文档说明原因。
 ```
 
+## 8.9 文档完整性判断必须参考缺口审查清单
+
+```text
+不得笼统声称文档体系已经完整。
+如需判断文档是否足够，必须参考 docs/架构文档缺口审查清单.md。
+如发现新的关键缺口，必须更新缺口审查清单，而不是只新增单个文档。
+```
+
 ---
 
 # 九、测试约束
@@ -390,6 +400,7 @@ broken-package fail-safe 测试通过。
 10. 是否违反 docs/全局技术栈与架构选型.md 的接入阶段？
 11. 是否违反 docs/AI前沿技术选型与接入规划.md 的 AI 技术边界？
 12. 是否违反 docs/模型训练与后训练规划.md 的训练接入边界？
+13. 是否需要更新 docs/架构文档缺口审查清单.md？
 ```
 
 ---
@@ -442,4 +453,5 @@ Phase 1 Runtime Core 和 Phase 2 Asset Provider 必须保持稳定。
 Evaluation 只能评估 Runtime，并生成 EvaluationResult 与 CapabilityProfileUpdateProposal。
 Phase 3 的目标是让能力边界有评估依据，而不是继续堆问诊功能。
 技术实现总方案、全局技术栈、AI 前沿技术和模型训练规划可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
+文档体系是否完整必须由架构文档缺口审查清单判断，而不是凭主观感觉。
 ```
