@@ -32,34 +32,34 @@
 
 ## 2.1 资产基础结构
 
-- [ ] 创建 `asset/AssetMetadata.java`
-- [ ] 创建 `asset/AssetType.java`
-- [ ] 创建 `asset/AssetStatus.java`
-- [ ] 创建 `asset/ReviewStatus.java`
-- [ ] 创建 `asset/AssetVersion.java`
-- [ ] 创建 `asset/AssetPackageManifest.java`
-- [ ] 创建 `asset/AssetQueryContext.java`
-- [ ] 创建 `asset/AssetUsedRecord.java`
-- [ ] 创建 `asset/AssetLoadException.java`
-- [ ] 编写资产基础结构单元测试
+- [x] 创建 `asset/AssetMetadata.java`
+- [x] 创建 `asset/AssetType.java`
+- [x] 创建 `asset/AssetStatus.java`
+- [x] 创建 `asset/ReviewStatus.java`
+- [x] 创建 `asset/AssetVersion.java`
+- [x] 创建 `asset/AssetPackageManifest.java`
+- [x] 创建 `asset/AssetQueryContext.java`
+- [x] 创建 `asset/AssetUsedRecord.java`
+- [x] 创建 `asset/AssetLoadException.java`
+- [x] 编写资产基础结构单元测试
 
 ## 2.2 Provider 接口
 
-- [ ] 创建 `provider/MedicalKnowledgeProvider.java`
-- [ ] 创建 `provider/RedFlagRuleProvider.java`
-- [ ] 创建 `provider/TestRecommendationProvider.java`
-- [ ] 创建 `provider/CapabilityProfileProvider.java`
-- [ ] 创建 `provider/ClinicalExperienceProvider.java`
-- [ ] 创建 `provider/EvidenceAssetProvider.java`
-- [ ] 创建 `asset/AssetPackageRepository.java`
-- [ ] 编写 Provider 接口编译测试或最小 mock 测试
+- [x] 创建 `provider/MedicalKnowledgeProvider.java`
+- [x] 创建 `provider/RedFlagRuleProvider.java`
+- [x] 创建 `provider/TestRecommendationProvider.java`
+- [x] 创建 `provider/CapabilityProfileProvider.java`
+- [x] 创建 `provider/ClinicalExperienceProvider.java`
+- [x] 创建 `provider/EvidenceAssetProvider.java`
+- [x] 创建 `asset/AssetPackageRepository.java`
+- [x] 编写 Provider 接口编译测试或最小 mock 测试
 
 ## 2.3 Phase2-P0-A 验收
 
-- [ ] Provider 接口不依赖具体 YAML 实现
-- [ ] Provider 返回对象包含 AssetMetadata
-- [ ] AssetLoadException 能表达安全关键资产加载失败
-- [ ] 所有测试通过
+- [x] Provider 接口不依赖具体 YAML 实现
+- [x] Provider 返回对象包含 AssetMetadata
+- [x] AssetLoadException 能表达安全关键资产加载失败
+- [x] 所有测试通过
 
 ---
 
@@ -250,3 +250,4 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-06-26 | 创建 Phase 2 任务清单 | 用于约束共享能力资产原型实现 |
+| 2026-06-26 | 完成 Phase2-P0-A | 资产元数据、Provider 接口、AssetLoadException 及单元/Mock 测试；Runtime 主流程未改动 |
