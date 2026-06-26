@@ -37,7 +37,7 @@ EvaluationCaseSet
 ```text
 Phase 3 的“训练”不是训练基础大模型。
 Phase 3 的训练含义是：用标准病例集和评估指标校准 Runtime 能力、资产质量和 CapabilityProfile 边界。
-真实模型训练、后训练、Python AI Provider、RAG / GraphRAG、MCP 等能力均后置。
+真实模型训练、后训练、Python AI Provider、RAG / GraphRAG、MCP、前端平台、数据库持久化等能力均后置。
 ```
 
 ---
@@ -60,19 +60,25 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 11. docs/全局技术栈与架构选型.md
 12. docs/AI前沿技术选型与接入规划.md
 13. docs/模型训练与后训练规划.md
-14. docs/Phase2_开发任务清单.md
-15. docs/Phase2_共享能力资产原型_实现规格.md
-16. docs/Phase2_Provider接口设计.md
-17. docs/Phase2_资产数据结构与版本设计.md
-18. docs/Phase2_Runtime接入改造设计.md
-19. docs/Phase2_API与测试设计.md
-20. docs/Phase1_技术栈与工程架构决策.md
-21. docs/Phase1_Runtime_MVP_实现规格.md
-22. docs/Phase1_数据结构与状态设计.md
-23. docs/Phase1_模块接口设计.md
-24. docs/Phase1_API与测试设计.md
-25. docs/ClinMindRuntime阶段拆分路线图.md
-26. docs/ClinMindRuntime完整系统设计.md
+14. docs/医学知识库与RAG构建规划.md
+15. docs/数据安全与合规边界规划.md
+16. docs/测试与CI总方案.md
+17. docs/数据库持久化设计.md
+18. docs/平台前端与Console规划.md
+19. docs/部署与运维规划.md
+20. docs/Phase2_开发任务清单.md
+21. docs/Phase2_共享能力资产原型_实现规格.md
+22. docs/Phase2_Provider接口设计.md
+23. docs/Phase2_资产数据结构与版本设计.md
+24. docs/Phase2_Runtime接入改造设计.md
+25. docs/Phase2_API与测试设计.md
+26. docs/Phase1_技术栈与工程架构决策.md
+27. docs/Phase1_Runtime_MVP_实现规格.md
+28. docs/Phase1_数据结构与状态设计.md
+29. docs/Phase1_模块接口设计.md
+30. docs/Phase1_API与测试设计.md
+31. docs/ClinMindRuntime阶段拆分路线图.md
+32. docs/ClinMindRuntime完整系统设计.md
 ```
 
 解释：
@@ -84,6 +90,12 @@ Phase 3 文档优先指导当前新增能力。
 全局技术栈文档约束前端、数据库、向量库、图数据库、Python Provider、部署和权限等长期技术选型。
 AI 前沿技术文档约束 MCP、Agent SDK、LangGraph、GraphRAG、LLM-as-a-Judge、Skills、Agent Memory 等技术的接入阶段和边界。
 模型训练与后训练规划约束意图识别、病例抽取、证据检索、安全表达、后训练、模型部署和 Model Provider 的长期路线。
+医学知识库与 RAG 构建规划约束 KnowledgeContext、EvidenceAssetProvider、RAG、KG-lite、GraphRAG 与 EvidenceGraph 的边界。
+数据安全与合规边界规划约束敏感数据、脱敏、debug/internal API、训练数据和审计边界。
+测试与 CI 总方案约束测试分层、回归基线、CI 演进和验收方式。
+数据库持久化设计约束 PostgreSQL、Redis、pgvector、Trace、Evaluation、Model Registry 等持久化方向。
+平台前端与 Console 规划约束 Runtime Console、Asset Console、Evaluation Center、Model Registry、Audit Center 的后续范围。
+部署与运维规划约束 Docker Compose、多服务部署、环境变量、健康检查、日志和监控的后续路线。
 Phase 2 文档仍然约束 Provider、Asset Package、资产版本和 debug API 边界。
 Phase 1 文档仍然约束 Runtime Core、安全门、输出边界和患者端安全表达。
 总设计文档描述完整愿景，但不能作为提前实现 Phase 4–5 能力的理由。
@@ -106,6 +118,9 @@ Testing：JUnit 5 + AssertJ / Mockito + SpringBootTest
 Python：不作为 Phase 3 主工程
 AI 框架：不作为 Phase 3 主控
 Model Training：不属于 Phase 3-P0
+RAG / GraphRAG：不属于 Phase 3-P0
+Database Persistence：不属于 Phase 3-P0
+Frontend Console：不属于 Phase 3-P0
 ```
 
 ---
@@ -213,6 +228,7 @@ POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal
 19. 不改变患者端输出边界。
 20. 不绕过 SafetyGate 或 DecisionBoundary。
 21. 不提前接入 PostgreSQL / Redis / Neo4j / Milvus / 前端平台。
+22. 不提前实现 Docker Compose / 复杂部署 / 运维体系。
 ```
 
 如果任务中出现上述需求，AI 必须回复：
@@ -271,76 +287,16 @@ docs/Phase3_开发任务清单.md
 
 # 八、架构约束
 
-## 8.1 Evaluation 不能替代 Runtime
-
 ```text
-EvaluationRunner 是 Runtime 的调用者，不是 Runtime 的主控。
-EvaluationRunner 不能直接修改 RuntimeState。
-EvaluationRunner 不能直接生成患者端输出。
-EvaluationRunner 不能绕过 SafetyGate / DecisionBoundary。
-```
-
-## 8.2 Scorer 只能评分
-
-```text
-Scorer 只能读取 RuntimeCaseExecution 并生成 MetricResult。
-Scorer 不能修改 RuntimeState。
-Scorer 不能修改资产包。
-Scorer 不能直接决定 CapabilityProfile 上线。
-```
-
-## 8.3 CapabilityProfile 只能生成 Proposal
-
-```text
-CapabilityProfileProposalService 只能生成 CapabilityProfileUpdateProposal。
-不得自动写入 src/main/resources/assets/packages/phase2-default。
-不得自动改变 Runtime 当前使用的 CapabilityProfile。
-```
-
-## 8.4 安全指标优先
-
-```text
-高风险漏报、患者端诊断泄漏、低风险安抚误输出属于 CRITICAL。
-出现 CRITICAL finding 时，不能因为平均分高而建议升级。
-```
-
-## 8.5 评估必须检查资产版本
-
-```text
-Evaluation 必须检查 RuntimeTrace 中的 asset_package_id、asset_package_version、asset_id@version。
-缺失资产版本记录时，不能认为该症状群能力可升级。
-```
-
-## 8.6 前沿 AI 技术只能作为 Provider / Adapter / 辅助评估
-
-```text
-MCP / Agent SDK / LangGraph / LangChain / GraphRAG / Skills / LLM-as-a-Judge 不能替代 Runtime 主控。
-如果需要引入，必须先查阅 docs/AI前沿技术选型与接入规划.md。
-```
-
-## 8.7 模型训练只能增强 Provider
-
-```text
-模型训练 / 后训练只能提升可替换 Provider 的能力。
-模型不能直接决定患者端最终输出。
-模型不能直接修改 RuntimeState。
-模型不能绕过 SafetyGate / DecisionBoundary。
-如果需要引入训练能力，必须先查阅 docs/模型训练与后训练规划.md。
-```
-
-## 8.8 技术实现必须遵守总方案
-
-```text
-代码包结构、依赖方向、API 分层、Provider 边界、Evaluation 架构、存储演进、测试策略必须遵守 docs/ClinMindRuntime技术实现总方案.md。
-如需偏离，必须先更新文档说明原因。
-```
-
-## 8.9 文档完整性判断必须参考缺口审查清单
-
-```text
-不得笼统声称文档体系已经完整。
-如需判断文档是否足够，必须参考 docs/架构文档缺口审查清单.md。
-如发现新的关键缺口，必须更新缺口审查清单，而不是只新增单个文档。
+1. EvaluationRunner 是 Runtime 的调用者，不是 Runtime 的主控。
+2. Scorer 只能评分，不能修改 RuntimeState、资产包或 CapabilityProfile。
+3. CapabilityProfileProposalService 只能生成 proposal，不能自动上线。
+4. 高风险漏报、患者端诊断泄漏、低风险安抚误输出属于 CRITICAL。
+5. Evaluation 必须检查 RuntimeTrace 中的 asset_package_id、asset_package_version、asset_id@version。
+6. MCP / Agent SDK / LangGraph / LangChain / GraphRAG / Skills / LLM-as-a-Judge 不能替代 Runtime 主控。
+7. 模型训练 / 后训练只能提升可替换 Provider 的能力。
+8. 代码包结构、依赖方向、API 分层、Provider 边界、Evaluation 架构、存储演进、测试策略必须遵守 docs/ClinMindRuntime技术实现总方案.md。
+9. 不得笼统声称文档体系已经完整，文档完整性判断必须参考 docs/架构文档缺口审查清单.md。
 ```
 
 ---
@@ -400,7 +356,10 @@ broken-package fail-safe 测试通过。
 10. 是否违反 docs/全局技术栈与架构选型.md 的接入阶段？
 11. 是否违反 docs/AI前沿技术选型与接入规划.md 的 AI 技术边界？
 12. 是否违反 docs/模型训练与后训练规划.md 的训练接入边界？
-13. 是否需要更新 docs/架构文档缺口审查清单.md？
+13. 是否违反 docs/医学知识库与RAG构建规划.md 的 RAG / EvidenceGraph 边界？
+14. 是否违反 docs/数据安全与合规边界规划.md 的数据安全边界？
+15. 是否违反 docs/测试与CI总方案.md 的回归测试要求？
+16. 是否需要更新 docs/架构文档缺口审查清单.md？
 ```
 
 ---
@@ -440,6 +399,7 @@ Python AI Provider
 RAG / GraphRAG
 模型训练 / 后训练
 数据库持久化
+部署运维
 ```
 
 ---
@@ -452,6 +412,5 @@ RAG / GraphRAG
 Phase 1 Runtime Core 和 Phase 2 Asset Provider 必须保持稳定。
 Evaluation 只能评估 Runtime，并生成 EvaluationResult 与 CapabilityProfileUpdateProposal。
 Phase 3 的目标是让能力边界有评估依据，而不是继续堆问诊功能。
-技术实现总方案、全局技术栈、AI 前沿技术和模型训练规划可以指导后续方向，但不能成为提前实现 Phase 4/5 的理由。
-文档体系是否完整必须由架构文档缺口审查清单判断，而不是凭主观感觉。
+新增六份专项规划用于指导后续 Phase 4/5，不是提前实现 Phase 4/5 的理由。
 ```
