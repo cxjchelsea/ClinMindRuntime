@@ -1,5 +1,6 @@
 package com.clinmind.runtime.api;
 
+import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,6 +9,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(EvaluationLoadException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEvaluationLoad(EvaluationLoadException ex) {
+        String code = ex.getMessage() != null && ex.getMessage().contains("case set")
+                ? "EVALUATION_CASE_SET_NOT_FOUND"
+                : "EVALUATION_RUN_NOT_FOUND";
+        return ResponseEntity.status(404)
+                .body(ApiResponse.fail(new ApiError(code, ex.getMessage())));
+    }
 
     @ExceptionHandler(RuntimeNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeNotFound(RuntimeNotFoundException ex) {

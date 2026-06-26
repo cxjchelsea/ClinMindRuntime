@@ -211,21 +211,21 @@
 
 ## 8.1 API
 
-- [ ] 创建 `api/EvaluationController.java`
-- [ ] 实现 `POST /api/v1/debug/evaluations/runs`
-- [ ] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}`
-- [ ] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}/result`
-- [ ] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}/items/{case_id}`
-- [ ] 实现 `POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal`
+- [x] 创建 `api/EvaluationController.java`
+- [x] 实现 `POST /api/v1/debug/evaluations/runs`
+- [x] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}`
+- [x] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}/result`
+- [x] 实现 `GET /api/v1/debug/evaluations/runs/{run_id}/items/{case_id}`
+- [x] 实现 `POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal`
 
 ## 8.2 测试
 
-- [ ] EvaluationControllerTest
-- [ ] EvaluationEndToEndIntegrationTest
-- [ ] Phase1RegressionTest 继续通过
-- [ ] Phase2 Asset Provider 回归继续通过
-- [ ] PatientOutputAssetIsolationTest 继续通过
-- [ ] RuntimeAssetVersionMismatchTest 继续通过
+- [x] EvaluationControllerTest
+- [x] EvaluationEndToEndIntegrationTest
+- [x] Phase1RegressionTest 继续通过
+- [x] Phase2 Asset Provider 回归继续通过
+- [x] PatientOutputAssetIsolationTest 继续通过
+- [x] RuntimeAssetVersionMismatchTest 继续通过
 
 ## 8.3 人工验收
 
@@ -255,3 +255,4 @@
 | 2026-06-26 | 完成 Phase3-P0-D | 7 个 EvaluationScorer + EvaluationItemScoringService；176 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-E | EvaluationResultAggregator 聚合 itemResults → EvaluationResult；180 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-F | CapabilityProfileProposalService 生成升级/保持/降级/阻塞建议；188 项测试全绿 |
+| 2026-06-26 | 完成 Phase3-P0-G | Evaluation debug API + Controller/E2E 测试；193 项测试全绿 |
