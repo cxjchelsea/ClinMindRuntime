@@ -106,29 +106,29 @@
 
 ## 4.1 Provider 实现
 
-- [ ] 创建 `provider/yaml/YamlMedicalKnowledgeProvider.java`
-- [ ] 创建 `provider/yaml/YamlRedFlagRuleProvider.java`
-- [ ] 创建 `provider/yaml/YamlTestRecommendationProvider.java`
-- [ ] 创建 `provider/yaml/YamlCapabilityProfileProvider.java`
-- [ ] 创建 `provider/yaml/YamlClinicalExperienceProvider.java`
-- [ ] 创建 `provider/yaml/StaticEvidenceAssetProvider.java` 或空实现
+- [x] 创建 `provider/yaml/YamlMedicalKnowledgeProvider.java`
+- [x] 创建 `provider/yaml/YamlRedFlagRuleProvider.java`
+- [x] 创建 `provider/yaml/YamlTestRecommendationProvider.java`
+- [x] 创建 `provider/yaml/YamlCapabilityProfileProvider.java`
+- [x] 创建 `provider/yaml/YamlClinicalExperienceProvider.java`
+- [x] 创建 `provider/yaml/StaticEvidenceAssetProvider.java` 或空实现
 
 ## 4.2 行为约束
 
-- [ ] MedicalKnowledgeProvider 返回 SymptomGroupAsset / MedicalKnowledgeAsset
-- [ ] RedFlagRuleProvider 返回带 AssetMetadata 的 RedFlagRuleAsset
-- [ ] TestRecommendationProvider 返回带 AssetMetadata 的 TestRecommendationAsset
-- [ ] CapabilityProfileProvider 返回带 AssetMetadata 的 CapabilityProfileAsset
-- [ ] ClinicalExperienceProvider 只返回 MOCK_VERIFIED / HUMAN_VERIFIED 经验单元
-- [ ] EvidenceAssetProvider 只返回静态 ref 或空列表，不做 RAG
+- [x] MedicalKnowledgeProvider 返回 SymptomGroupAsset / MedicalKnowledgeAsset
+- [x] RedFlagRuleProvider 返回带 AssetMetadata 的 RedFlagRuleAsset
+- [x] TestRecommendationProvider 返回带 AssetMetadata 的 TestRecommendationAsset
+- [x] CapabilityProfileProvider 返回带 AssetMetadata 的 CapabilityProfileAsset
+- [x] ClinicalExperienceProvider 只返回 MOCK_VERIFIED / HUMAN_VERIFIED 经验单元
+- [x] EvidenceAssetProvider 只返回静态 ref 或空列表，不做 RAG
 
 ## 4.3 测试
 
-- [ ] 编写 YamlMedicalKnowledgeProviderTest
-- [ ] 编写 YamlRedFlagRuleProviderTest
-- [ ] 编写 YamlTestRecommendationProviderTest
-- [ ] 编写 YamlCapabilityProfileProviderTest
-- [ ] 编写 YamlClinicalExperienceProviderTest
+- [x] 编写 YamlMedicalKnowledgeProviderTest
+- [x] 编写 YamlRedFlagRuleProviderTest
+- [x] 编写 YamlTestRecommendationProviderTest
+- [x] 编写 YamlCapabilityProfileProviderTest
+- [x] 编写 YamlClinicalExperienceProviderTest
 
 ---
 
@@ -252,3 +252,4 @@
 | 2026-06-26 | 创建 Phase 2 任务清单 | 用于约束共享能力资产原型实现 |
 | 2026-06-26 | 完成 Phase2-P0-A | 资产元数据、Provider 接口、AssetLoadException 及单元/Mock 测试；Runtime 主流程未改动 |
 | 2026-06-26 | 完成 Phase2-P0-B | phase2-default/alt/broken 资产包与 YamlAssetPackageRepository；Runtime 主流程未改动 |
+| 2026-06-26 | 完成 Phase2-P0-C | 6 个 YAML Provider 实现 + 5 个单元测试；共享 YamlAssetParsingSupport/YamlProviderSupport；Runtime 主流程未改动 |

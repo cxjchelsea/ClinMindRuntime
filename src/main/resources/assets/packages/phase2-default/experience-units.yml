@@ -12,3 +12,13 @@ experience_units:
       - QuestionTestPolicy
     confidence: 0.7
     review_status: mock_verified
+  - experience_id: exp_unreviewed_001
+    symptom_group: chest_pain
+    trigger_features:
+      - activity_related
+    summary: 未审核经验单元
+    suggested_questions: []
+    suggested_cautions: []
+    affected_modules: []
+    confidence: 0.5
+    review_status: unreviewed
