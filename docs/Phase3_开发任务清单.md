@@ -229,10 +229,10 @@
 
 ## 8.3 人工验收
 
-- [ ] 创建 `docs/Phase3_人工测试API结果.md`
-- [ ] 记录默认病例集评估运行结果
-- [ ] 记录失败病例 MetricResult
-- [ ] 记录 CapabilityProfileUpdateProposal
+- [x] 创建 `docs/Phase3_人工测试API结果.md`
+- [x] 记录默认病例集评估运行结果
+- [x] 记录失败病例 MetricResult
+- [x] 记录 CapabilityProfileUpdateProposal
 
 ---
 
@@ -256,3 +256,4 @@
 | 2026-06-26 | 完成 Phase3-P0-E | EvaluationResultAggregator 聚合 itemResults → EvaluationResult；180 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-F | CapabilityProfileProposalService 生成升级/保持/降级/阻塞建议；188 项测试全绿 |
 | 2026-06-26 | 完成 Phase3-P0-G | Evaluation debug API + Controller/E2E 测试；193 项测试全绿 |
+| 2026-06-26 | Phase3 人工 API 验收 | `docs/Phase3_人工测试API结果.md`；8 条 debug Evaluation API 抽测通过 |
