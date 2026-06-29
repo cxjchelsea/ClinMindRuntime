@@ -39,33 +39,33 @@
 
 # 三、Phase4-P0-A：Candidate 数据结构
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateSourceRef
-[ ] CandidateSourceType
-[ ] CandidateRiskLevel
-[ ] CandidateReviewStatus
-[ ] ExperienceCandidate
-[ ] ExperienceCandidateType
-[ ] TrainingExampleCandidate
-[ ] TrainingTaskType
-[ ] SanitizationStatus
-[ ] CandidateGenerationPolicy
-[ ] CandidateGenerationResult
-[ ] CandidateSkippedItem
+[x] CandidateSourceRef
+[x] CandidateSourceType
+[x] CandidateRiskLevel
+[x] CandidateReviewStatus
+[x] ExperienceCandidate
+[x] ExperienceCandidateType
+[x] TrainingExampleCandidate
+[x] TrainingTaskType
+[x] SanitizationStatus
+[x] CandidateGenerationPolicy
+[x] CandidateGenerationResult
+[x] CandidateSkippedItem
 ```
 
 测试：
 
 ```text
-[ ] CandidateSourceRefTest
-[ ] ExperienceCandidateTest
-[ ] TrainingExampleCandidateTest
-[ ] CandidateGenerationPolicyTest
-[ ] CandidateGenerationResultTest
+[x] CandidateSourceRefTest
+[x] ExperienceCandidateTest
+[x] TrainingExampleCandidateTest
+[x] CandidateGenerationPolicyTest
+[x] CandidateGenerationResultTest
 ```
 
 验收标准：
@@ -339,13 +339,13 @@ Phase4-P0 完成需要满足：
 当前下一步：
 
 ```text
-Phase4-P0-A：Candidate 数据结构
+Phase4-P0-B：CandidateStore
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase4-P0-A 状态从 [ ] 改为 [/]。
-2. 只实现数据结构和基础测试。
+1. 将 Phase4-P0-B 状态从 [ ] 改为 [/]。
+2. 只实现 CandidateStore 接口与 InMemoryCandidateStore。
 3. 不实现 Generator / Service / API。
 ```

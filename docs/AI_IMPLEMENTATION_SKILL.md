@@ -18,7 +18,7 @@
 Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
-Phase 4-P0：详细设计已建立，准备进入 P0-A 数据结构实现
+Phase 4-P0：详细设计已建立，P0-A 数据结构已完成，准备进入 P0-B CandidateStore
 ```
 
 Phase 4-P0 目标：
@@ -335,25 +335,25 @@ EvaluationEndToEndIntegrationTest 通过。
 当前最优实现任务是：
 
 ```text
-Phase4-P0-A：Candidate 数据结构
+Phase4-P0-B：CandidateStore
 ```
 
 只应实现：
 
 ```text
-1. CandidateSourceRef / enums。
-2. ExperienceCandidate / TrainingExampleCandidate。
-3. CandidateGenerationPolicy / CandidateGenerationResult / CandidateSkippedItem。
-4. 基础单元测试。
+1. CandidateStore interface。
+2. InMemoryCandidateStore。
+3. saveGenerationResult / getGenerationResult / list / get 查询方法。
+4. InMemoryCandidateStoreTest。
 5. 同步更新 docs/Phase4_开发任务清单.md。
 ```
 
-不应在 P0-A 中实现：
+不应在 P0-B 中实现：
 
 ```text
-CandidateStore
-CandidateGenerationService
+CandidateGenerationPolicy 映射策略
 Generator
+CandidateGenerationService
 API
 数据库
 前端
