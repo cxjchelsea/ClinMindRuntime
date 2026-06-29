@@ -9,7 +9,7 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 4-P0 经验候选与训练数据候选沉淀机制
+当前阶段：Phase 4-P0 经验候选与训练数据候选沉淀机制 — 已完成
 ```
 
 当前已经完成的主线：
@@ -18,7 +18,7 @@
 Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
-Phase 4-P0：P0-A 至 P0-F 已完成，准备进入 P0-G Debug API
+Phase 4-P0：P0-A 至 P0-G 全部完成（候选沉淀机制 + debug API）
 ```
 
 Phase 4-P0 目标：
@@ -332,23 +332,28 @@ EvaluationEndToEndIntegrationTest 通过。
 
 # 九、当前最优下一步
 
-当前最优实现任务是：
+Phase4-P0 已全部完成。
+
+当前最优下一步：
 
 ```text
-Phase4-P0-G：Debug API 与测试
+Phase4-P0 freeze 归档 / Phase4-P1 backlog 规划
 ```
 
-只应实现：
+Phase4-P0 已完成：
 
 ```text
-1. CandidateController。
-2. /api/v1/debug/candidates/** 查询与生成 API。
-3. CandidateControllerTest 与 CandidateEndToEndIntegrationTest。
-4. docs/Phase4_人工测试API结果.md。
-5. 同步更新 docs/Phase4_开发任务清单.md。
+1. Candidate 数据结构（P0-A）。
+2. CandidateStore（P0-B）。
+3. CandidateMappingPolicy（P0-C）。
+4. ExperienceCandidateGenerator（P0-D）。
+5. TrainingExampleCandidateGenerator（P0-E）。
+6. CandidateGenerationService（P0-F）。
+7. CandidateController + debug API + 测试（P0-G）。
+8. docs/Phase4_人工测试API结果.md。
 ```
 
-不应在 P0-G 中实现：
+不应在 P0 freeze 后于 P0 范围继续实现：
 
 ```text
 数据库

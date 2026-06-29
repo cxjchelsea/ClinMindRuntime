@@ -256,27 +256,27 @@
 
 # 九、Phase4-P0-G：Debug API 与端到端测试
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateController
-[ ] POST /api/v1/debug/candidates/generations/from-evaluation/{run_id}
-[ ] GET /api/v1/debug/candidates/generations/{generation_id}
-[ ] GET /api/v1/debug/candidates/generations/{generation_id}/experience-candidates
-[ ] GET /api/v1/debug/candidates/generations/{generation_id}/training-example-candidates
-[ ] GET /api/v1/debug/candidates/experience-candidates/{candidate_id}
-[ ] GET /api/v1/debug/candidates/training-example-candidates/{candidate_id}
-[ ] API 错误码
-[ ] docs/Phase4_人工测试API结果.md
+[x] CandidateController
+[x] POST /api/v1/debug/candidates/generations/from-evaluation/{run_id}
+[x] GET /api/v1/debug/candidates/generations/{generation_id}
+[x] GET /api/v1/debug/candidates/generations/{generation_id}/experience-candidates
+[x] GET /api/v1/debug/candidates/generations/{generation_id}/training-example-candidates
+[x] GET /api/v1/debug/candidates/experience-candidates/{candidate_id}
+[x] GET /api/v1/debug/candidates/training-example-candidates/{candidate_id}
+[x] API 错误码
+[x] docs/Phase4_人工测试API结果.md
 ```
 
 测试：
 
 ```text
-[ ] CandidateControllerTest
-[ ] CandidateEndToEndIntegrationTest
+[x] CandidateControllerTest
+[x] CandidateEndToEndIntegrationTest
 ```
 
 验收标准：
@@ -336,16 +336,16 @@ Phase4-P0 完成需要满足：
 
 # 十二、当前下一步
 
+Phase4-P0 已全部完成（P0-A 至 P0-G）。
+
 当前下一步：
 
 ```text
-Phase4-P0-G：Debug API 与端到端测试
+Phase4-P0 freeze / Phase4-P1 规划（不在 P0 范围）
 ```
 
-开始实现前必须：
+P0 完成记录：
 
 ```text
-1. 将 Phase4-P0-G 状态从 [ ] 改为 [/]。
-2. 只实现 CandidateController 与 API 测试。
-3. 不实现数据库 / 前端 / 模型训练。
+2026-06-29：完成 Phase4-P0-G — CandidateController + debug API + 245 项 JUnit 全绿
 ```
