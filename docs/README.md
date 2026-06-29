@@ -13,18 +13,19 @@
 Phase 1-P0：Runtime MVP 已完成。
 Phase 2-P0：共享能力资产原型已完成。
 Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收和冻结记录。
-当前阶段：Phase 3-P0 freeze complete / Phase 4 preparation pending。
+Phase 4-P0：经验候选与训练数据候选沉淀机制详细设计已建立。
+当前阶段：Phase 4-P0 implementation ready，下一步是 Phase4-P0-A Candidate 数据结构。
 ```
 
-当前可以开始 Phase 4 准备，但不应直接写 Phase 4 功能代码。
+当前可以开始 Phase4-P0-A 代码实现，但必须严格按 Phase4 开发任务清单推进。
 
 当前最优先任务：
 
 ```text
-1. 保持 Phase 1 / Phase 2 / Phase 3 回归通过。
-2. 基于 Phase3_P0冻结记录进入 Phase 4 前置设计。
-3. 先补 Phase4 详细设计与 Phase4 开发任务清单。
-4. 再进入 Phase4-P0-A 数据结构实现。
+1. 读取 docs/Phase4_开发任务清单.md。
+2. 将 Phase4-P0-A 状态从 [ ] 改为 [/]。
+3. 只实现 Candidate 数据结构和基础单元测试。
+4. 不实现 Generator / Service / API。
 5. 继续禁止提前接入 RAG、Python Provider、数据库、前端和模型训练。
 ```
 
@@ -40,23 +41,28 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 3. docs/ClinMindRuntime技术实现总方案.md
 4. docs/Phase3_P0冻结记录.md
 5. docs/Phase3_人工测试API结果.md
-6. docs/架构模式与设计模式说明.md
+6. docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md
+7. docs/架构模式与设计模式说明.md
 ```
 
-阅读目标：快速理解项目定位、当前实现、为什么不是普通 RAG / Agent Demo、Phase 3 已经实现并冻结了什么。
+阅读目标：快速理解项目定位、当前实现、为什么不是普通 RAG / Agent Demo、Phase 3 已经实现并冻结了什么，以及 Phase 4 为什么只做候选沉淀。
 
 ## 2.2 后续代码实现 / AI 编码工具
 
 ```text
 1. docs/AI_IMPLEMENTATION_SKILL.md
-2. docs/Phase3_P0冻结记录.md
-3. docs/Phase3_开发任务清单.md
-4. docs/ClinMindRuntime技术实现总方案.md
-5. docs/测试与CI总方案.md
-6. docs/架构文档缺口审查清单.md
+2. docs/Phase4_开发任务清单.md
+3. docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md
+4. docs/Phase4_数据结构设计.md
+5. docs/Phase4_候选生成策略设计.md
+6. docs/Phase4_Runtime与Evaluation接入设计.md
+7. docs/Phase4_API与测试设计.md
+8. docs/Phase3_P0冻结记录.md
+9. docs/ClinMindRuntime技术实现总方案.md
+10. docs/测试与CI总方案.md
 ```
 
-阅读目标：明确 Phase 3-P0 已冻结；下一步只能先做 Phase 4 准备文档，不能直接堆 Phase 4/5 功能。
+阅读目标：明确 Phase 4-P0 当前只允许按任务清单做候选沉淀机制，不得跳到 RAG、数据库、前端或模型训练。
 
 ## 2.3 架构学习 / 自我复盘
 
@@ -87,6 +93,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 | 文档 | 状态 | 用途 |
 |---|---|---|
 | `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
+| `docs/Phase4_开发任务清单.md` | 活跃 | Phase4-P0-A 到 P0-G 实现顺序与验收标准 |
 | `docs/Phase3_P0冻结记录.md` | 已冻结 | Phase3-P0 冻结依据和 Phase4 前置条件 |
 | `docs/Phase3_开发任务清单.md` | 已完成 / freeze 依据 | 记录 Phase3-P0-A 到 P0-G 完成情况 |
 | `docs/ClinMindRuntime技术实现总方案.md` | 活跃 | 约束包结构、依赖方向、Runtime 主链路、Provider 边界 |
@@ -103,7 +110,18 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 | `docs/全局技术栈与架构选型.md` | 规划基线 | 定义 Java / Python / PostgreSQL / pgvector / React / Docker 等选型 |
 | `docs/架构模式与设计模式说明.md` | 学习说明 | 用于理解架构模式、设计模式、代码模式 |
 
-## 3.4 当前 Phase 文档：Phase 3
+## 3.4 当前 Phase 文档：Phase 4
+
+| 文档 | 状态 | 用途 |
+|---|---|---|
+| `docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md` | 当前基线 | Phase4-P0 总体实现规格 |
+| `docs/Phase4_数据结构设计.md` | 当前基线 | Candidate 数据结构依据 |
+| `docs/Phase4_候选生成策略设计.md` | 当前基线 | CandidateGenerationPolicy 与映射策略依据 |
+| `docs/Phase4_Runtime与Evaluation接入设计.md` | 当前基线 | Phase4 只读 Evaluation / Runtime 结果的接入边界 |
+| `docs/Phase4_API与测试设计.md` | 当前基线 | Candidate debug API 与测试依据 |
+| `docs/Phase4_开发任务清单.md` | 活跃 | Phase4-P0 实现顺序与验收清单 |
+
+## 3.5 已冻结 Phase 文档：Phase 3
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -117,7 +135,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 | `docs/Phase3_人工测试API结果.md` | 验收归档 | Phase 3 人工 API 验收记录 |
 | `docs/Phase3_P0冻结记录.md` | 冻结归档 | Phase 3-P0 冻结状态、冻结依据和 Phase4 前置条件 |
 
-## 3.5 历史 Phase 文档
+## 3.6 历史 Phase 文档
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -126,7 +144,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 
 这些文档不要删除。它们证明项目不是一次性生成，而是从 Runtime → Asset → Evaluation 分阶段演进。
 
-## 3.6 后续专项规划文档
+## 3.7 后续专项规划文档
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -146,7 +164,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 
 ```text
 1. 不应继续无限新增总体规划文档。
-2. 不应直接写 Phase 4 功能代码。
+2. 不应跳过 Phase4-P0-A 直接实现 Service / API。
 3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
 4. 不应提前接 PostgreSQL / Redis / pgvector。
 5. 不应提前做前端 Console。
@@ -159,11 +177,11 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 # 五、当前建议做什么
 
 ```text
-1. 以 docs/Phase3_P0冻结记录.md 作为 Phase3-P0 完成依据。
-2. 保持 Phase 1 / Phase 2 / Phase 3 回归测试通过。
-3. 创建 Phase4 总体设计 / Phase4 开发任务清单。
-4. 明确 Phase4-P0 只做候选沉淀，不做自动经验上线、不做模型训练、不做 RAG。
-5. 再进入 Phase4-P0-A：ExperienceCandidate / TrainingExampleCandidate 数据结构。
+1. 以 docs/Phase4_开发任务清单.md 作为当前实现顺序依据。
+2. 先进入 Phase4-P0-A：Candidate 数据结构。
+3. 只实现 CandidateSourceRef / ExperienceCandidate / TrainingExampleCandidate / Policy / Result 等数据结构。
+4. 补基础单元测试。
+5. 保持 Phase1/2/3 回归测试通过。
 ```
 
 ---
@@ -182,4 +200,4 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收
 
 # 七、最终结论
 
-当前文档体系已经足够支撑 Phase 4 准备阶段。Phase 3-P0 已冻结，下一步应先补 Phase4 详细设计和任务清单，而不是直接写 Phase4 功能代码。
+当前文档体系已经足够支撑 Phase4-P0 实现。Phase3-P0 已冻结，Phase4-P0 详细设计已建立，下一步应进入 Phase4-P0-A：Candidate 数据结构。
