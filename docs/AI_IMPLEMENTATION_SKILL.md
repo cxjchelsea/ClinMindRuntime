@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 4-P1 候选治理与安全加固 — 设计已建立
-下一步：Phase4-P1-A CandidateSanitizer 与脱敏策略
+当前阶段：Phase 4-P1 候选治理与安全加固 — 已完成
+下一步：Phase4-P1 冻结记录 / Phase4-P2 规划
 ```
 
 当前已经完成的主线：
@@ -20,7 +20,7 @@ Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
-Phase 4-P1：候选治理与安全加固设计，准备进入 P1-A
+Phase 4-P1：候选治理与安全加固，已完成（P1-A 至 P1-F）
 ```
 
 Phase 4-P1 目标：
@@ -103,7 +103,7 @@ Phase 5 专项规划只能指导后续，不是提前实现理由。
 
 # 三、当前允许实现的内容
 
-当前只允许按 Phase4-P1-A 到 Phase4-P1-F 顺序推进。
+Phase 4-P1-A 至 P1-F 已全部完成。后续改动不得破坏 P1 脱敏、SourceRef 校验、Review 记录与 REVIEW_REQUIRED 边界。
 
 ## 3.1 Phase4-P1-A：CandidateSanitizer 与脱敏策略
 
@@ -303,20 +303,22 @@ CandidateEndToEndIntegrationTest 通过。
 当前最优实现任务是：
 
 ```text
-Phase4-P1-A：CandidateSanitizer 与脱敏策略
+Phase4-P1 已完成。下一步：编写 Phase4_P1冻结记录.md，或按 Phase4-P2 / Phase5 规划推进。
 ```
 
-只应实现：
+P1 已完成内容：
 
 ```text
-1. CandidateSanitizationPolicy / Result / Sanitizer。
-2. TrainingExampleCandidateGenerator 接入 sanitizer。
-3. sanitization_status 与 metadata policy 信息。
-4. 基础单元测试。
-5. 同步更新 docs/Phase4_P1开发任务清单.md。
+1. CandidateSanitizationPolicy / Result / Sanitizer + Generator 接入。
+2. CandidateSourceRefFactory / Validator + Generator 接入。
+3. CandidateNotFoundException resourceType + 错误码映射。
+4. CandidateReviewRecord / Service / Store。
+5. Review Debug API + 端到端测试。
+6. docs/Phase4_P1开发任务清单.md 与 Phase4_P1人工测试API结果.md 已更新。
+7. 全量 mvn test 292 项全绿。
 ```
 
-不应在 P1-A 中实现：
+不应在 P1 冻结后继续扩展 P1 范围：
 
 ```text
 CandidateReviewService
@@ -334,6 +336,6 @@ RAG
 ```text
 当前不是在实现完整训练平台。
 当前不是在实现正式医生审核平台。
-当前是在实现 Phase 4-P1 候选治理与安全加固。
+当前是在 Phase 4-P1 候选治理与安全加固已完成阶段。
 Phase 4-P1 的目标是让候选更安全、更可追踪、更可治理，但仍然不自动生效。
 ```

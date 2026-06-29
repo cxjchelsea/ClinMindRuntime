@@ -6,6 +6,9 @@ import com.clinmind.runtime.candidate.CandidateGenerationPolicy;
 import com.clinmind.runtime.candidate.CandidateReviewStatus;
 import com.clinmind.runtime.candidate.SanitizationStatus;
 import com.clinmind.runtime.candidate.TrainingTaskType;
+import com.clinmind.runtime.candidate.sanitization.CandidateSanitizer;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefFactory;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidator;
 import com.clinmind.runtime.evaluation.EvaluationCase;
 import com.clinmind.runtime.evaluation.EvaluationItemResult;
 import com.clinmind.runtime.evaluation.EvaluationResult;
@@ -37,7 +40,10 @@ class TrainingExampleCandidateGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        generator = new TrainingExampleCandidateGenerator(new CandidateMappingPolicy());
+        CandidateMappingPolicy mappingPolicy = new CandidateMappingPolicy();
+        CandidateSourceRefFactory sourceRefFactory = new CandidateSourceRefFactory(new CandidateSourceRefValidator());
+        generator = new TrainingExampleCandidateGenerator(
+                mappingPolicy, new CandidateSanitizer(), sourceRefFactory);
         policy = CandidateGenerationPolicy.defaults();
     }
 
@@ -74,7 +80,9 @@ class TrainingExampleCandidateGeneratorTest {
                         TrainingTaskType.NEXT_ACTION_EXPECTATION,
                         TrainingTaskType.ASSET_TRACE_EXPECTATION);
         assertThat(candidates).allMatch(candidate -> candidate.reviewStatus() == CandidateReviewStatus.REVIEW_REQUIRED);
-        assertThat(candidates).allMatch(candidate -> candidate.sanitizationStatus() == SanitizationStatus.NEEDS_REVIEW);
+        assertThat(candidates).allMatch(candidate -> candidate.sanitizationStatus() == SanitizationStatus.NEEDS_REVIEW
+                || candidate.sanitizationStatus() == SanitizationStatus.SANITIZED);
+        assertThat(candidates).allMatch(candidate -> candidate.metadata().containsKey("sanitizer_policy_id"));
     }
 
     @Test

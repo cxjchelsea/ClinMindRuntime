@@ -18,4 +18,8 @@ public interface CandidateStore {
     ExperienceCandidate getExperienceCandidate(String candidateId);
 
     TrainingExampleCandidate getTrainingExampleCandidate(String candidateId);
+
+    void updateExperienceCandidate(ExperienceCandidate candidate);
+
+    void updateTrainingExampleCandidate(TrainingExampleCandidate candidate);
 }

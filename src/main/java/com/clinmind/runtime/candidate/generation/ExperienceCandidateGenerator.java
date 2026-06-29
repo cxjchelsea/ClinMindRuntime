@@ -4,9 +4,9 @@ import com.clinmind.runtime.candidate.CandidateGenerationPolicy;
 import com.clinmind.runtime.candidate.CandidateReviewStatus;
 import com.clinmind.runtime.candidate.CandidateRiskLevel;
 import com.clinmind.runtime.candidate.CandidateSourceRef;
-import com.clinmind.runtime.candidate.CandidateSourceType;
 import com.clinmind.runtime.candidate.ExperienceCandidate;
 import com.clinmind.runtime.candidate.ExperienceCandidateType;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefFactory;
 import com.clinmind.runtime.evaluation.CaseSeverity;
 import com.clinmind.runtime.evaluation.EvaluationCase;
 import com.clinmind.runtime.evaluation.EvaluationItemResult;
@@ -31,9 +31,12 @@ import org.springframework.stereotype.Component;
 public class ExperienceCandidateGenerator {
 
     private final CandidateMappingPolicy mappingPolicy;
+    private final CandidateSourceRefFactory sourceRefFactory;
 
-    public ExperienceCandidateGenerator(CandidateMappingPolicy mappingPolicy) {
+    public ExperienceCandidateGenerator(
+            CandidateMappingPolicy mappingPolicy, CandidateSourceRefFactory sourceRefFactory) {
         this.mappingPolicy = mappingPolicy;
+        this.sourceRefFactory = sourceRefFactory;
     }
 
     public List<ExperienceCandidate> generateFromItemResult(
@@ -101,19 +104,8 @@ public class ExperienceCandidateGenerator {
                 continue;
             }
             ExperienceCandidateType type = mappingPolicy.mapRegressionFinding(finding);
-            CandidateSourceRef sourceRef = new CandidateSourceRef(
-                    CandidateSourceType.REGRESSION_FINDING,
-                    null,
-                    run.runId(),
-                    finding.affectedCases().isEmpty() ? null : finding.affectedCases().get(0),
-                    null,
-                    null,
-                    finding.findingId(),
-                    null,
-                    null,
-                    assetContext.packageId(),
-                    assetContext.version(),
-                    "regression_finding");
+            CandidateSourceRef sourceRef = sourceRefFactory.fromRegressionFinding(
+                    run, finding, assetContext.packageId(), assetContext.version());
             candidates.add(new ExperienceCandidate(
                     "exp_cand_" + run.runId() + "_rf_" + finding.findingId(),
                     type,
@@ -140,19 +132,8 @@ public class ExperienceCandidateGenerator {
             ExperienceCandidateType type,
             CaseSeverity caseSeverity,
             AssetContext assetContext) {
-        CandidateSourceRef sourceRef = new CandidateSourceRef(
-                CandidateSourceType.METRIC_RESULT,
-                execution == null ? itemResult.runtimeId() : execution.runtimeId(),
-                run.runId(),
-                itemResult.caseId(),
-                itemResult.runId() + ":" + itemResult.caseId(),
-                firstTraceId(itemResult, execution),
-                null,
-                null,
-                metric.metricId(),
-                assetContext.packageId(),
-                assetContext.version(),
-                "metric_result");
+        CandidateSourceRef sourceRef = sourceRefFactory.fromMetricResult(
+                run, itemResult, execution, metric, assetContext.packageId(), assetContext.version());
         return new ExperienceCandidate(
                 "exp_cand_" + run.runId() + "_" + itemResult.caseId() + "_" + metric.metricId(),
                 type,
@@ -176,19 +157,14 @@ public class ExperienceCandidateGenerator {
             SafetyViolation violation,
             ExperienceCandidateType type,
             AssetContext assetContext) {
-        CandidateSourceRef sourceRef = new CandidateSourceRef(
-                CandidateSourceType.SAFETY_VIOLATION,
-                execution == null ? itemResult.runtimeId() : execution.runtimeId(),
-                run.runId(),
-                itemResult.caseId(),
-                itemResult.runId() + ":" + itemResult.caseId(),
-                firstTraceId(itemResult, execution),
-                null,
-                violation.violationId(),
+        CandidateSourceRef sourceRef = sourceRefFactory.fromSafetyViolation(
+                run,
+                itemResult,
+                execution,
+                violation,
                 linkedMetricId(violation.violationType()),
                 assetContext.packageId(),
-                assetContext.version(),
-                "safety_violation");
+                assetContext.version());
         return new ExperienceCandidate(
                 "exp_cand_" + run.runId() + "_" + violation.violationId(),
                 type,
@@ -211,15 +187,10 @@ public class ExperienceCandidateGenerator {
             RuntimeCaseExecution execution,
             ExperienceCandidateType type,
             AssetContext assetContext) {
-        CandidateSourceRef sourceRef = new CandidateSourceRef(
-                CandidateSourceType.EVALUATION_ITEM_RESULT,
-                execution.runtimeId(),
-                run.runId(),
-                itemResult.caseId(),
-                itemResult.runId() + ":" + itemResult.caseId(),
-                firstTraceId(itemResult, execution),
-                null,
-                null,
+        CandidateSourceRef sourceRef = sourceRefFactory.fromEvaluationItemResult(
+                run,
+                itemResult,
+                execution,
                 "runtime_execution",
                 assetContext.packageId(),
                 assetContext.version(),

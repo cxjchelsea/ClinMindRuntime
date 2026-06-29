@@ -7,6 +7,9 @@ import com.clinmind.runtime.candidate.CandidateGenerationPolicy;
 import com.clinmind.runtime.candidate.CandidateSkippedReason;
 import com.clinmind.runtime.candidate.ExperienceCandidateType;
 import com.clinmind.runtime.candidate.TrainingTaskType;
+import com.clinmind.runtime.candidate.sanitization.CandidateSanitizer;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefFactory;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidator;
 import com.clinmind.runtime.candidate.store.InMemoryCandidateStore;
 import com.clinmind.runtime.evaluation.EvaluationCase;
 import com.clinmind.runtime.evaluation.EvaluationCaseRepository;
@@ -37,7 +40,6 @@ class CandidateGenerationServiceTest {
     void setUp() {
         runStore = new EvaluationRunStore();
         candidateStore = new InMemoryCandidateStore();
-        CandidateMappingPolicy mappingPolicy = new CandidateMappingPolicy();
         EvaluationCaseRepository caseRepository = new EvaluationCaseRepository() {
             @Override
             public String getDefaultCaseSetId() {
@@ -64,11 +66,14 @@ class CandidateGenerationServiceTest {
                 return loadCases(caseSetId);
             }
         };
+        CandidateMappingPolicy mappingPolicy = new CandidateMappingPolicy();
+        CandidateSourceRefFactory sourceRefFactory = new CandidateSourceRefFactory(new CandidateSourceRefValidator());
         service = new CandidateGenerationService(
                 runStore,
                 caseRepository,
-                new ExperienceCandidateGenerator(mappingPolicy),
-                new TrainingExampleCandidateGenerator(mappingPolicy),
+                new ExperienceCandidateGenerator(mappingPolicy, sourceRefFactory),
+                new TrainingExampleCandidateGenerator(
+                        mappingPolicy, new CandidateSanitizer(), sourceRefFactory),
                 mappingPolicy,
                 candidateStore);
     }

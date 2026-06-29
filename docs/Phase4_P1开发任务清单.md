@@ -37,26 +37,26 @@ P1 必须保证：
 
 # 三、Phase4-P1-A：CandidateSanitizer 与脱敏策略
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateSanitizationPolicy
-[ ] CandidateSanitizationResult
-[ ] CandidateSanitizer
-[ ] SourceTrustLevel / CandidateInputSourceType（如需要）
-[ ] TrainingExampleCandidateGenerator 接入 CandidateSanitizer
-[ ] metadata 写入 sanitizer_policy_id / policy_version
-[ ] sanitization_status 由 sanitizer 决定
+[x] CandidateSanitizationPolicy
+[x] CandidateSanitizationResult
+[x] CandidateSanitizer
+[x] SourceTrustLevel / CandidateInputSourceType（如需要）
+[x] TrainingExampleCandidateGenerator 接入 CandidateSanitizer
+[x] metadata 写入 sanitizer_policy_id / policy_version
+[x] sanitization_status 由 sanitizer 决定
 ```
 
 测试：
 
 ```text
-[ ] CandidateSanitizerTest
-[ ] CandidateSanitizationPolicyTest
-[ ] TrainingExampleCandidateSanitizationIntegrationTest
+[x] CandidateSanitizerTest
+[x] CandidateSanitizationPolicyTest
+[x] TrainingExampleCandidateSanitizationIntegrationTest
 ```
 
 验收标准：
@@ -74,25 +74,25 @@ P1 必须保证：
 
 # 四、Phase4-P1-B：CandidateSourceRef Factory 与组合校验
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateSourceRefFactory
-[ ] CandidateSourceRefValidator
-[ ] CandidateSourceRefValidationException
-[ ] Generator 从 new CandidateSourceRef 改为 factory 创建
-[ ] 按 source_type 校验必填字段
-[ ] 增加 INVALID_CANDIDATE_SOURCE_REF 错误码
+[x] CandidateSourceRefFactory
+[x] CandidateSourceRefValidator
+[x] CandidateSourceRefValidationException
+[x] Generator 从 new CandidateSourceRef 改为 factory 创建
+[x] 按 source_type 校验必填字段
+[x] 增加 INVALID_CANDIDATE_SOURCE_REF 错误码
 ```
 
 测试：
 
 ```text
-[ ] CandidateSourceRefFactoryTest
-[ ] CandidateSourceRefValidatorTest
-[ ] CandidateGenerationSourceRefIntegrationTest
+[x] CandidateSourceRefFactoryTest
+[x] CandidateSourceRefValidatorTest
+[x] CandidateGenerationSourceRefIntegrationTest
 ```
 
 验收标准：
@@ -108,23 +108,23 @@ P1 必须保证：
 
 # 五、Phase4-P1-C：CandidateNotFoundException resourceType
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateResourceType enum
-[ ] CandidateNotFoundException 增加 resourceType
-[ ] InMemoryCandidateStore 抛异常时指定 resourceType
-[ ] ApiExceptionHandler 不再依赖 message 字符串
-[ ] 错误码映射集中化
+[x] CandidateResourceType enum
+[x] CandidateNotFoundException 增加 resourceType
+[x] InMemoryCandidateStore 抛异常时指定 resourceType
+[x] ApiExceptionHandler 不再依赖 message 字符串
+[x] 错误码映射集中化
 ```
 
 测试：
 
 ```text
-[ ] CandidateNotFoundExceptionTest
-[ ] CandidateControllerErrorCodeTest
+[x] CandidateNotFoundExceptionTest
+[x] CandidateControllerErrorCodeTest
 ```
 
 验收标准：
@@ -140,23 +140,23 @@ P1 必须保证：
 
 # 六、Phase4-P1-D：CandidateReview 数据结构
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateKind
-[ ] CandidateReviewDecision
-[ ] CandidateReviewRecord
-[ ] CandidateReviewRequest
-[ ] CandidateReviewTransitionPolicy
+[x] CandidateKind
+[x] CandidateReviewDecision
+[x] CandidateReviewRecord
+[x] CandidateReviewRequest
+[x] CandidateReviewTransitionPolicy
 ```
 
 测试：
 
 ```text
-[ ] CandidateReviewRecordTest
-[ ] CandidateReviewTransitionPolicyTest
+[x] CandidateReviewRecordTest
+[x] CandidateReviewTransitionPolicyTest
 ```
 
 验收标准：
@@ -173,25 +173,25 @@ P1 必须保证：
 
 # 七、Phase4-P1-E：CandidateReviewStore 与 Service
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateReviewStore interface
-[ ] InMemoryCandidateReviewStore
-[ ] CandidateReviewService
-[ ] reviewExperienceCandidate
-[ ] reviewTrainingExampleCandidate
-[ ] listReviewsByCandidate
-[ ] getReviewRecord
+[x] CandidateReviewStore interface
+[x] InMemoryCandidateReviewStore
+[x] CandidateReviewService
+[x] reviewExperienceCandidate
+[x] reviewTrainingExampleCandidate
+[x] listReviewsByCandidate
+[x] getReviewRecord
 ```
 
 测试：
 
 ```text
-[ ] CandidateReviewStoreTest
-[ ] CandidateReviewServiceTest
+[x] CandidateReviewStoreTest
+[x] CandidateReviewServiceTest
 ```
 
 验收标准：
@@ -208,24 +208,24 @@ P1 必须保证：
 
 # 八、Phase4-P1-F：Review Debug API 与端到端测试
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] POST /api/v1/debug/candidates/experience-candidates/{candidate_id}/review
-[ ] POST /api/v1/debug/candidates/training-example-candidates/{candidate_id}/review
-[ ] GET /api/v1/debug/candidates/reviews/{review_id}
-[ ] GET /api/v1/debug/candidates/{candidate_id}/reviews
-[ ] API 错误码
-[ ] docs/Phase4_P1人工测试API结果.md
+[x] POST /api/v1/debug/candidates/experience-candidates/{candidate_id}/review
+[x] POST /api/v1/debug/candidates/training-example-candidates/{candidate_id}/review
+[x] GET /api/v1/debug/candidates/reviews/{review_id}
+[x] GET /api/v1/debug/candidates/{candidate_id}/reviews
+[x] API 错误码
+[x] docs/Phase4_P1人工测试API结果.md
 ```
 
 测试：
 
 ```text
-[ ] CandidateReviewControllerTest
-[ ] CandidateReviewEndToEndIntegrationTest
+[x] CandidateReviewControllerTest
+[x] CandidateReviewEndToEndIntegrationTest
 ```
 
 验收标准：
@@ -245,14 +245,14 @@ P1 必须保证：
 Phase4-P1 完成需要满足：
 
 ```text
-1. P1-A 到 P1-F 全部完成。
-2. TrainingExampleCandidate.input 经过 CandidateSanitizer。
-3. CandidateSourceRef 通过 Factory / Validator 创建。
-4. CandidateNotFoundException 使用 resourceType。
-5. CandidateReviewRecord 可记录和查询。
-6. review 不导致 Runtime / Asset / Capability / TrainingDataset 自动变化。
-7. 新增 Phase4_P1人工测试API结果.md。
-8. 更新 AI_IMPLEMENTATION_SKILL.md，标记 Phase4-P1 完成或进入 freeze。
+1. P1-A 到 P1-F 全部完成。 ✅
+2. TrainingExampleCandidate.input 经过 CandidateSanitizer。 ✅
+3. CandidateSourceRef 通过 Factory / Validator 创建。 ✅
+4. CandidateNotFoundException 使用 resourceType。 ✅
+5. CandidateReviewRecord 可记录和查询。 ✅
+6. review 不导致 Runtime / Asset / Capability / TrainingDataset 自动变化。 ✅
+7. 新增 Phase4_P1人工测试API结果.md。 ✅
+8. 更新 AI_IMPLEMENTATION_SKILL.md，标记 Phase4-P1 完成或进入 freeze。 ✅
 ```
 
 ---
@@ -282,13 +282,6 @@ Phase4-P1 完成需要满足：
 当前下一步：
 
 ```text
-Phase4-P1-A：CandidateSanitizer 与脱敏策略
-```
-
-开始实现前必须：
-
-```text
-1. 将 Phase4-P1-A 状态从 [ ] 改为 [/]。
-2. 只实现 CandidateSanitizer / SanitizationPolicy / SanitizationResult 及接入 TrainingExampleCandidateGenerator。
-3. 不实现 ReviewService / Review API。
+Phase4-P1 已完成，可进入 P1 冻结记录编写（参考 Phase4_P0冻结记录.md）。
+后续可选：Phase4-P2 或 Phase5 规划项。
 ```

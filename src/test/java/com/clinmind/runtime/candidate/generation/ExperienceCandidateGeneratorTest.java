@@ -6,6 +6,8 @@ import com.clinmind.runtime.candidate.CandidateGenerationPolicy;
 import com.clinmind.runtime.candidate.CandidateReviewStatus;
 import com.clinmind.runtime.candidate.CandidateRiskLevel;
 import com.clinmind.runtime.candidate.ExperienceCandidateType;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefFactory;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidator;
 import com.clinmind.runtime.evaluation.CaseSeverity;
 import com.clinmind.runtime.evaluation.EvaluationCase;
 import com.clinmind.runtime.evaluation.EvaluationItemResult;
@@ -38,7 +40,8 @@ class ExperienceCandidateGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        generator = new ExperienceCandidateGenerator(new CandidateMappingPolicy());
+        generator = new ExperienceCandidateGenerator(
+                new CandidateMappingPolicy(), new CandidateSourceRefFactory(new CandidateSourceRefValidator()));
         policy = CandidateGenerationPolicy.defaults();
     }
 

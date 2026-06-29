@@ -4,7 +4,10 @@ import com.clinmind.runtime.candidate.CandidateGenerationPolicy;
 import com.clinmind.runtime.candidate.CandidateReviewStatus;
 import com.clinmind.runtime.candidate.CandidateRiskLevel;
 import com.clinmind.runtime.candidate.CandidateSourceRef;
-import com.clinmind.runtime.candidate.CandidateSourceType;
+import com.clinmind.runtime.candidate.sanitization.CandidateInputSourceType;
+import com.clinmind.runtime.candidate.sanitization.CandidateSanitizationResult;
+import com.clinmind.runtime.candidate.sanitization.CandidateSanitizer;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefFactory;
 import com.clinmind.runtime.candidate.SanitizationStatus;
 import com.clinmind.runtime.candidate.TrainingExampleCandidate;
 import com.clinmind.runtime.candidate.TrainingTaskType;
@@ -32,9 +35,16 @@ import org.springframework.stereotype.Component;
 public class TrainingExampleCandidateGenerator {
 
     private final CandidateMappingPolicy mappingPolicy;
+    private final CandidateSanitizer candidateSanitizer;
+    private final CandidateSourceRefFactory sourceRefFactory;
 
-    public TrainingExampleCandidateGenerator(CandidateMappingPolicy mappingPolicy) {
+    public TrainingExampleCandidateGenerator(
+            CandidateMappingPolicy mappingPolicy,
+            CandidateSanitizer candidateSanitizer,
+            CandidateSourceRefFactory sourceRefFactory) {
         this.mappingPolicy = mappingPolicy;
+        this.candidateSanitizer = candidateSanitizer;
+        this.sourceRefFactory = sourceRefFactory;
     }
 
     public List<TrainingExampleCandidate> generateFromItemResult(
@@ -87,39 +97,49 @@ public class TrainingExampleCandidateGenerator {
             ExpectedOutcome expectedOutcome,
             CaseSeverity caseSeverity,
             AssetContext assetContext) {
-        CandidateSourceRef sourceRef = new CandidateSourceRef(
-                CandidateSourceType.METRIC_RESULT,
-                execution == null ? itemResult.runtimeId() : execution.runtimeId(),
-                run.runId(),
-                itemResult.caseId(),
-                itemResult.runId() + ":" + itemResult.caseId(),
-                firstTraceId(itemResult, execution),
-                null,
-                null,
-                metric.metricId(),
-                assetContext.packageId(),
-                assetContext.version(),
-                "metric_result");
+        CandidateSourceRef sourceRef = sourceRefFactory.fromMetricResult(
+                run, itemResult, execution, metric, assetContext.packageId(), assetContext.version());
 
-        Map<String, Object> input = buildInput(taskType, evaluationCase, execution, assetContext);
         Map<String, Object> expectedOutput = buildExpectedOutput(taskType, expectedOutcome, assetContext);
         Map<String, Object> negativeOutput = buildNegativeOutput(metric);
+        Map<String, Object> rawInput = buildInput(taskType, evaluationCase, execution, assetContext);
+        CandidateInputSourceType sourceType = resolveInputSourceType(evaluationCase, execution);
+        CandidateSanitizationResult sanitizationResult =
+                candidateSanitizer.sanitize(rawInput, taskType, sourceType);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("metric_id", metric.metricId());
+        metadata.put("sanitizer_policy_id", sanitizationResult.policyId());
+        metadata.put("sanitizer_policy_version", sanitizationResult.policyVersion());
+        if (!sanitizationResult.warnings().isEmpty()) {
+            metadata.put("sanitizer_warnings", sanitizationResult.warnings());
+        }
 
         return new TrainingExampleCandidate(
                 "train_cand_" + run.runId() + "_" + itemResult.caseId() + "_" + metric.metricId(),
                 taskType,
                 sourceRef,
-                input,
+                sanitizationResult.sanitizedInput(),
                 expectedOutput,
                 negativeOutput,
                 taskType.name().toLowerCase(),
                 metric.message(),
                 mappingPolicy.resolveExperienceRiskLevel(metric, caseSeverity),
                 CandidateReviewStatus.REVIEW_REQUIRED,
-                SanitizationStatus.NEEDS_REVIEW,
+                sanitizationResult.sanitizationStatus(),
                 List.of(metric.metricId(), taskType.name().toLowerCase()),
                 Instant.now(),
-                Map.of("metric_id", metric.metricId()));
+                Map.copyOf(metadata));
+    }
+
+    private static CandidateInputSourceType resolveInputSourceType(
+            EvaluationCase evaluationCase, RuntimeCaseExecution execution) {
+        if (evaluationCase != null) {
+            return CandidateInputSourceType.SYNTHETIC_EVALUATION;
+        }
+        if (execution != null) {
+            return CandidateInputSourceType.REAL_RUNTIME;
+        }
+        return CandidateInputSourceType.UNKNOWN;
     }
 
     private Map<String, Object> buildInput(

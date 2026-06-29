@@ -1,7 +1,10 @@
 package com.clinmind.runtime.api;
 
 import com.clinmind.runtime.candidate.generation.CandidateGenerationException;
+import com.clinmind.runtime.candidate.review.CandidateReviewException;
+import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidationException;
 import com.clinmind.runtime.candidate.store.CandidateNotFoundException;
+import com.clinmind.runtime.candidate.store.CandidateResourceType;
 import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -34,11 +37,26 @@ public class ApiExceptionHandler {
                 .body(ApiResponse.fail(new ApiError("EVALUATION_RUN_NOT_COMPLETED", ex.getMessage())));
     }
 
+    @ExceptionHandler(CandidateSourceRefValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCandidateSourceRefValidation(
+            CandidateSourceRefValidationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.fail(new ApiError(ex.getCode(), ex.getMessage())));
+    }
+
+    @ExceptionHandler(CandidateReviewException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCandidateReview(CandidateReviewException ex) {
+        HttpStatus status = "CANDIDATE_REVIEW_NOT_FOUND".equals(ex.getCode())
+                ? HttpStatus.NOT_FOUND
+                : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status)
+                .body(ApiResponse.fail(new ApiError(ex.getCode(), ex.getMessage())));
+    }
+
     @ExceptionHandler(CandidateNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleCandidateNotFound(CandidateNotFoundException ex) {
-        String code = resolveCandidateNotFoundCode(ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.fail(new ApiError(code, ex.getMessage())));
+                .body(ApiResponse.fail(new ApiError(resolveCandidateNotFoundCode(ex), ex.getMessage())));
     }
 
     @ExceptionHandler(ApiException.class)
@@ -48,14 +66,11 @@ public class ApiExceptionHandler {
     }
 
     private static String resolveCandidateNotFoundCode(CandidateNotFoundException ex) {
-        if (ex.getGenerationId() != null) {
-            return "CANDIDATE_GENERATION_NOT_FOUND";
-        }
-        String message = ex.getMessage();
-        if (message != null && message.contains("Training example")) {
-            return "TRAINING_EXAMPLE_CANDIDATE_NOT_FOUND";
-        }
-        return "EXPERIENCE_CANDIDATE_NOT_FOUND";
+        return switch (ex.getResourceType()) {
+            case GENERATION -> "CANDIDATE_GENERATION_NOT_FOUND";
+            case TRAINING_EXAMPLE_CANDIDATE -> "TRAINING_EXAMPLE_CANDIDATE_NOT_FOUND";
+            case EXPERIENCE_CANDIDATE -> "EXPERIENCE_CANDIDATE_NOT_FOUND";
+        };
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -3,6 +3,7 @@ package com.clinmind.runtime.candidate.store;
 import com.clinmind.runtime.candidate.CandidateGenerationResult;
 import com.clinmind.runtime.candidate.ExperienceCandidate;
 import com.clinmind.runtime.candidate.TrainingExampleCandidate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +28,7 @@ public class InMemoryCandidateStore implements CandidateStore {
     public CandidateGenerationResult getGenerationResult(String generationId) {
         CandidateGenerationResult result = generationResults.get(generationId);
         if (result == null) {
-            throw new CandidateNotFoundException("Candidate generation result not found: " + generationId, generationId);
+            throw CandidateNotFoundException.generationNotFound(generationId);
         }
         return result;
     }
@@ -46,7 +47,7 @@ public class InMemoryCandidateStore implements CandidateStore {
     public ExperienceCandidate getExperienceCandidate(String candidateId) {
         ExperienceCandidate candidate = experienceCandidates.get(candidateId);
         if (candidate == null) {
-            throw new CandidateNotFoundException("Experience candidate not found: " + candidateId, null, candidateId);
+            throw CandidateNotFoundException.experienceCandidateNotFound(candidateId);
         }
         return candidate;
     }
@@ -55,11 +56,76 @@ public class InMemoryCandidateStore implements CandidateStore {
     public TrainingExampleCandidate getTrainingExampleCandidate(String candidateId) {
         TrainingExampleCandidate candidate = trainingExampleCandidates.get(candidateId);
         if (candidate == null) {
-            throw new CandidateNotFoundException(
-                    "Training example candidate not found: " + candidateId,
-                    null,
-                    candidateId);
+            throw CandidateNotFoundException.trainingExampleCandidateNotFound(candidateId);
         }
         return candidate;
+    }
+
+    @Override
+    public void updateExperienceCandidate(ExperienceCandidate candidate) {
+        if (!experienceCandidates.containsKey(candidate.candidateId())) {
+            throw CandidateNotFoundException.experienceCandidateNotFound(candidate.candidateId());
+        }
+        experienceCandidates.put(candidate.candidateId(), candidate);
+        refreshGenerationResults(candidate.candidateId(), candidate, null);
+    }
+
+    @Override
+    public void updateTrainingExampleCandidate(TrainingExampleCandidate candidate) {
+        if (!trainingExampleCandidates.containsKey(candidate.candidateId())) {
+            throw CandidateNotFoundException.trainingExampleCandidateNotFound(candidate.candidateId());
+        }
+        trainingExampleCandidates.put(candidate.candidateId(), candidate);
+        refreshGenerationResults(candidate.candidateId(), null, candidate);
+    }
+
+    private void refreshGenerationResults(
+            String candidateId, ExperienceCandidate experienceCandidate, TrainingExampleCandidate trainingCandidate) {
+        for (Map.Entry<String, CandidateGenerationResult> entry : generationResults.entrySet()) {
+            CandidateGenerationResult result = entry.getValue();
+            boolean updated = false;
+            List<ExperienceCandidate> experienceCandidates = result.experienceCandidates();
+            List<TrainingExampleCandidate> trainingCandidates = result.trainingExampleCandidates();
+
+            if (experienceCandidate != null) {
+                List<ExperienceCandidate> refreshedExperience = new ArrayList<>();
+                for (ExperienceCandidate candidate : experienceCandidates) {
+                    if (candidate.candidateId().equals(candidateId)) {
+                        refreshedExperience.add(experienceCandidate);
+                        updated = true;
+                    } else {
+                        refreshedExperience.add(candidate);
+                    }
+                }
+                experienceCandidates = refreshedExperience;
+            }
+
+            if (trainingCandidate != null) {
+                List<TrainingExampleCandidate> refreshedTraining = new ArrayList<>();
+                for (TrainingExampleCandidate candidate : trainingCandidates) {
+                    if (candidate.candidateId().equals(candidateId)) {
+                        refreshedTraining.add(trainingCandidate);
+                        updated = true;
+                    } else {
+                        refreshedTraining.add(candidate);
+                    }
+                }
+                trainingCandidates = refreshedTraining;
+            }
+
+            if (updated) {
+                generationResults.put(
+                        entry.getKey(),
+                        new CandidateGenerationResult(
+                                result.generationId(),
+                                result.sourceEvaluationRunId(),
+                                result.startedAt(),
+                                result.completedAt(),
+                                List.copyOf(experienceCandidates),
+                                List.copyOf(trainingCandidates),
+                                result.skippedItems(),
+                                result.warnings()));
+            }
+        }
     }
 }
