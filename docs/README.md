@@ -12,20 +12,20 @@
 ```text
 Phase 1-P0：Runtime MVP 已完成。
 Phase 2-P0：共享能力资产原型已完成。
-Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收。
-当前阶段：Phase 3-P0 freeze / cleanup / release polish。
+Phase 3-P0：训练与评估闭环 MVP 已完成代码实现、人工 API 验收和冻结记录。
+当前阶段：Phase 3-P0 freeze complete / Phase 4 preparation pending。
 ```
 
-当前不应继续新增 Phase 4/5 功能。
+当前可以开始 Phase 4 准备，但不应直接写 Phase 4 功能代码。
 
 当前最优先任务：
 
 ```text
-1. 文档导航与阶段状态同步。
-2. Phase 3-P0 冻结前质量清理。
-3. README / 项目展示导读完善。
-4. 小型一致性修复，例如 case_set_version 校验、API 错误码、评估指标语义。
-5. 保持 Phase 1 / Phase 2 / Phase 3 回归通过。
+1. 保持 Phase 1 / Phase 2 / Phase 3 回归通过。
+2. 基于 Phase3_P0冻结记录进入 Phase 4 前置设计。
+3. 先补 Phase4 详细设计与 Phase4 开发任务清单。
+4. 再进入 Phase4-P0-A 数据结构实现。
+5. 继续禁止提前接入 RAG、Python Provider、数据库、前端和模型训练。
 ```
 
 ---
@@ -38,23 +38,25 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 1. docs/项目展示导读.md
 2. docs/ClinMindRuntime完整系统设计.md
 3. docs/ClinMindRuntime技术实现总方案.md
-4. docs/Phase3_人工测试API结果.md
-5. docs/架构模式与设计模式说明.md
+4. docs/Phase3_P0冻结记录.md
+5. docs/Phase3_人工测试API结果.md
+6. docs/架构模式与设计模式说明.md
 ```
 
-阅读目标：快速理解项目定位、当前实现、为什么不是普通 RAG / Agent Demo、Phase 3 已经实现了什么。
+阅读目标：快速理解项目定位、当前实现、为什么不是普通 RAG / Agent Demo、Phase 3 已经实现并冻结了什么。
 
 ## 2.2 后续代码实现 / AI 编码工具
 
 ```text
 1. docs/AI_IMPLEMENTATION_SKILL.md
-2. docs/Phase3_开发任务清单.md
-3. docs/ClinMindRuntime技术实现总方案.md
-4. docs/测试与CI总方案.md
-5. docs/架构文档缺口审查清单.md
+2. docs/Phase3_P0冻结记录.md
+3. docs/Phase3_开发任务清单.md
+4. docs/ClinMindRuntime技术实现总方案.md
+5. docs/测试与CI总方案.md
+6. docs/架构文档缺口审查清单.md
 ```
 
-阅读目标：明确当前不能继续堆 Phase 4/5，而是先做 Phase 3-P0 freeze cleanup。
+阅读目标：明确 Phase 3-P0 已冻结；下一步只能先做 Phase 4 准备文档，不能直接堆 Phase 4/5 功能。
 
 ## 2.3 架构学习 / 自我复盘
 
@@ -85,6 +87,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 | 文档 | 状态 | 用途 |
 |---|---|---|
 | `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
+| `docs/Phase3_P0冻结记录.md` | 已冻结 | Phase3-P0 冻结依据和 Phase4 前置条件 |
 | `docs/Phase3_开发任务清单.md` | 已完成 / freeze 依据 | 记录 Phase3-P0-A 到 P0-G 完成情况 |
 | `docs/ClinMindRuntime技术实现总方案.md` | 活跃 | 约束包结构、依赖方向、Runtime 主链路、Provider 边界 |
 | `docs/架构文档缺口审查清单.md` | 活跃 | 判断文档体系覆盖状态，不再凭感觉判断完整性 |
@@ -104,7 +107,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/Phase3_训练与评估闭环_实现规格.md` | 当前基线 | Phase 3 总体实现规格 |
+| `docs/Phase3_训练与评估闭环_实现规格.md` | 已实现基线 | Phase 3 总体实现规格 |
 | `docs/Phase3_评估数据结构设计.md` | 已实现基线 | Evaluation 数据结构依据 |
 | `docs/Phase3_病例集与考试流程设计.md` | 已实现基线 | YAML case set 与 EvaluationRunner 依据 |
 | `docs/Phase3_Runtime评估接入设计.md` | 已实现基线 | Evaluation 必须通过 RuntimeService 的约束 |
@@ -112,6 +115,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 | `docs/Phase3_API与测试设计.md` | 已实现基线 | Evaluation debug API 和测试依据 |
 | `docs/Phase3_开发任务清单.md` | 已完成 | Phase3-P0-A 到 P0-G 均已完成 |
 | `docs/Phase3_人工测试API结果.md` | 验收归档 | Phase 3 人工 API 验收记录 |
+| `docs/Phase3_P0冻结记录.md` | 冻结归档 | Phase 3-P0 冻结状态、冻结依据和 Phase4 前置条件 |
 
 ## 3.5 历史 Phase 文档
 
@@ -142,7 +146,7 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 
 ```text
 1. 不应继续无限新增总体规划文档。
-2. 不应立刻进入 Phase 4。
+2. 不应直接写 Phase 4 功能代码。
 3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
 4. 不应提前接 PostgreSQL / Redis / pgvector。
 5. 不应提前做前端 Console。
@@ -155,11 +159,11 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 # 五、当前建议做什么
 
 ```text
-1. 更新 AI_IMPLEMENTATION_SKILL.md：从“Phase3-P0-A 待实现”改为“Phase3-P0 已完成，进入 freeze cleanup”。
-2. 更新架构文档缺口审查清单：标记无 P0 文档缺口，当前进入文档治理与 release cleanup。
-3. 补充 README / 项目展示导读。
-4. 做小型一致性修复：case_set_version 校验、notApplicable 评分语义、Evaluation item not found 错误码等。
-5. 通过测试后冻结 Phase3-P0。
+1. 以 docs/Phase3_P0冻结记录.md 作为 Phase3-P0 完成依据。
+2. 保持 Phase 1 / Phase 2 / Phase 3 回归测试通过。
+3. 创建 Phase4 总体设计 / Phase4 开发任务清单。
+4. 明确 Phase4-P0 只做候选沉淀，不做自动经验上线、不做模型训练、不做 RAG。
+5. 再进入 Phase4-P0-A：ExperienceCandidate / TrainingExampleCandidate 数据结构。
 ```
 
 ---
@@ -178,4 +182,4 @@ Phase 3-P0：训练与评估闭环 MVP 已完成代码实现和人工 API 验收
 
 # 七、最终结论
 
-当前文档体系已经足够支撑 Phase 3-P0 freeze cleanup。现在需要的是文档治理和状态同步，而不是继续堆新规划。
+当前文档体系已经足够支撑 Phase 4 准备阶段。Phase 3-P0 已冻结，下一步应先补 Phase4 详细设计和任务清单，而不是直接写 Phase4 功能代码。
