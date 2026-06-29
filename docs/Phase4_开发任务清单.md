@@ -303,7 +303,10 @@ Phase4-P0 完成需要满足：
 4. Phase1/2/3 回归测试通过。
 5. 新增 Phase4 人工 API 验收记录。
 6. 更新 AI_IMPLEMENTATION_SKILL.md，标记 Phase4-P0 完成或进入 freeze。
+7. 新增 docs/Phase4_P0冻结记录.md。
 ```
+
+**Phase4-P0 已于 2026-06-29 冻结。** 详见 `docs/Phase4_P0冻结记录.md`。
 
 ---
 
@@ -336,16 +339,23 @@ Phase4-P0 完成需要满足：
 
 # 十二、当前下一步
 
-Phase4-P0 已全部完成（P0-A 至 P0-G）。
+Phase4-P0 已全部完成并冻结（2026-06-29）。
 
 当前下一步：
 
 ```text
-Phase4-P0 freeze / Phase4-P1 规划（不在 P0 范围）
+Phase4-P1 规划（不在 P0 范围）
+```
+
+冻结与 hardening 依据：
+
+```text
+docs/Phase4_P0冻结记录.md
 ```
 
 P0 完成记录：
 
 ```text
-2026-06-29：完成 Phase4-P0-G — CandidateController + debug API + 245 项 JUnit 全绿
+2026-06-29：完成 Phase4-P0-G — CandidateController + debug API + 245 项 JUnit 全绿 + 人工 API 抽测
+2026-06-29：Phase4-P0 冻结归档 — commit bbfeabd
 ```

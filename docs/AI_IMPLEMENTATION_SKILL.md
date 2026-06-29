@@ -1,15 +1,16 @@
 # AI Implementation Skill：ClinMindRuntime Phase 4-P0
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP 已完成并冻结。  
-> 当前进入 Phase 4-P0：经验候选与训练数据候选沉淀机制。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环和患者端隔离。
+> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制均已完成并冻结。  
+> 后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、候选 REVIEW_REQUIRED 边界和患者端隔离。
 
 ---
 
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 4-P0 经验候选与训练数据候选沉淀机制 — 已完成
+当前阶段：Phase 4-P0 经验候选与训练数据候选沉淀机制 — 已冻结
+下一阶段：Phase 4-P1 规划 pending（不在 P0 范围）
 ```
 
 当前已经完成的主线：
@@ -18,7 +19,7 @@
 Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
-Phase 4-P0：P0-A 至 P0-G 全部完成（候选沉淀机制 + debug API）
+Phase 4-P0：候选沉淀机制 + debug API，已冻结
 ```
 
 Phase 4-P0 目标：
@@ -332,15 +333,15 @@ EvaluationEndToEndIntegrationTest 通过。
 
 # 九、当前最优下一步
 
-Phase4-P0 已全部完成。
+Phase4-P0 已全部完成并冻结。
 
 当前最优下一步：
 
 ```text
-Phase4-P0 freeze 归档 / Phase4-P1 backlog 规划
+Phase4-P1 规划 / P0 hardening 评估（脱敏层、CandidateSourceRef 校验、CandidateNotFoundException resourceType）
 ```
 
-Phase4-P0 已完成：
+Phase4-P0 已完成（已冻结，详见 docs/Phase4_P0冻结记录.md）：
 
 ```text
 1. Candidate 数据结构（P0-A）。
@@ -353,7 +354,7 @@ Phase4-P0 已完成：
 8. docs/Phase4_人工测试API结果.md。
 ```
 
-不应在 P0 freeze 后于 P0 范围继续实现：
+不应在 Phase4-P0 冻结后继续向 P0 范围实现：
 
 ```text
 数据库
