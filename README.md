@@ -2,7 +2,7 @@
 
 受控医疗 AI Runtime：结构化临床推理、资产治理与评估闭环，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 3 Evaluation MVP**（Phase 1 Runtime + Phase 2 Asset Provider + Phase 3 Evaluation 已落地）
+当前版本：**Phase 3-P0 Frozen / Phase 4 Preparation Pending**（Phase 1 Runtime + Phase 2 Asset Provider + Phase 3 Evaluation 已落地并冻结）
 
 ## 项目定位
 
@@ -14,15 +14,15 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 
 与「检索 + 大模型直接回答」的区别：Runtime **不绕过**结构化模块做最终临床判断；Evaluation **不绕过** Runtime 直接评输出文本。
 
-## 当前已实现（Phase 3-P0）
+## 当前已实现
 
-| 阶段 | 能力 |
-|------|------|
-| Phase 1 | 患者/医生 Runtime、SafetyGate、Trace、DecisionBoundary |
-| Phase 2 | 资产包 `phase2-default`、Provider 接口、debug `assets-used` |
-| Phase 3 | YAML 病例集、`RuntimeEvaluationRunner`、7 个 Scorer、EvaluationResult 聚合、CapabilityProfile Proposal、debug Evaluation API |
+| 阶段 | 能力 | 状态 |
+|------|------|------|
+| Phase 1 | 患者/医生 Runtime、SafetyGate、Trace、DecisionBoundary | 已完成 |
+| Phase 2 | 资产包 `phase2-default`、Provider 接口、debug `assets-used` | 已完成 |
+| Phase 3 | YAML 病例集、`RuntimeEvaluationRunner`、7 个 Scorer、EvaluationResult 聚合、CapabilityProfile Proposal、debug Evaluation API | 已冻结 |
 
-**193+ JUnit 测试全绿**；人工 API 验收见 [`docs/Phase3_人工测试API结果.md`](docs/Phase3_人工测试API结果.md)。
+Phase 3-P0 冻结记录见 [`docs/Phase3_P0冻结记录.md`](docs/Phase3_P0冻结记录.md)。人工 API 验收见 [`docs/Phase3_人工测试API结果.md`](docs/Phase3_人工测试API结果.md)。
 
 ## 快速启动
 
@@ -85,7 +85,9 @@ Content-Type: application/json
 
 | 文档 | 说明 |
 |------|------|
+| [`docs/README.md`](docs/README.md) | 文档导航 |
 | [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试/展示用精简导读 |
+| [`docs/Phase3_P0冻结记录.md`](docs/Phase3_P0冻结记录.md) | Phase 3-P0 冻结依据 |
 | [`docs/ClinMindRuntime完整系统设计.md`](docs/ClinMindRuntime完整系统设计.md) | 系统总设计 |
 | [`docs/ClinMindRuntime阶段拆分路线图.md`](docs/ClinMindRuntime阶段拆分路线图.md) | Phase 1–5 路线 |
 | [`docs/Phase3_开发任务清单.md`](docs/Phase3_开发任务清单.md) | Phase 3 实现进度 |
@@ -93,7 +95,9 @@ Content-Type: application/json
 
 ## 下一阶段
 
-**Phase 4**：Feedback / Outcome / RegressionFinding 复盘与经验候选（未开始）。Phase 3-P0 已冻结，优先质量清理而非继续堆 Phase 4/5。
+**Phase 4 准备阶段**：先补 Phase4 详细设计和开发任务清单，推荐主题是 `ExperienceCandidate / TrainingExampleCandidate` 候选沉淀机制。
+
+当前不应跳过设计直接实现 Phase4 功能代码。
 
 ## License
 
