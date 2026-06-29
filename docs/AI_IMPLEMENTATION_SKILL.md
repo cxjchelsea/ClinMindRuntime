@@ -18,7 +18,7 @@
 Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
-Phase 4-P0：P0-A 至 P0-D 已完成，准备进入 P0-E TrainingExampleCandidateGenerator
+Phase 4-P0：P0-A 至 P0-F 已完成，准备进入 P0-G Debug API
 ```
 
 Phase 4-P0 目标：
@@ -335,30 +335,27 @@ EvaluationEndToEndIntegrationTest 通过。
 当前最优实现任务是：
 
 ```text
-Phase4-P0-E：TrainingExampleCandidateGenerator
+Phase4-P0-G：Debug API 与测试
 ```
 
 只应实现：
 
 ```text
-1. TrainingExampleCandidateGenerator。
-2. 从失败病例生成训练样本候选。
-3. sanitization_status 默认 NEEDS_REVIEW。
-4. TrainingExampleCandidateGeneratorTest。
+1. CandidateController。
+2. /api/v1/debug/candidates/** 查询与生成 API。
+3. CandidateControllerTest 与 CandidateEndToEndIntegrationTest。
+4. docs/Phase4_人工测试API结果.md。
 5. 同步更新 docs/Phase4_开发任务清单.md。
 ```
 
-不应在 P0-E 中实现：
+不应在 P0-G 中实现：
 
 ```text
-CandidateGenerationService
-CandidateController
-API
 数据库
 前端
 模型训练
 RAG
-LLM 调用
+自动审核流
 ```
 
 ---

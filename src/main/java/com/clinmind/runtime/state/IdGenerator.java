@@ -22,4 +22,8 @@ public final class IdGenerator {
     public static String capabilityProposalId() {
         return "cap_prop_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String candidateGenerationId() {
+        return "cand_gen_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

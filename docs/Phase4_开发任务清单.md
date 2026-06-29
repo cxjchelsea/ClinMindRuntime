@@ -185,24 +185,24 @@
 
 # 七、Phase4-P0-E：TrainingExampleCandidateGenerator
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] TrainingExampleCandidateGenerator
-[ ] SafetyGate failure → RISK_SIGNAL_CLASSIFICATION
-[ ] PatientBoundary failure → PATIENT_SAFE_REWRITE
-[ ] Ddx failure → DDX_EXPECTATION
-[ ] NextAction failure → NEXT_ACTION_EXPECTATION
-[ ] Asset trace failure → ASSET_TRACE_EXPECTATION
-[ ] sanitization_status 默认 NEEDS_REVIEW
+[x] TrainingExampleCandidateGenerator
+[x] SafetyGate failure → RISK_SIGNAL_CLASSIFICATION
+[x] PatientBoundary failure → PATIENT_SAFE_REWRITE
+[x] Ddx failure → DDX_EXPECTATION
+[x] NextAction failure → NEXT_ACTION_EXPECTATION
+[x] Asset trace failure → ASSET_TRACE_EXPECTATION
+[x] sanitization_status 默认 NEEDS_REVIEW
 ```
 
 测试：
 
 ```text
-[ ] TrainingExampleCandidateGeneratorTest
+[x] TrainingExampleCandidateGeneratorTest
 ```
 
 验收标准：
@@ -218,28 +218,28 @@
 
 # 八、Phase4-P0-F：CandidateGenerationService
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateGenerationService
-[ ] 从 EvaluationRunStore 读取 EvaluationRun
-[ ] 检查 run 是否完成
-[ ] 遍历 EvaluationItemResult
-[ ] 读取 RuntimeCaseExecution
-[ ] 调用 ExperienceCandidateGenerator
-[ ] 调用 TrainingExampleCandidateGenerator
-[ ] 聚合 CandidateGenerationResult
-[ ] 保存到 CandidateStore
-[ ] 记录 skipped_items / warnings
+[x] CandidateGenerationService
+[x] 从 EvaluationRunStore 读取 EvaluationRun
+[x] 检查 run 是否完成
+[x] 遍历 EvaluationItemResult
+[x] 读取 RuntimeCaseExecution
+[x] 调用 ExperienceCandidateGenerator
+[x] 调用 TrainingExampleCandidateGenerator
+[x] 聚合 CandidateGenerationResult
+[x] 保存到 CandidateStore
+[x] 记录 skipped_items / warnings
 ```
 
 测试：
 
 ```text
-[ ] CandidateGenerationServiceTest
-[ ] CandidateGenerationServiceIntegrationTest
+[x] CandidateGenerationServiceTest
+[x] CandidateGenerationServiceIntegrationTest
 ```
 
 验收标准：
@@ -339,13 +339,13 @@ Phase4-P0 完成需要满足：
 当前下一步：
 
 ```text
-Phase4-P0-E：TrainingExampleCandidateGenerator
+Phase4-P0-G：Debug API 与端到端测试
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase4-P0-E 状态从 [ ] 改为 [/]。
-2. 只实现 TrainingExampleCandidateGenerator 及其单元测试。
-3. 不实现 CandidateGenerationService / API。
+1. 将 Phase4-P0-G 状态从 [ ] 改为 [/]。
+2. 只实现 CandidateController 与 API 测试。
+3. 不实现数据库 / 前端 / 模型训练。
 ```
