@@ -5,7 +5,7 @@
 | 验收日期 | 2026-06-29 |
 | 验收人 | 手动验收 |
 | 验收结论 | **通过** — Phase 4-P0 候选沉淀 debug API 人工 API 验收合格 |
-| 代码基线 | commit 待本次 P0-G 提交 |
+| 代码基线 | commit `752b5ef` |
 | 启动方式 | `set JAVA_HOME=D:\cxj\software\jdk21` → `mvn -DskipTests package` → `java -jar target\clinmind-runtime-0.1.0-SNAPSHOT.jar` |
 | Base URL | `http://localhost:8080` |
 | 自动化补充 | `CandidateControllerTest` + `CandidateEndToEndIntegrationTest`；全量 `mvn test` **245 项全绿** |
