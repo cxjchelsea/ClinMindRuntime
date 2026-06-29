@@ -82,25 +82,25 @@
 
 # 四、Phase4-P0-B：CandidateStore
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidateStore interface
-[ ] InMemoryCandidateStore
-[ ] saveGenerationResult
-[ ] getGenerationResult
-[ ] listExperienceCandidates
-[ ] listTrainingExampleCandidates
-[ ] getExperienceCandidate
-[ ] getTrainingExampleCandidate
+[x] CandidateStore interface
+[x] InMemoryCandidateStore
+[x] saveGenerationResult
+[x] getGenerationResult
+[x] listExperienceCandidates
+[x] listTrainingExampleCandidates
+[x] getExperienceCandidate
+[x] getTrainingExampleCandidate
 ```
 
 测试：
 
 ```text
-[ ] InMemoryCandidateStoreTest
+[x] InMemoryCandidateStoreTest
 ```
 
 验收标准：
@@ -116,26 +116,26 @@
 
 # 五、Phase4-P0-C：CandidateGenerationPolicy 与映射策略
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] 默认 CandidateGenerationPolicy
-[ ] MetricSeverity → CandidateRiskLevel 映射
-[ ] MetricResult → ExperienceCandidateType 映射
-[ ] MetricResult → TrainingTaskType 映射
-[ ] SafetyViolation → ExperienceCandidate 映射
-[ ] RegressionFinding → ExperienceCandidate 映射
-[ ] skipped item reason 设计
-[ ] max_candidates_per_case 限制
+[x] 默认 CandidateGenerationPolicy
+[x] MetricSeverity → CandidateRiskLevel 映射
+[x] MetricResult → ExperienceCandidateType 映射
+[x] MetricResult → TrainingTaskType 映射
+[x] SafetyViolation → ExperienceCandidate 映射
+[x] RegressionFinding → ExperienceCandidate 映射
+[x] skipped item reason 设计
+[x] max_candidates_per_case 限制
 ```
 
 测试：
 
 ```text
-[ ] CandidateGenerationPolicyTest
-[ ] CandidateMappingPolicyTest
+[x] CandidateGenerationPolicyTest
+[x] CandidateMappingPolicyTest
 ```
 
 验收标准：
@@ -339,13 +339,13 @@ Phase4-P0 完成需要满足：
 当前下一步：
 
 ```text
-Phase4-P0-B：CandidateStore
+Phase4-P0-D：ExperienceCandidateGenerator
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase4-P0-B 状态从 [ ] 改为 [/]。
-2. 只实现 CandidateStore 接口与 InMemoryCandidateStore。
-3. 不实现 Generator / Service / API。
+1. 将 Phase4-P0-D 状态从 [ ] 改为 [/]。
+2. 只实现 ExperienceCandidateGenerator 及其单元测试。
+3. 不实现 TrainingExampleCandidateGenerator / Service / API。
 ```
