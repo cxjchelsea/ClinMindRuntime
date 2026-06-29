@@ -1,16 +1,16 @@
-# AI Implementation Skill：ClinMindRuntime Phase 4-P1
+# AI Implementation Skill：ClinMindRuntime Phase 4-P1（已冻结）
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制均已完成并冻结。  
-> 当前进入 Phase 4-P1：候选治理与安全加固。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、候选 REVIEW_REQUIRED 边界和患者端隔离。
+> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制、Phase 4-P1 候选治理与安全加固均已完成并冻结。  
+> 后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、候选 REVIEW_REQUIRED 边界、脱敏策略、SourceRef 校验、Review 记录边界和患者端隔离。
 
 ---
 
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 4-P1 候选治理与安全加固 — 已完成
-下一步：Phase4-P1 冻结记录 / Phase4-P2 规划
+当前阶段：Phase 4-P1 候选治理与安全加固 — 已冻结
+下一步：Phase4-P2 规划 / Phase 5 专项（ApprovedExperience、持久化等）
 ```
 
 当前已经完成的主线：
@@ -20,7 +20,7 @@ Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
-Phase 4-P1：候选治理与安全加固，已完成（P1-A 至 P1-F）
+Phase 4-P1：候选治理与安全加固，已冻结
 ```
 
 Phase 4-P1 目标：
@@ -60,29 +60,30 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 
 ```text
 1. docs/AI_IMPLEMENTATION_SKILL.md
-2. docs/Phase4_P1开发任务清单.md
-3. docs/Phase4_P1候选治理与安全加固_实现规格.md
-4. docs/Phase4_P1候选脱敏与来源校验设计.md
-5. docs/Phase4_P1候选Review记录设计.md
-6. docs/Phase4_P0冻结记录.md
-7. docs/Phase4_开发任务清单.md
-8. docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md
-9. docs/Phase4_数据结构设计.md
-10. docs/Phase4_候选生成策略设计.md
-11. docs/Phase4_Runtime与Evaluation接入设计.md
-12. docs/Phase4_API与测试设计.md
-13. docs/README.md
-14. docs/项目展示导读.md
-15. docs/Phase3_P0冻结记录.md
-16. docs/Phase3_开发任务清单.md
-17. docs/Phase3_人工测试API结果.md
-18. docs/架构文档缺口审查清单.md
-19. docs/ClinMindRuntime技术实现总方案.md
-20. docs/测试与CI总方案.md
-21. docs/数据安全与合规边界规划.md
-22. docs/模型训练与后训练规划.md
-23. docs/医学知识库与RAG构建规划.md
-24. docs/数据库持久化设计.md
+2. docs/Phase4_P1冻结记录.md
+3. docs/Phase4_P1开发任务清单.md
+4. docs/Phase4_P1候选治理与安全加固_实现规格.md
+5. docs/Phase4_P1候选脱敏与来源校验设计.md
+6. docs/Phase4_P1候选Review记录设计.md
+7. docs/Phase4_P0冻结记录.md
+8. docs/Phase4_开发任务清单.md
+9. docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md
+10. docs/Phase4_数据结构设计.md
+11. docs/Phase4_候选生成策略设计.md
+12. docs/Phase4_Runtime与Evaluation接入设计.md
+13. docs/Phase4_API与测试设计.md
+14. docs/README.md
+15. docs/项目展示导读.md
+16. docs/Phase3_P0冻结记录.md
+17. docs/Phase3_开发任务清单.md
+18. docs/Phase3_人工测试API结果.md
+19. docs/架构文档缺口审查清单.md
+20. docs/ClinMindRuntime技术实现总方案.md
+21. docs/测试与CI总方案.md
+22. docs/数据安全与合规边界规划.md
+23. docs/模型训练与后训练规划.md
+24. docs/医学知识库与RAG构建规划.md
+25. docs/数据库持久化设计.md
 25. docs/平台前端与Console规划.md
 26. docs/部署与运维规划.md
 27. docs/ClinMindRuntime阶段拆分路线图.md
@@ -93,8 +94,9 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 解释：
 
 ```text
-Phase 4-P1 文档优先指导当前新增能力。
-docs/Phase4_P0冻结记录.md 是 P0 冻结边界与 hardening backlog 依据。
+Phase 4-P1 文档与实现已冻结。
+docs/Phase4_P0冻结记录.md 是 P0 冻结边界依据。
+docs/Phase4_P1冻结记录.md 是 P1 冻结边界与 hardening backlog 依据。
 docs/数据安全与合规边界规划.md 是 CandidateSanitizer 的安全依据。
 Phase 5 专项规划只能指导后续，不是提前实现理由。
 ```
@@ -103,7 +105,7 @@ Phase 5 专项规划只能指导后续，不是提前实现理由。
 
 # 三、当前允许实现的内容
 
-Phase 4-P1-A 至 P1-F 已全部完成。后续改动不得破坏 P1 脱敏、SourceRef 校验、Review 记录与 REVIEW_REQUIRED 边界。
+Phase 4-P1-A 至 P1-F 已全部完成并冻结。后续改动不得破坏 P1 脱敏、SourceRef 校验、Review 记录与 REVIEW_REQUIRED 边界；不得向 Phase 4-P1 继续堆新大能力。
 
 ## 3.1 Phase4-P1-A：CandidateSanitizer 与脱敏策略
 
@@ -283,17 +285,18 @@ CandidateEndToEndIntegrationTest 通过。
 # 八、AI 每次执行任务前的检查清单
 
 ```text
-1. 当前任务是否属于 Phase4-P1-A 到 Phase4-P1-F？
-2. 是否读取并更新了 docs/Phase4_P1开发任务清单.md？
-3. 是否会误实现 RAG / Python Provider / DB / Frontend / Model Training？如果会，禁止。
-4. 是否保持 Runtime 主控不被绕过？
-5. 是否影响患者端输出边界？
-6. 是否会自动修改资产包或 CapabilityProfile？如果会，禁止。
-7. 是否会把候选经验自动上线？如果会，禁止。
-8. 是否会把训练候选自动进入训练集？如果会，禁止。
-9. 是否会让 review 触发 Runtime 行为变化？如果会，禁止。
-10. 是否违反数据安全与合规边界规划？如果会，禁止。
-11. 是否需要更新 docs/README.md 或 docs/架构文档缺口审查清单.md？
+1. 当前任务是否仍属 Phase4-P1 范围内的 bug fix / 测试补强 / 文档同步？
+2. 是否会向 Phase4-P1 新增大能力？如果是，禁止，应进入 P2/P5 规划。
+3. 是否读取并更新了相关任务清单或冻结记录？
+4. 是否会误实现 RAG / Python Provider / DB / Frontend / Model Training？如果会，禁止。
+5. 是否保持 Runtime 主控不被绕过？
+6. 是否影响患者端输出边界？
+7. 是否会自动修改资产包或 CapabilityProfile？如果会，禁止。
+8. 是否会把候选经验自动上线？如果会，禁止。
+9. 是否会把训练候选自动进入训练集？如果会，禁止。
+10. 是否会让 review 触发 Runtime 行为变化？如果会，禁止。
+11. 是否违反数据安全与合规边界规划？如果会，禁止。
+12. 是否需要更新 docs/README.md 或 docs/架构文档缺口审查清单.md？
 ```
 
 ---
@@ -303,10 +306,11 @@ CandidateEndToEndIntegrationTest 通过。
 当前最优实现任务是：
 
 ```text
-Phase4-P1 已完成。下一步：编写 Phase4_P1冻结记录.md，或按 Phase4-P2 / Phase5 规划推进。
+Phase4-P1 已冻结。下一步：Phase4-P2 规划或 Phase 5 专项（ApprovedExperience、持久化、正式审核等）。
+参考 docs/Phase4_P1冻结记录.md 第六节 hardening backlog。
 ```
 
-P1 已完成内容：
+P1 已冻结内容：
 
 ```text
 1. CandidateSanitizationPolicy / Result / Sanitizer + Generator 接入。
@@ -316,9 +320,10 @@ P1 已完成内容：
 5. Review Debug API + 端到端测试。
 6. docs/Phase4_P1开发任务清单.md 与 Phase4_P1人工测试API结果.md 已更新。
 7. 全量 mvn test 292 项全绿。
+8. docs/Phase4_P1冻结记录.md 已建立。
 ```
 
-不应在 P1 冻结后继续扩展 P1 范围：
+不应在 P1 冻结后继续扩展 P1 范围（新大能力应进入 P2/P5 规划）：
 
 ```text
 CandidateReviewService
@@ -336,6 +341,6 @@ RAG
 ```text
 当前不是在实现完整训练平台。
 当前不是在实现正式医生审核平台。
-当前是在 Phase 4-P1 候选治理与安全加固已完成阶段。
+当前处于 Phase 4-P1 候选治理与安全加固已冻结阶段。
 Phase 4-P1 的目标是让候选更安全、更可追踪、更可治理，但仍然不自动生效。
 ```

@@ -14,18 +14,17 @@ Phase 1-P0：Runtime MVP 已完成。
 Phase 2-P0：共享能力资产原型已完成。
 Phase 3-P0：训练与评估闭环 MVP 已完成并冻结。
 Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
-Phase 4-P1：候选治理与安全加固设计已建立。
-当前阶段：Phase 4-P1 implementation ready，下一步是 Phase4-P1-A CandidateSanitizer 与脱敏策略。
+Phase 4-P1：候选治理与安全加固已完成并冻结。
+当前阶段：Phase 4-P1 freeze complete，下一步是 Phase4-P2 或 Phase 5 规划。
 ```
 
 当前最优先任务：
 
 ```text
-1. 读取 docs/Phase4_P1开发任务清单.md。
-2. 将 Phase4-P1-A 状态从 [ ] 改为 [/]。
-3. 只实现 CandidateSanitizer / SanitizationPolicy / SanitizationResult 与 TrainingExampleCandidateGenerator 接入。
-4. 不实现 ReviewService / Review API。
-5. 继续禁止提前接入 RAG、Python Provider、数据库、前端和模型训练。
+1. 读取 docs/Phase4_P1冻结记录.md，遵守 P1 冻结边界。
+2. 新大能力进入 Phase4-P2 / Phase 5 规划，不向 P1 继续堆功能。
+3. 保持 Phase1/2/3/4-P0/4-P1 回归测试通过。
+4. 继续禁止提前接入 RAG、Python Provider、数据库、前端和模型训练（除非进入对应 Phase 规划）。
 ```
 
 ---
@@ -40,29 +39,32 @@ Phase 4-P1：候选治理与安全加固设计已建立。
 3. docs/ClinMindRuntime技术实现总方案.md
 4. docs/Phase3_P0冻结记录.md
 5. docs/Phase4_P0冻结记录.md
-6. docs/Phase4_人工测试API结果.md
-7. docs/Phase4_P1候选治理与安全加固_实现规格.md
-8. docs/架构模式与设计模式说明.md
+6. docs/Phase4_P1冻结记录.md
+7. docs/Phase4_P1人工测试API结果.md
+8. docs/Phase4_人工测试API结果.md
+9. docs/Phase4_P1候选治理与安全加固_实现规格.md
+10. docs/架构模式与设计模式说明.md
 ```
 
-阅读目标：快速理解项目定位、当前实现、为什么不是普通 RAG / Agent Demo、Phase 3/4-P0 已经实现并冻结了什么，以及 Phase 4-P1 为什么先做候选治理与安全加固。
+阅读目标：快速理解项目定位、当前实现、为什么不是普通 RAG / Agent Demo、Phase 3/4-P0/4-P1 已经实现并冻结了什么。
 
 ## 2.2 后续代码实现 / AI 编码工具
 
 ```text
 1. docs/AI_IMPLEMENTATION_SKILL.md
-2. docs/Phase4_P1开发任务清单.md
-3. docs/Phase4_P1候选治理与安全加固_实现规格.md
-4. docs/Phase4_P1候选脱敏与来源校验设计.md
-5. docs/Phase4_P1候选Review记录设计.md
-6. docs/Phase4_P0冻结记录.md
-7. docs/Phase4_开发任务清单.md
-8. docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md
-9. docs/数据安全与合规边界规划.md
-10. docs/测试与CI总方案.md
+2. docs/Phase4_P1冻结记录.md
+3. docs/Phase4_P1开发任务清单.md
+4. docs/Phase4_P1候选治理与安全加固_实现规格.md
+5. docs/Phase4_P1候选脱敏与来源校验设计.md
+6. docs/Phase4_P1候选Review记录设计.md
+7. docs/Phase4_P0冻结记录.md
+8. docs/Phase4_开发任务清单.md
+9. docs/Phase4_经验候选与训练数据候选沉淀_实现规格.md
+10. docs/数据安全与合规边界规划.md
+11. docs/测试与CI总方案.md
 ```
 
-阅读目标：明确 Phase 4-P1 当前只允许按任务清单做候选治理与安全加固，不得跳到 RAG、数据库、前端、模型训练或正式审核平台。
+阅读目标：明确 Phase 4-P1 已冻结边界；新能力应进入 P2/P5 规划，不得跳到 RAG、数据库、前端、模型训练或正式审核平台。
 
 ## 2.3 架构学习 / 自我复盘
 
@@ -93,10 +95,12 @@ Phase 4-P1：候选治理与安全加固设计已建立。
 | 文档 | 状态 | 用途 |
 |---|---|---|
 | `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
-| `docs/Phase4_P1开发任务清单.md` | 活跃 | Phase4-P1-A 到 P1-F 实现顺序与验收标准 |
-| `docs/Phase4_P1候选治理与安全加固_实现规格.md` | 当前基线 | Phase4-P1 总体实现规格 |
-| `docs/Phase4_P1候选脱敏与来源校验设计.md` | 当前基线 | CandidateSanitizer 与 SourceRef 强校验设计 |
-| `docs/Phase4_P1候选Review记录设计.md` | 当前基线 | 最小 review 记录设计 |
+| `docs/Phase4_P1冻结记录.md` | 已冻结 | Phase4-P1 冻结依据、边界与 hardening backlog |
+| `docs/Phase4_P1开发任务清单.md` | 已完成 | Phase4-P1-A 到 P1-F 均已完成 |
+| `docs/Phase4_P1候选治理与安全加固_实现规格.md` | 已实现基线 | Phase4-P1 总体实现规格 |
+| `docs/Phase4_P1候选脱敏与来源校验设计.md` | 已实现基线 | CandidateSanitizer 与 SourceRef 强校验设计 |
+| `docs/Phase4_P1候选Review记录设计.md` | 已实现基线 | 最小 review 记录设计 |
+| `docs/Phase4_P1人工测试API结果.md` | 验收归档 | Phase 4-P1 人工 / E2E API 验收记录 |
 | `docs/Phase4_P0冻结记录.md` | 已冻结 | Phase4-P0 冻结依据、边界与 hardening backlog |
 | `docs/测试与CI总方案.md` | 活跃 | 约束测试分层、回归基线和 CI 演进 |
 
@@ -164,9 +168,8 @@ Phase 4-P1：候选治理与安全加固设计已建立。
 
 ```text
 1. 不应继续无限新增总体规划文档。
-2. 不应向 Phase 4-P0 继续堆新能力（已冻结）。
-3. 不应跳过 Phase4-P1-A 直接实现 Review API。
-4. 不应提前实现 RAG / GraphRAG / Python AI Provider。
+2. 不应向 Phase 4-P0 / Phase 4-P1 继续堆新能力（均已冻结）。
+3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
 5. 不应提前接 PostgreSQL / Redis / pgvector。
 6. 不应提前做前端 Console。
 7. 不应提前实现模型训练 / 后训练。
@@ -178,11 +181,9 @@ Phase 4-P1：候选治理与安全加固设计已建立。
 # 五、当前建议做什么
 
 ```text
-1. 以 docs/Phase4_P1开发任务清单.md 作为当前实现顺序依据。
-2. 先进入 Phase4-P1-A：CandidateSanitizer 与脱敏策略。
-3. 只实现 CandidateSanitizer / SanitizationPolicy / SanitizationResult 与 TrainingExampleCandidateGenerator 接入。
-4. 补基础单元测试。
-5. 保持 Phase1/2/3/4-P0 回归测试通过。
+1. 以 docs/Phase4_P1冻结记录.md 作为 P1 边界依据。
+2. 规划 Phase4-P2 或 Phase 5 专项前，先升级设计与任务清单。
+3. 保持 Phase1/2/3/4-P0/4-P1 回归测试通过。
 ```
 
 ---
@@ -201,4 +202,4 @@ Phase 4-P1：候选治理与安全加固设计已建立。
 
 # 七、最终结论
 
-当前文档体系已支撑 Phase4-P1 实现。Phase3-P0 与 Phase4-P0 均已冻结，Phase4-P1 详细设计已建立，下一步应进入 Phase4-P1-A：CandidateSanitizer 与脱敏策略。
+当前文档体系已支撑 Phase4-P1 冻结归档。Phase3-P0、Phase4-P0、Phase4-P1 均已冻结。下一步应规划 Phase4-P2 或 Phase 5 专项，参考 `docs/Phase4_P1冻结记录.md` 第六节 hardening backlog。

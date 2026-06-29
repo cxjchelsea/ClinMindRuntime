@@ -253,6 +253,7 @@ Phase4-P1 完成需要满足：
 6. review 不导致 Runtime / Asset / Capability / TrainingDataset 自动变化。 ✅
 7. 新增 Phase4_P1人工测试API结果.md。 ✅
 8. 更新 AI_IMPLEMENTATION_SKILL.md，标记 Phase4-P1 完成或进入 freeze。 ✅
+9. docs/Phase4_P1冻结记录.md 已建立。 ✅
 ```
 
 ---
@@ -282,6 +283,6 @@ Phase4-P1 完成需要满足：
 当前下一步：
 
 ```text
-Phase4-P1 已完成，可进入 P1 冻结记录编写（参考 Phase4_P0冻结记录.md）。
-后续可选：Phase4-P2 或 Phase5 规划项。
+Phase4-P1 已冻结（docs/Phase4_P1冻结记录.md）。
+后续可选：Phase4-P2 规划或 Phase 5 专项（ApprovedExperience、持久化、正式审核等）。
 ```
