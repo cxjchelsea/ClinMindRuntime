@@ -341,23 +341,24 @@ Phase4-P0-E：TrainingExampleCandidateGenerator
 只应实现：
 
 ```text
-1. ExperienceCandidateGenerator。
-2. 从 failed MetricResult / SafetyViolation / RegressionFinding 生成 ExperienceCandidate。
-3. CandidateSourceRef 绑定 run_id / case_id / metric_id / asset version。
-4. ExperienceCandidateGeneratorTest。
+1. TrainingExampleCandidateGenerator。
+2. 从失败病例生成训练样本候选。
+3. sanitization_status 默认 NEEDS_REVIEW。
+4. TrainingExampleCandidateGeneratorTest。
 5. 同步更新 docs/Phase4_开发任务清单.md。
 ```
 
-不应在 P0-D 中实现：
+不应在 P0-E 中实现：
 
 ```text
-TrainingExampleCandidateGenerator
 CandidateGenerationService
+CandidateController
 API
 数据库
 前端
 模型训练
 RAG
+LLM 调用
 ```
 
 ---
