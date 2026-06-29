@@ -1,8 +1,8 @@
 # ClinMindRuntime
 
-受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环与候选治理，**不是**普通 RAG 聊天应用。
+受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理与持久化治理底座，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 4-P1 Design Ready**（Phase 1 Runtime + Phase 2 Asset Provider + Phase 3 Evaluation + Phase 4-P0 Candidate Sedimentation 已落地并冻结；Phase 4-P1 候选治理与安全加固设计已完成）
+当前版本：**Phase 5-P0 Design Ready**（Phase 1 Runtime + Phase 2 Asset Provider + Phase 3 Evaluation + Phase 4 Candidate Governance 已落地并冻结；Phase 5-P0 持久化与治理底座设计已完成）
 
 ## 项目定位
 
@@ -13,8 +13,9 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 - **Evaluation 闭环**：标准病例集 → Runtime 执行 → Scorer 评分 → 聚合报告 → CapabilityProfile 更新建议
 - **Candidate 沉淀**：从 Evaluation 暴露的问题中生成可追踪、可审核、不可自动生效的经验候选与训练数据候选
 - **Candidate 治理**：通过脱敏、来源校验和 review 记录，让候选更安全、更可治理，但仍不自动生效
+- **Persistence 治理底座**：通过 PostgreSQL、Repository 双实现和 AuditLog，让核心治理对象可持久化、可审计、可恢复
 
-与「检索 + 大模型直接回答」的区别：Runtime **不绕过**结构化模块做最终临床判断；Evaluation **不绕过** Runtime 直接评输出文本；Candidate **不自动** 上线经验或进入训练集。
+与「检索 + 大模型直接回答」的区别：Runtime **不绕过**结构化模块做最终临床判断；Evaluation **不绕过** Runtime 直接评输出文本；Candidate **不自动** 上线经验或进入训练集；Persistence **不改变** AI 决策边界。
 
 ## 当前已实现 / 已设计
 
@@ -24,9 +25,10 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 2 | 资产包 `phase2-default`、Provider 接口、debug `assets-used` | 已完成 |
 | Phase 3 | YAML 病例集、`RuntimeEvaluationRunner`、7 个 Scorer、EvaluationResult 聚合、CapabilityProfile Proposal、debug Evaluation API | 已冻结 |
 | Phase 4-P0 | ExperienceCandidate / TrainingExampleCandidate 候选沉淀机制、Candidate debug API | 已冻结 |
-| Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 设计完成，准备实现 P1-A |
+| Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
+| Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog 最小治理 | 设计完成，准备实现 P0-A |
 
-Phase 3-P0 冻结记录见 [`docs/Phase3_P0冻结记录.md`](docs/Phase3_P0冻结记录.md)。Phase 4-P0 冻结记录见 [`docs/Phase4_P0冻结记录.md`](docs/Phase4_P0冻结记录.md)。Phase 4-P1 设计见 [`docs/Phase4_P1候选治理与安全加固_实现规格.md`](docs/Phase4_P1候选治理与安全加固_实现规格.md)。
+Phase 5-P0 设计见 [`docs/Phase5_P0持久化与治理底座_实现规格.md`](docs/Phase5_P0持久化与治理底座_实现规格.md)。Phase 4-P1 冻结记录见 [`docs/Phase4_P1冻结记录.md`](docs/Phase4_P1冻结记录.md)。
 
 ## 快速启动
 
@@ -85,8 +87,8 @@ Content-Type: application/json
 - 不自动上线 ExperienceCandidate
 - 不自动把 TrainingExampleCandidate 进入训练集
 - 不把 Candidate review 当作正式临床审核
-- 无数据库持久化、无前端后台、无权限系统
-- 无 MCP / LangGraph / 完整 RAG 平台
+- 不做前端 Console、正式 RBAC、登录、多租户
+- 不做 MCP / LangGraph / 完整 RAG 平台
 
 ## 文档入口
 
@@ -94,19 +96,18 @@ Content-Type: application/json
 |------|------|
 | [`docs/README.md`](docs/README.md) | 文档导航 |
 | [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试/展示用精简导读 |
-| [`docs/Phase3_P0冻结记录.md`](docs/Phase3_P0冻结记录.md) | Phase 3-P0 冻结依据 |
-| [`docs/Phase4_P0冻结记录.md`](docs/Phase4_P0冻结记录.md) | Phase 4-P0 冻结依据 |
-| [`docs/Phase4_P1候选治理与安全加固_实现规格.md`](docs/Phase4_P1候选治理与安全加固_实现规格.md) | Phase 4-P1 总体规格 |
-| [`docs/Phase4_P1开发任务清单.md`](docs/Phase4_P1开发任务清单.md) | Phase 4-P1 实现顺序 |
-| [`docs/ClinMindRuntime完整系统设计.md`](docs/ClinMindRuntime完整系统设计.md) | 系统总设计 |
-| [`docs/ClinMindRuntime阶段拆分路线图.md`](docs/ClinMindRuntime阶段拆分路线图.md) | Phase 1–5 路线 |
+| [`docs/Phase5_P0持久化与治理底座_实现规格.md`](docs/Phase5_P0持久化与治理底座_实现规格.md) | Phase 5-P0 总体规格 |
+| [`docs/Phase5_P0数据库Schema设计.md`](docs/Phase5_P0数据库Schema设计.md) | Phase 5-P0 数据库 Schema |
+| [`docs/Phase5_P0Repository迁移设计.md`](docs/Phase5_P0Repository迁移设计.md) | Store / Repository 迁移方案 |
+| [`docs/Phase5_P0开发任务清单.md`](docs/Phase5_P0开发任务清单.md) | Phase 5-P0 实现顺序 |
+| [`docs/Phase4_P1冻结记录.md`](docs/Phase4_P1冻结记录.md) | Phase 4-P1 冻结依据 |
 | [`docs/AI_IMPLEMENTATION_SKILL.md`](docs/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor/Agent） |
 
 ## 下一阶段
 
-**Phase 4-P1-A**：CandidateSanitizer 与脱敏策略。
+**Phase 5-P0-A**：依赖与配置。
 
-只应实现 `CandidateSanitizationPolicy`、`CandidateSanitizationResult`、`CandidateSanitizer` 以及 `TrainingExampleCandidateGenerator` 接入脱敏层，不应跳到 ReviewService、Review API、数据库、前端或模型训练。
+只应实现 PostgreSQL driver、Flyway、`clinmind.persistence.mode`、datasource / flyway 配置骨架和 in-memory 默认启动保护，不应直接跳到所有 JDBC Store、前端、RAG、模型训练或正式 RBAC。
 
 ## License
 
