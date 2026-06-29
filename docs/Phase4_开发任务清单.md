@@ -152,24 +152,24 @@
 
 # 六、Phase4-P0-D：ExperienceCandidateGenerator
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] ExperienceCandidateGenerator
-[ ] 从 failed MetricResult 生成 ExperienceCandidate
-[ ] 从 SafetyViolation 生成 ExperienceCandidate
-[ ] 从 RegressionFinding 生成聚合型 ExperienceCandidate
-[ ] CandidateSourceRef 绑定 run_id / case_id / metric_id / asset version
-[ ] risk_level 计算
-[ ] review_status 默认 REVIEW_REQUIRED
+[x] ExperienceCandidateGenerator
+[x] 从 failed MetricResult 生成 ExperienceCandidate
+[x] 从 SafetyViolation 生成 ExperienceCandidate
+[x] 从 RegressionFinding 生成聚合型 ExperienceCandidate
+[x] CandidateSourceRef 绑定 run_id / case_id / metric_id / asset version
+[x] risk_level 计算
+[x] review_status 默认 REVIEW_REQUIRED
 ```
 
 测试：
 
 ```text
-[ ] ExperienceCandidateGeneratorTest
+[x] ExperienceCandidateGeneratorTest
 ```
 
 验收标准：
@@ -339,13 +339,13 @@ Phase4-P0 完成需要满足：
 当前下一步：
 
 ```text
-Phase4-P0-D：ExperienceCandidateGenerator
+Phase4-P0-E：TrainingExampleCandidateGenerator
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase4-P0-D 状态从 [ ] 改为 [/]。
-2. 只实现 ExperienceCandidateGenerator 及其单元测试。
-3. 不实现 TrainingExampleCandidateGenerator / Service / API。
+1. 将 Phase4-P0-E 状态从 [ ] 改为 [/]。
+2. 只实现 TrainingExampleCandidateGenerator 及其单元测试。
+3. 不实现 CandidateGenerationService / API。
 ```

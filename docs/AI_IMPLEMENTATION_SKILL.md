@@ -18,7 +18,7 @@
 Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
 Phase 3-P0：训练与评估闭环 MVP，已冻结
-Phase 4-P0：P0-A 数据结构、P0-B CandidateStore、P0-C 映射策略已完成，准备进入 P0-D ExperienceCandidateGenerator
+Phase 4-P0：P0-A 至 P0-D 已完成，准备进入 P0-E TrainingExampleCandidateGenerator
 ```
 
 Phase 4-P0 目标：
@@ -335,7 +335,7 @@ EvaluationEndToEndIntegrationTest 通过。
 当前最优实现任务是：
 
 ```text
-Phase4-P0-D：ExperienceCandidateGenerator
+Phase4-P0-E：TrainingExampleCandidateGenerator
 ```
 
 只应实现：
