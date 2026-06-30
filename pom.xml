@@ -15,7 +15,7 @@
     <artifactId>clinmind-runtime</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>clinmind-runtime</name>
-    <description>ClinMindRuntime Phase 3 Evaluation MVP</description>
+    <description>ClinMindRuntime Governance Runtime Prototype</description>
 
     <properties>
         <java.version>17</java.version>
