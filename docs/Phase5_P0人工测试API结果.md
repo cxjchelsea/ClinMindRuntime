@@ -3,6 +3,7 @@
 | 项目 | 内容 |
 |------|------|
 | 验收日期 | 2026-06-30 |
+| 代码基线 | commit `2ad656d` |
 | 验收结论 | **通过** — in-memory 369 项全绿（含 postgres 专项 22 项） |
 | 启动方式（in-memory） | `mvn -DskipTests package` → `java -jar target/clinmind-runtime-0.1.0-SNAPSHOT.jar` |
 | 启动方式（postgres） | `java -jar ... --spring.profiles.active=postgres`（需本地 PostgreSQL） |

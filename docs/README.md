@@ -23,8 +23,8 @@ Phase 5-P0：持久化与治理底座已完成并冻结。
 
 ```text
 1. 读取 docs/Phase5_P0冻结记录.md 确认边界。
-2. 在有 Docker 的环境执行 RUN_POSTGRES_TESTS=true postgres 专项测试。
-3. 规划 Phase 5-P1（最小 Console / RBAC 强化）。
+2. 规划 Phase 5-P1（最小 Console / RBAC 强化）。
+3. 保持 Phase1–5 回归与 postgres 专项测试通过。
 4. 继续禁止提前接入 RAG、Python Provider、前端、模型训练和正式 RBAC。
 ```
 
@@ -43,7 +43,7 @@ Phase 5-P0：持久化与治理底座已完成并冻结。
 6. docs/Phase4_P1冻结记录.md
 7. docs/Phase5_P0冻结记录.md
 8. docs/Phase5_P0持久化与治理底座_实现规格.md
-8. docs/架构模式与设计模式说明.md
+9. docs/架构模式与设计模式说明.md
 ```
 
 阅读目标：快速理解项目定位、为什么不是普通 RAG / Agent Demo、Phase 1–4 已经完成并冻结了什么，以及 Phase 5 为什么优先做持久化与治理底座。
@@ -144,8 +144,7 @@ Phase 5-P0：持久化与治理底座已完成并冻结。
 ```text
 1. 以 docs/Phase5_P0冻结记录.md 作为 Phase 5-P0 边界依据。
 2. 规划 Phase 5-P1（最小 Console API / RBAC 强化）。
-3. 在有 Docker 的环境跑通 RUN_POSTGRES_TESTS=true postgres 专项。
-4. 保持 Phase1/2/3/4/5 in-memory 回归测试通过。
+3. 保持 Phase1/2/3/4/5 回归测试通过（含 postgres 专项）。
 ```
 
 ---

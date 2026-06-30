@@ -257,11 +257,21 @@ Phase5-P0 完成需要满足：
 8. 更新 AI_IMPLEMENTATION_SKILL.md，标记 Phase5-P0 完成或进入 freeze。
 ```
 
-**当前状态：P0 完成定义已满足（postgres 专项测试需 Docker 环境执行）。**
+**当前状态：P0 完成定义已满足，Phase 5-P0 已冻结（commit 2ad656d）。**
 
 ---
 
-# 十二、后置任务
+# 十二、归档状态
+
+```text
+归档日期：2026-06-30
+代码基线：commit 2ad656d
+冻结记录：docs/Phase5_P0冻结记录.md
+人工验收：docs/Phase5_P0人工测试API结果.md
+测试结论：347 in-memory + 22 postgres = 369 项全绿
+```
+
+# 十三、后置任务
 
 ```text
 [-] Phase5-P1：最小 Console API / 页面
@@ -275,10 +285,9 @@ Phase5-P0 完成需要满足：
 
 ---
 
-# 十三、当前下一步
+# 十四、当前下一步
 
 ```text
-1. 进入 Phase5-P1 规划（最小 Console / RBAC 强化）。
-2. 在有 Docker 的环境执行 RUN_POSTGRES_TESTS=true mvn test 做 postgres 专项全绿确认。
-3. 保持 Phase1–4 与 in-memory 回归通过。
+Phase 5-P0 已冻结（docs/Phase5_P0冻结记录.md，commit 2ad656d）。
+后续可选：Phase 5-P1 规划（最小 Console / RBAC 强化）。
 ```
