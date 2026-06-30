@@ -1,5 +1,9 @@
 package com.clinmind.runtime.service;
 
+import com.clinmind.runtime.audit.AuditActionType;
+import com.clinmind.runtime.audit.AuditLogService;
+import com.clinmind.runtime.audit.AuditResourceType;
+import com.clinmind.runtime.audit.AuditResultStatus;
 import com.clinmind.runtime.api.ContinueRuntimeRequest;
 import com.clinmind.runtime.api.StartRuntimeRequest;
 import com.clinmind.runtime.api.UserInputRequest;
@@ -59,6 +63,7 @@ public class RuntimeService {
     private final FailurePolicyService failurePolicyService;
     private final RuntimeTraceCollector traceCollector;
     private final AssetPackageRepository assetPackageRepository;
+    private final AuditLogService auditLogService;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -75,7 +80,8 @@ public class RuntimeService {
             ClinicianReportService clinicianReportService,
             FailurePolicyService failurePolicyService,
             RuntimeTraceCollector traceCollector,
-            AssetPackageRepository assetPackageRepository) {
+            AssetPackageRepository assetPackageRepository,
+            AuditLogService auditLogService) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -91,6 +97,7 @@ public class RuntimeService {
         this.failurePolicyService = failurePolicyService;
         this.traceCollector = traceCollector;
         this.assetPackageRepository = assetPackageRepository;
+        this.auditLogService = auditLogService;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -140,6 +147,12 @@ public class RuntimeService {
         state.getRuntimeTraceIds().add(trace.getTraceId());
         state.bumpVersion();
         runtimeStore.update(state);
+        auditLogService.record(
+                AuditActionType.CREATE_RUNTIME,
+                AuditResourceType.RUNTIME,
+                state.getRuntimeId(),
+                AuditResultStatus.SUCCESS,
+                Map.of("runtime_status", state.getRuntimeStatus().getValue()));
         return new RuntimeExecutionResult(state, trace);
     }
 
@@ -167,6 +180,12 @@ public class RuntimeService {
             state.getRuntimeTraceIds().add(trace.getTraceId());
             state.bumpVersion();
             runtimeStore.update(state);
+            auditLogService.record(
+                    AuditActionType.CONTINUE_RUNTIME,
+                    AuditResourceType.RUNTIME,
+                    state.getRuntimeId(),
+                    AuditResultStatus.SUCCESS,
+                    Map.of("runtime_status", state.getRuntimeStatus().getValue(), "step", step));
             return new RuntimeExecutionResult(state, trace);
         } finally {
             traceCollector.drainStepsForRuntime(state.getRuntimeId());

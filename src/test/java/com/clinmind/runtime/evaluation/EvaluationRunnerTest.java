@@ -52,7 +52,7 @@ class EvaluationRunnerTest {
 
     @Test
     void evaluationRunStorePersistsExecutions() {
-        EvaluationRunStore store = new EvaluationRunStore();
+        EvaluationRunStore store = new InMemoryEvaluationRunStore();
         EvaluationRunConfig config = EvaluationRunConfig.defaults("phase3-default", "0.3.0");
         EvaluationRun run = new EvaluationRun(
                 "eval_test001",

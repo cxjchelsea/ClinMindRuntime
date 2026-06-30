@@ -1,0 +1,10 @@
+package com.clinmind.runtime.audit;
+
+public enum AuditResourceType {
+    RUNTIME,
+    EVALUATION_RUN,
+    CANDIDATE_GENERATION,
+    EXPERIENCE_CANDIDATE,
+    TRAINING_EXAMPLE_CANDIDATE,
+    CANDIDATE_REVIEW
+}

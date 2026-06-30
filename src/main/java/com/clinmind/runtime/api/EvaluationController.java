@@ -1,5 +1,9 @@
 package com.clinmind.runtime.api;
 
+import com.clinmind.runtime.audit.AuditActionType;
+import com.clinmind.runtime.audit.AuditLogService;
+import com.clinmind.runtime.audit.AuditResourceType;
+import com.clinmind.runtime.audit.AuditResultStatus;
 import com.clinmind.runtime.evaluation.EvaluationItemResult;
 import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.evaluation.EvaluationResult;
@@ -30,19 +34,28 @@ public class EvaluationController {
     private final EvaluationRunner evaluationRunner;
     private final EvaluationRunStore runStore;
     private final CapabilityProfileProposalService proposalService;
+    private final AuditLogService auditLogService;
 
     public EvaluationController(
             EvaluationRunner evaluationRunner,
             EvaluationRunStore runStore,
-            CapabilityProfileProposalService proposalService) {
+            CapabilityProfileProposalService proposalService,
+            AuditLogService auditLogService) {
         this.evaluationRunner = evaluationRunner;
         this.runStore = runStore;
         this.proposalService = proposalService;
+        this.auditLogService = auditLogService;
     }
 
     @PostMapping("/runs")
     public ApiResponse<?> createRun(@RequestBody EvaluationRunConfig config) {
         EvaluationRun run = evaluationRunner.run(config);
+        auditLogService.record(
+                AuditActionType.CREATE_EVALUATION_RUN,
+                AuditResourceType.EVALUATION_RUN,
+                run.runId(),
+                AuditResultStatus.SUCCESS,
+                Map.of("status", run.status().name()));
         return ApiResponse.ok(toRunSummary(run));
     }
 

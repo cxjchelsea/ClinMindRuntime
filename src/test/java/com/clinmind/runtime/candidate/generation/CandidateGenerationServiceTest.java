@@ -11,6 +11,8 @@ import com.clinmind.runtime.candidate.sanitization.CandidateSanitizer;
 import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefFactory;
 import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidator;
 import com.clinmind.runtime.candidate.store.InMemoryCandidateStore;
+import com.clinmind.runtime.audit.AuditLogService;
+import com.clinmind.runtime.audit.InMemoryAuditLogStore;
 import com.clinmind.runtime.evaluation.EvaluationCase;
 import com.clinmind.runtime.evaluation.EvaluationCaseRepository;
 import com.clinmind.runtime.evaluation.EvaluationCaseSet;
@@ -19,6 +21,7 @@ import com.clinmind.runtime.evaluation.EvaluationResult;
 import com.clinmind.runtime.evaluation.EvaluationRun;
 import com.clinmind.runtime.evaluation.EvaluationRunStatus;
 import com.clinmind.runtime.evaluation.EvaluationRunStore;
+import com.clinmind.runtime.evaluation.InMemoryEvaluationRunStore;
 import com.clinmind.runtime.evaluation.EvaluationTestFixtures;
 import com.clinmind.runtime.evaluation.MetricResult;
 import com.clinmind.runtime.evaluation.MetricSeverity;
@@ -38,7 +41,7 @@ class CandidateGenerationServiceTest {
 
     @BeforeEach
     void setUp() {
-        runStore = new EvaluationRunStore();
+        runStore = new InMemoryEvaluationRunStore();
         candidateStore = new InMemoryCandidateStore();
         EvaluationCaseRepository caseRepository = new EvaluationCaseRepository() {
             @Override
@@ -75,7 +78,8 @@ class CandidateGenerationServiceTest {
                 new TrainingExampleCandidateGenerator(
                         mappingPolicy, new CandidateSanitizer(), sourceRefFactory),
                 mappingPolicy,
-                candidateStore);
+                candidateStore,
+                new AuditLogService(new InMemoryAuditLogStore()));
     }
 
     @Test

@@ -1,0 +1,10 @@
+package com.clinmind.runtime.audit;
+
+public enum AuditActionType {
+    CREATE_RUNTIME,
+    CONTINUE_RUNTIME,
+    CREATE_EVALUATION_RUN,
+    GENERATE_CANDIDATES,
+    REVIEW_EXPERIENCE_CANDIDATE,
+    REVIEW_TRAINING_CANDIDATE
+}

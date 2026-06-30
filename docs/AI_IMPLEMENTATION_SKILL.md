@@ -1,16 +1,16 @@
 # AI Implementation Skill：ClinMindRuntime Phase 5-P0
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制、Phase 4-P1 候选治理与安全加固均已完成并冻结。  
-> 当前进入 Phase 5-P0：持久化与治理底座设计。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、Candidate 脱敏、SourceRef 校验、Review 记录边界和患者端隔离。
+> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制、Phase 4-P1 候选治理与安全加固、Phase 5-P0 持久化与治理底座均已完成并冻结。  
+> 后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、Candidate 脱敏、SourceRef 校验、Review 记录边界、持久化双模式和患者端隔离。
 
 ---
 
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P0 持久化与治理底座 — 设计已建立
-下一步：Phase5-P0-A 依赖与配置
+当前阶段：Phase 5-P0 持久化与治理底座 — 已冻结
+下一步：Phase 5-P1 规划（最小 Console / RBAC 强化）
 ```
 
 当前已经完成的主线：
@@ -21,7 +21,7 @@ Phase 2-P0：共享能力资产原型，已完成
 Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
-Phase 5-P0：持久化与治理底座设计，准备进入 P0-A
+Phase 5-P0：持久化与治理底座，已冻结
 ```
 
 Phase 5-P0 目标：
@@ -257,12 +257,26 @@ Phase 5-P0 必须同时保护 in-memory 回归和 postgres 持久化专项测试
 FlywayMigrationTest
 DatabaseSchemaSmokeTest
 JsonSnapshotMapperTest
+RuntimeSnapshotMapperTest
+EvaluationSnapshotMapperTest
+ReviewSnapshotMapperTest
 JdbcCandidateStoreTest
 JdbcCandidateReviewStoreTest
 JdbcEvaluationRunStoreTest
 JdbcRuntimeStoreTest
 JdbcAuditLogStoreTest
+AuditLogRecordTest
+InMemoryAuditLogStoreTest
 AuditLogServiceTest
+AuditLogControllerTest
+AuditLogIntegrationTest
+CandidateGenerationAuditIntegrationTest
+CandidateReviewAuditIntegrationTest
+DebugTokenFilterTest
+PostgresRuntimePersistenceIntegrationTest
+PostgresEvaluationPersistenceIntegrationTest
+PostgresCandidatePersistenceIntegrationTest
+PostgresReviewPersistenceIntegrationTest
 Phase5PostgresEndToEndIntegrationTest
 ```
 
@@ -290,30 +304,15 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P0-A：依赖与配置
+Phase 5-P1 规划（不在 P0 范围）
 ```
 
-只应实现：
+P0 已完成，后续不应再向 Phase 5-P0 堆新能力。若需继续开发，应：
 
 ```text
-1. PostgreSQL driver / Flyway 依赖。
-2. clinmind.persistence.mode 配置。
-3. datasource / flyway 配置骨架。
-4. in-memory 默认启动保护。
-5. 基础 context test。
-```
-
-不应在 P0-A 中实现：
-
-```text
-JdbcRuntimeStore
-JdbcEvaluationRunStore
-JdbcCandidateStore
-AuditLogService
-前端
-RAG
-模型训练
-正式 RBAC
+1. 读取 docs/Phase5_P0冻结记录.md 确认边界。
+2. 规划 Phase5-P1（最小 Console API / RBAC 强化）。
+3. 保持 in-memory 与 postgres 双模式回归通过。
 ```
 
 ---
@@ -323,6 +322,6 @@ RAG
 ```text
 当前不是在实现完整产品化平台。
 当前不是在实现模型训练平台。
-当前是在设计并准备实现 Phase 5-P0 持久化与治理底座。
+Phase 5-P0 持久化与治理底座已冻结。
 Phase 5-P0 的目标是让已有 Runtime / Evaluation / Candidate / Review 治理对象可持久化、可审计、可恢复，但不改变 AI 决策边界。
 ```

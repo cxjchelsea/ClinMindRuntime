@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.clinmind.runtime.candidate.CandidateReviewStatus;
 import com.clinmind.runtime.candidate.CandidateTestFixtures;
+import com.clinmind.runtime.audit.AuditLogService;
+import com.clinmind.runtime.audit.InMemoryAuditLogStore;
 import com.clinmind.runtime.candidate.store.InMemoryCandidateStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,9 @@ class CandidateReviewServiceTest {
     void setUp() {
         candidateStore = new InMemoryCandidateStore();
         reviewStore = new InMemoryCandidateReviewStore();
-        service = new CandidateReviewService(candidateStore, reviewStore, new CandidateReviewTransitionPolicy());
+        service = new CandidateReviewService(
+                candidateStore, reviewStore, new CandidateReviewTransitionPolicy(),
+                new AuditLogService(new InMemoryAuditLogStore()));
         candidateStore.saveGenerationResult(CandidateTestFixtures.sampleGenerationResult());
     }
 

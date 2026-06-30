@@ -15,18 +15,17 @@ Phase 2-P0：共享能力资产原型已完成。
 Phase 3-P0：训练与评估闭环 MVP 已完成并冻结。
 Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
 Phase 4-P1：候选治理与安全加固已完成并冻结。
-Phase 5-P0：持久化与治理底座详细设计已建立。
-当前阶段：Phase 5-P0 implementation ready，下一步是 Phase5-P0-A 依赖与配置。
+Phase 5-P0：持久化与治理底座已完成并冻结。
+当前阶段：Phase 5-P0 freeze complete / Phase 5-P1 planning pending。
 ```
 
 当前最优先任务：
 
 ```text
-1. 读取 docs/Phase5_P0开发任务清单.md。
-2. 将 Phase5-P0-A 状态从 [ ] 改为 [/]。
-3. 只实现 PostgreSQL / Flyway 依赖、clinmind.persistence.mode、datasource/flyway 配置骨架。
-4. 不直接实现所有 JDBC Store。
-5. 继续禁止提前接入 RAG、Python Provider、前端、模型训练和正式 RBAC。
+1. 读取 docs/Phase5_P0冻结记录.md 确认边界。
+2. 在有 Docker 的环境执行 RUN_POSTGRES_TESTS=true postgres 专项测试。
+3. 规划 Phase 5-P1（最小 Console / RBAC 强化）。
+4. 继续禁止提前接入 RAG、Python Provider、前端、模型训练和正式 RBAC。
 ```
 
 ---
@@ -42,7 +41,8 @@ Phase 5-P0：持久化与治理底座详细设计已建立。
 4. docs/Phase3_P0冻结记录.md
 5. docs/Phase4_P0冻结记录.md
 6. docs/Phase4_P1冻结记录.md
-7. docs/Phase5_P0持久化与治理底座_实现规格.md
+7. docs/Phase5_P0冻结记录.md
+8. docs/Phase5_P0持久化与治理底座_实现规格.md
 8. docs/架构模式与设计模式说明.md
 ```
 
@@ -87,19 +87,20 @@ Phase 5-P0：持久化与治理底座详细设计已建立。
 | `docs/README.md` | 活跃 | 文档导航入口 |
 | `docs/项目展示导读.md` | 活跃 | 面向面试官 / 自我复盘的项目导读 |
 
-## 3.2 当前实现约束文档：Phase 5-P0
+## 3.2 已冻结 Phase 文档：Phase 5-P0
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
-| `docs/Phase5_P0开发任务清单.md` | 活跃 | Phase5-P0-A 到 P0-H 实现顺序与验收标准 |
-| `docs/Phase5_P0持久化与治理底座_实现规格.md` | 当前基线 | Phase5-P0 总体实现规格 |
-| `docs/Phase5_P0数据库Schema设计.md` | 当前基线 | PostgreSQL schema / JSONB / migration 依据 |
-| `docs/Phase5_P0Repository迁移设计.md` | 当前基线 | in-memory / postgres 双实现迁移依据 |
-| `docs/Phase5_P0审计与权限边界设计.md` | 当前基线 | AuditLog 与 debug API 最小访问边界 |
-| `docs/Phase5_P0_API与测试设计.md` | 当前基线 | Persistence health、Audit API、测试与人工验收依据 |
+| `docs/Phase5_P0冻结记录.md` | 已冻结 | Phase5-P0 冻结依据、边界与 P1 检查项 |
+| `docs/Phase5_P0人工测试API结果.md` | 验收归档 | Phase5-P0 人工 / E2E 验收记录 |
+| `docs/Phase5_P0开发任务清单.md` | 归档 | Phase5-P0-A 到 P0-H 实现顺序（已完成） |
+| `docs/Phase5_P0持久化与治理底座_实现规格.md` | 冻结基线 | Phase5-P0 总体实现规格 |
+| `docs/Phase5_P0数据库Schema设计.md` | 冻结基线 | PostgreSQL schema / JSONB / migration 依据 |
+| `docs/Phase5_P0Repository迁移设计.md` | 冻结基线 | in-memory / postgres 双实现迁移依据 |
+| `docs/Phase5_P0审计与权限边界设计.md` | 冻结基线 | AuditLog 与 debug API 最小访问边界 |
+| `docs/Phase5_P0_API与测试设计.md` | 冻结基线 | Persistence health、Audit API、测试与人工验收依据 |
 
-## 3.3 已冻结 Phase 文档
+## 3.3 已冻结 Phase 文档：Phase 4 及更早
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -127,14 +128,13 @@ Phase 5-P0：持久化与治理底座详细设计已建立。
 # 四、当前不应做什么
 
 ```text
-1. 不应向 Phase 4-P0 / Phase 4-P1 继续堆新能力（均已冻结）。
-2. 不应跳过 Phase5-P0-A 直接实现所有 JDBC Store。
-3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
-4. 不应提前做前端 Console。
-5. 不应提前实现模型训练 / 后训练。
-6. 不应实现正式 RBAC / 登录 / 多租户。
-7. 不应实现 ApprovedExperience 自动生效或 TrainingDatasetVersion 发布。
-8. 不应大规模移动 docs 文件，除非同步更新全部引用。
+1. 不应向 Phase 4-P0 / Phase 4-P1 / Phase 5-P0 继续堆新能力（均已冻结）。
+2. 不应提前实现 RAG / GraphRAG / Python AI Provider。
+3. 不应提前做前端 Console。
+4. 不应提前实现模型训练 / 后训练。
+5. 不应实现正式 RBAC / 登录 / 多租户。
+6. 不应实现 ApprovedExperience 自动生效或 TrainingDatasetVersion 发布。
+7. 不应大规模移动 docs 文件，除非同步更新全部引用。
 ```
 
 ---
@@ -142,11 +142,10 @@ Phase 5-P0：持久化与治理底座详细设计已建立。
 # 五、当前建议做什么
 
 ```text
-1. 以 docs/Phase5_P0开发任务清单.md 作为当前实现顺序依据。
-2. 先进入 Phase5-P0-A：依赖与配置。
-3. 只实现 PostgreSQL driver / Flyway / persistence mode / datasource 配置骨架。
-4. 保持 in-memory 默认可启动。
-5. 保持 Phase1/2/3/4 回归测试通过。
+1. 以 docs/Phase5_P0冻结记录.md 作为 Phase 5-P0 边界依据。
+2. 规划 Phase 5-P1（最小 Console API / RBAC 强化）。
+3. 在有 Docker 的环境跑通 RUN_POSTGRES_TESTS=true postgres 专项。
+4. 保持 Phase1/2/3/4/5 in-memory 回归测试通过。
 ```
 
 ---
@@ -165,4 +164,4 @@ Phase 5-P0：持久化与治理底座详细设计已建立。
 
 # 七、最终结论
 
-当前文档体系已支撑 Phase5-P0 实现。Phase3-P0、Phase4-P0、Phase4-P1 均已冻结，Phase5-P0 详细设计已建立，下一步应进入 Phase5-P0-A：依赖与配置。
+当前文档体系已支撑 Phase5-P0 冻结与 Phase5-P1 规划。Phase3-P0、Phase4-P0、Phase4-P1、Phase5-P0 均已冻结，下一步应进入 Phase 5-P1 规划。

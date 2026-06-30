@@ -30,4 +30,8 @@ public final class IdGenerator {
     public static String candidateReviewId() {
         return "cand_rev_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String auditId() {
+        return "audit_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

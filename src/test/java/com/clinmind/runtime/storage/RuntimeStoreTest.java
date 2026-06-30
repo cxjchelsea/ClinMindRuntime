@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 
 class RuntimeStoreTest {
 
-    private RuntimeStore store;
+    private InMemoryRuntimeStore store;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        store = new RuntimeStore(objectMapper);
+        store = new InMemoryRuntimeStore(objectMapper);
     }
 
     @Test

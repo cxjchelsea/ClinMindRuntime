@@ -6,6 +6,10 @@ import com.clinmind.runtime.candidate.CandidateSkippedItem;
 import com.clinmind.runtime.candidate.CandidateSkippedReason;
 import com.clinmind.runtime.candidate.ExperienceCandidate;
 import com.clinmind.runtime.candidate.TrainingExampleCandidate;
+import com.clinmind.runtime.audit.AuditActionType;
+import com.clinmind.runtime.audit.AuditLogService;
+import com.clinmind.runtime.audit.AuditResourceType;
+import com.clinmind.runtime.audit.AuditResultStatus;
 import com.clinmind.runtime.candidate.store.CandidateStore;
 import com.clinmind.runtime.evaluation.EvaluationCase;
 import com.clinmind.runtime.evaluation.EvaluationCaseRepository;
@@ -22,7 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CandidateGenerationService {
@@ -33,6 +39,7 @@ public class CandidateGenerationService {
     private final TrainingExampleCandidateGenerator trainingExampleCandidateGenerator;
     private final CandidateMappingPolicy mappingPolicy;
     private final CandidateStore candidateStore;
+    private final AuditLogService auditLogService;
 
     public CandidateGenerationService(
             EvaluationRunStore runStore,
@@ -40,19 +47,22 @@ public class CandidateGenerationService {
             ExperienceCandidateGenerator experienceCandidateGenerator,
             TrainingExampleCandidateGenerator trainingExampleCandidateGenerator,
             CandidateMappingPolicy mappingPolicy,
-            CandidateStore candidateStore) {
+            CandidateStore candidateStore,
+            AuditLogService auditLogService) {
         this.runStore = runStore;
         this.caseRepository = caseRepository;
         this.experienceCandidateGenerator = experienceCandidateGenerator;
         this.trainingExampleCandidateGenerator = trainingExampleCandidateGenerator;
         this.mappingPolicy = mappingPolicy;
         this.candidateStore = candidateStore;
+        this.auditLogService = auditLogService;
     }
 
     public CandidateGenerationResult generateFromEvaluationRun(String runId) {
         return generateFromEvaluationRun(runId, CandidateGenerationPolicy.defaults());
     }
 
+    @Transactional
     public CandidateGenerationResult generateFromEvaluationRun(String runId, CandidateGenerationPolicy policy) {
         Instant startedAt = Instant.now();
         EvaluationRun run = runStore.get(runId);
@@ -95,6 +105,15 @@ public class CandidateGenerationService {
                 List.copyOf(skippedItems),
                 List.copyOf(warnings));
         candidateStore.saveGenerationResult(result);
+        auditLogService.record(
+                AuditActionType.GENERATE_CANDIDATES,
+                AuditResourceType.CANDIDATE_GENERATION,
+                result.generationId(),
+                AuditResultStatus.SUCCESS,
+                Map.of(
+                        "source_evaluation_run_id", runId,
+                        "experience_candidate_count", result.experienceCandidates().size(),
+                        "training_candidate_count", result.trainingExampleCandidates().size()));
         return result;
     }
 
