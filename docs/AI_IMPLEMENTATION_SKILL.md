@@ -1,16 +1,16 @@
-# AI Implementation Skill：ClinMindRuntime Phase 5-P1
+# AI Implementation Skill：ClinMindRuntime Phase 5-P2
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制、Phase 4-P1 候选治理与安全加固、Phase 5-P0 持久化与治理底座、Phase 5-P1 最小 Console 与访问治理均已完成并冻结。  
-> 后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、Candidate 脱敏、SourceRef 校验、Review 记录边界、持久化双模式、AuditLog、Console 访问治理和患者端隔离。
+> 当前 Phase 1–4、Phase 5-P0 持久化与治理底座、Phase 5-P1 最小 Console 与访问治理均已完成并冻结。  
+> 当前进入 **Phase 5-P2：最小前端 Console MVP**。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、Evaluation 闭环、Candidate 脱敏、持久化双模式、AuditLog、Console 访问治理和患者端隔离。
 
 ---
 
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P1 最小 Console 与访问治理 — 已冻结
-下一步：Phase 5-P2 规划待定
+当前阶段：Phase 5-P2 最小前端 Console MVP — P2-A 已完成
+下一步：Phase5-P2-B Console API Client 与 Debug Context
 ```
 
 当前已经完成的主线：
@@ -23,37 +23,33 @@ Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
 Phase 5-P1：最小 Console 与访问治理，已冻结
+Phase 5-P2：最小前端 Console MVP — P2-A 已完成
 ```
 
-Phase 5-P1 目标：
+Phase 5-P2 目标：
 
 ```text
-让 Phase5-P0 已持久化的 Runtime / Evaluation / Candidate / Review / AuditLog 可以通过最小 Console API 被安全查询、权限控制和审计复盘。
+实现 console-web/ 最小治理界面，只消费 Phase 5-P1 Safe Console API，不暴露敏感字段、不改变 Runtime 决策边界。
 ```
 
-Phase 5-P1 推荐链路：
+Phase 5-P2 推荐链路：
 
 ```text
-Console / Debug Request
-→ DebugTokenFilter
-→ ActorContextResolver
-→ AccessPolicy / RolePolicy
-→ ConsoleQueryService
-→ Store / Repository
-→ Safe DTO Mapper
-→ AuditLogService
-→ Console API Response
+Frontend Console (console-web/)
+→ Debug Token / Actor / Roles 输入
+→ Console API Client
+→ /api/v1/debug/console/**
+→ Safe DTO Response
+→ 列表 / 详情 / Review 操作 / Audit Center
 ```
 
 重要说明：
 
 ```text
-Phase 5-P1 不是 RAG 阶段。
-Phase 5-P1 不是模型训练阶段。
-Phase 5-P1 不是完整前端 Console 阶段。
-Phase 5-P1 不是正式医生审核平台。
-Phase 5-P1 不实现 ApprovedExperience 自动生效。
-Phase 5-P1 只做最小 Console API、RBAC-lite、Audit Center 查询增强和安全 DTO。
+Phase 5-P2 不是完整生产前端。
+Phase 5-P2 不是正式登录 / OAuth / JWT 阶段。
+Phase 5-P2 不是 RAG 或模型训练阶段。
+Phase 5-P2 只做最小前端 Console MVP，对接已有 Console API。
 ```
 
 ---
@@ -64,31 +60,15 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 
 ```text
 1. docs/AI_IMPLEMENTATION_SKILL.md
-2. docs/Phase5_P1开发任务清单.md
-3. docs/Phase5_P1最小Console与访问治理_实现规格.md
-4. docs/Phase5_P1_RBAC与AuditCenter设计.md
-5. docs/Phase5_P1Console_API与测试设计.md
-6. docs/Phase5_P0冻结记录.md
-7. docs/Phase5_P0人工测试API结果.md
-8. docs/Phase5_P0开发任务清单.md
-9. docs/Phase5_P0持久化与治理底座_实现规格.md
-10. docs/Phase4_P1冻结记录.md
-11. docs/Phase4_P0冻结记录.md
-12. docs/Phase3_P0冻结记录.md
-13. docs/README.md
-14. docs/项目展示导读.md
-15. docs/架构文档缺口审查清单.md
-16. docs/ClinMindRuntime技术实现总方案.md
-17. docs/测试与CI总方案.md
-18. docs/数据安全与合规边界规划.md
-19. docs/数据库持久化设计.md
-20. docs/平台前端与Console规划.md
-21. docs/部署与运维规划.md
-22. docs/模型训练与后训练规划.md
-23. docs/医学知识库与RAG构建规划.md
-24. docs/ClinMindRuntime阶段拆分路线图.md
-25. docs/ClinMindRuntime完整系统设计.md
-26. docs/架构模式与设计模式说明.md
+2. docs/Phase5_P2开发任务清单.md
+3. docs/Phase5_P2最小前端Console_MVP_实现规格.md
+4. docs/Phase5_P2前端信息架构与页面设计.md
+5. docs/Phase5_P2_API对接与前端状态管理设计.md
+6. docs/Phase5_P2前端安全边界与测试设计.md
+7. docs/Phase5_P1冻结记录.md
+8. docs/Phase5_P1最小Console与访问治理_实现规格.md
+9. docs/Phase5_P0冻结记录.md
+10. docs/README.md
 ```
 
 解释：
@@ -280,20 +260,29 @@ postgres 模式专项测试通过。
 
 # 八、当前最优下一步
 
-Phase 5-P1 已冻结。进入 Phase 5-P2 前：
+当前最优实现任务是：
 
 ```text
-1. 新增 Phase 5-P2 详细设计与任务清单。
-2. 保持 Phase 1–5 in-memory 回归与 postgres 专项测试通过。
-3. 不在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
+Phase5-P2-B：Console API Client 与 Debug Context
 ```
 
-Phase 5-P2 候选主题（backlog，未启动）：
+只应实现：
 
 ```text
-最小前端 Console 页面
-Docker Compose 本地编排
-正式 RBAC / 登录集成
+1. console-web/src/api/consoleClient.ts 与 types.ts。
+2. DebugContextPanel / debugContext 状态。
+3. 请求统一 header 注入与错误码映射。
+4. 同步更新 docs/Phase5_P2开发任务清单.md。
+```
+
+不应在 P2-B 中实现：
+
+```text
+全部数据页面（Runtime / Evaluation / Candidate / Review / Audit）
+正式登录系统
+Docker Compose
+RAG / 模型训练
+后端 Console API 大改
 ```
 
 ---

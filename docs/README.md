@@ -17,17 +17,17 @@ Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
 Phase 4-P1：候选治理与安全加固已完成并冻结。
 Phase 5-P0：持久化与治理底座已完成并冻结。
 Phase 5-P1：最小 Console 与访问治理已完成并冻结。
-当前阶段：Phase 5-P2 规划待定。
+Phase 5-P2：最小前端 Console MVP — P2-A 已完成，当前进入 P2-B。
 ```
 
 当前最优先任务：
 
 ```text
-1. 阅读 docs/Phase5_P1冻结记录.md 了解 P1 边界。
-2. 新增 Phase 5-P2 详细设计与任务清单（如需要）。
-3. 保持 Phase 1–5 in-memory 回归与 postgres 专项测试通过。
-4. 不在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
-5. 继续禁止提前接入 RAG、Python Provider、模型训练、正式审核平台和 ApprovedExperience 自动生效。
+1. 阅读 docs/Phase5_P2开发任务清单.md。
+2. 进入 Phase5-P2-B：Console API Client 与 Debug Context。
+3. 保持 Phase 1–5 后端 mvn test 回归通过。
+4. console-web 只调用 Safe Console API，不展示敏感字段。
+5. 继续禁止 RAG、Python Provider、模型训练、正式审核平台和 ApprovedExperience 自动生效。
 ```
 
 ---
@@ -88,7 +88,17 @@ Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 | `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
 | `docs/项目展示导读.md` | 活跃 | 面向面试官 / 自我复盘的项目导读 |
 
-## 3.2 已冻结 Phase 文档：Phase 5-P1
+## 3.2 当前实现约束文档：Phase 5-P2
+
+| 文档 | 状态 | 用途 |
+|---|---|---|
+| `docs/Phase5_P2开发任务清单.md` | 活跃 | Phase5-P2-A 到 P2-F 实现顺序与验收标准 |
+| `docs/Phase5_P2最小前端Console_MVP_实现规格.md` | 当前基线 | Phase5-P2 总体实现规格 |
+| `docs/Phase5_P2前端信息架构与页面设计.md` | 当前基线 | 页面结构、导航与展示边界 |
+| `docs/Phase5_P2_API对接与前端状态管理设计.md` | 当前基线 | Console API Client、Debug Context |
+| `docs/Phase5_P2前端安全边界与测试设计.md` | 当前基线 | 前端安全边界与测试分层 |
+
+## 3.3 已冻结 Phase 文档：Phase 5-P1
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -99,7 +109,7 @@ Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 | `docs/Phase5_P1_RBAC与AuditCenter设计.md` | 冻结基线 | ActorContext、RBAC-lite、Audit Center 设计 |
 | `docs/Phase5_P1Console_API与测试设计.md` | 冻结基线 | Console API、安全 DTO、测试和人工验收依据 |
 
-## 3.3 已冻结 Phase 文档：Phase 5-P0
+## 3.4 已冻结 Phase 文档：Phase 5-P0
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -112,7 +122,7 @@ Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 | `docs/Phase5_P0审计与权限边界设计.md` | 冻结基线 | AuditLog 与 debug API 最小访问边界 |
 | `docs/Phase5_P0_API与测试设计.md` | 冻结基线 | Persistence health、Audit API、测试与人工验收依据 |
 
-## 3.4 已冻结 Phase 文档：Phase 4 及更早
+## 3.5 已冻结 Phase 文档：Phase 4 及更早
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -123,7 +133,7 @@ Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 | `docs/Phase3_P0冻结记录.md` | 已冻结 | Phase3-P0 冻结依据 |
 | `docs/Phase3_人工测试API结果.md` | 验收归档 | Phase3 人工 API 验收记录 |
 
-## 3.5 总体架构与专项规划文档
+## 3.6 总体架构与专项规划文档
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
@@ -156,9 +166,9 @@ Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 # 五、当前建议做什么
 
 ```text
-1. 阅读 docs/Phase5_P1冻结记录.md 了解 P1 边界。
-2. 新增 Phase 5-P2 详细设计与任务清单（如需要）。
-3. 保持 Phase1/2/3/4/5 in-memory 回归与 postgres 专项测试通过。
+1. 阅读 docs/Phase5_P2开发任务清单.md。
+2. 进入 Phase5-P2-B：Console API Client 与 Debug Context。
+3. 保持 Phase1/2/3/4/5 后端回归与 console-web 前端测试通过。
 ```
 
 ---
@@ -177,4 +187,4 @@ Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 
 # 七、最终结论
 
-当前文档体系已支撑 Phase 1–5-P1 全链路。Phase3-P0、Phase4-P0、Phase4-P1、Phase5-P0、Phase5-P1 均已冻结，下一步进入 Phase 5-P2 规划。
+当前文档体系已支撑 Phase 1–5-P2 全链路。Phase5-P1 已冻结，Phase5-P2 P2-A 已完成，下一步进入 P2-B。

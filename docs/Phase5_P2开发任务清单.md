@@ -37,23 +37,23 @@ P2 必须保证：
 
 # 三、Phase5-P2-A：前端工程初始化
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] 新增 console-web/ 目录
-[ ] Vite + React + TypeScript 初始化
-[ ] package.json / tsconfig / vite.config
-[ ] 基础目录结构
-[ ] AppShell / Sidebar / 基础样式
+[x] 新增 console-web/ 目录
+[x] Vite + React + TypeScript 初始化
+[x] package.json / tsconfig / vite.config
+[x] 基础目录结构
+[x] AppShell / Sidebar / 基础样式
 ```
 
 测试：
 
 ```text
-[ ] npm run build
-[ ] App smoke test
+[x] npm run build
+[x] App smoke test
 ```
 
 验收标准：
@@ -271,14 +271,14 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P2-A：前端工程初始化
+Phase5-P2-B：Console API Client 与 Debug Context
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase5-P2-A 状态从 [ ] 改为 [/]。
-2. 只初始化 console-web、Vite、React、TypeScript、基础布局。
-3. 不直接实现全部页面。
+1. 将 Phase5-P2-B 状态从 [ ] 改为 [/]。
+2. 只实现 consoleClient、DebugContextPanel 与请求 header 注入。
+3. 不直接实现全部数据页面。
 4. 不实现正式登录、Docker Compose、RAG、模型训练或正式审核平台。
 ```
