@@ -90,7 +90,8 @@ class CandidateReviewEndToEndIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.to_status").value("APPROVED"));
 
-        mockMvc.perform(get("/api/v1/debug/candidates/" + trainingCandidateId + "/reviews"))
+        mockMvc.perform(get("/api/v1/debug/candidates/" + trainingCandidateId + "/reviews")
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].candidate_kind").value("TRAINING_EXAMPLE_CANDIDATE"));
     }

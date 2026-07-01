@@ -72,6 +72,28 @@ class AccessPolicyTest {
                 .isInstanceOf(AccessDeniedException.class);
     }
 
+    @Test
+    void evaluationReviewerCanListRuntimeButNotReadDetail() {
+        ActorContext reviewer = context(List.of(DebugRole.EVALUATION_REVIEWER));
+
+        assertThat(accessPolicy.isAllowed(reviewer, ConsoleActionType.LIST, ConsoleResourceType.CONSOLE_RUNTIME))
+                .isTrue();
+        assertThat(accessPolicy.isAllowed(
+                        reviewer, ConsoleActionType.READ_DETAIL, ConsoleResourceType.CONSOLE_RUNTIME))
+                .isFalse();
+    }
+
+    @Test
+    void candidateReviewerCanReadReviewRecords() {
+        ActorContext reviewer = context(List.of(DebugRole.CANDIDATE_REVIEWER));
+
+        assertThat(accessPolicy.isAllowed(reviewer, ConsoleActionType.LIST, ConsoleResourceType.CONSOLE_REVIEW))
+                .isTrue();
+        assertThat(accessPolicy.isAllowed(
+                        reviewer, ConsoleActionType.READ_DETAIL, ConsoleResourceType.CONSOLE_REVIEW))
+                .isTrue();
+    }
+
     private static ActorContext context(List<DebugRole> roles) {
         return new ActorContext("actor_001", "tester", roles, "req_test", Instant.parse("2026-07-01T10:00:00Z"));
     }

@@ -19,7 +19,7 @@ final class RolePolicy {
     private static boolean allowsRuntime(DebugRole role, ConsoleActionType actionType) {
         return switch (role) {
             case SYSTEM_ADMIN -> true;
-            case EVALUATION_REVIEWER -> isSummaryOrList(actionType) || actionType == ConsoleActionType.READ_DETAIL;
+            case EVALUATION_REVIEWER -> isSummaryOrList(actionType);
             case READ_ONLY_OBSERVER -> isSummaryOrList(actionType);
             default -> false;
         };
@@ -48,7 +48,8 @@ final class RolePolicy {
             case SYSTEM_ADMIN -> true;
             case CANDIDATE_REVIEWER -> actionType == ConsoleActionType.REVIEW
                     || actionType == ConsoleActionType.LIST
-                    || actionType == ConsoleActionType.READ_SUMMARY;
+                    || actionType == ConsoleActionType.READ_SUMMARY
+                    || actionType == ConsoleActionType.READ_DETAIL;
             default -> false;
         };
     }

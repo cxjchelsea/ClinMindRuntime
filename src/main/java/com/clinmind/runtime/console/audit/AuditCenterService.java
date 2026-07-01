@@ -172,7 +172,7 @@ public class AuditCenterService {
 
         auditLogService.record(
                 AuditActionType.QUERY_CONSOLE_AUDIT,
-                AuditResourceType.EVALUATION_RUN,
+                AuditResourceType.AUDIT_LOG,
                 "audit-center",
                 actor.actorName(),
                 AuditResultStatus.SUCCESS,

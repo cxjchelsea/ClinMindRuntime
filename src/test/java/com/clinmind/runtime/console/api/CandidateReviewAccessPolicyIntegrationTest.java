@@ -80,6 +80,30 @@ class CandidateReviewAccessPolicyIntegrationTest {
                 .andExpect(jsonPath("$.data.training_dataset_version").doesNotExist());
     }
 
+    @Test
+    void observerCannotReadReviewRecords() throws Exception {
+        String candidateId = generateExperienceCandidateId();
+
+        mockMvc.perform(post("/api/v1/debug/candidates/experience-candidates/" + candidateId + "/review")
+                        .header("X-Debug-Token", "test-secret")
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "decision": "APPROVE",
+                                  "reason": "Approved for read access test",
+                                  "reviewer": "candidate-reviewer-a"
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/debug/candidates/" + candidateId + "/reviews")
+                        .header("X-Debug-Token", "test-secret")
+                        .header(ActorContextResolver.DEBUG_ACTOR_HEADER, "observer-a"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("ACCESS_DENIED"));
+    }
+
     private String generateExperienceCandidateId() throws Exception {
         MvcResult evalResult = mockMvc.perform(post("/api/v1/debug/evaluations/runs")
                         .header("X-Debug-Token", "test-secret")

@@ -54,19 +54,26 @@ public class CandidateReviewController {
     }
 
     @GetMapping("/reviews/{review_id}")
-    public ApiResponse<?> getReview(@PathVariable("review_id") String reviewId) {
+    public ApiResponse<?> getReview(HttpServletRequest request, @PathVariable("review_id") String reviewId) {
+        requireReviewReadAccess(request, ConsoleActionType.READ_DETAIL);
         return ApiResponse.ok(reviewService.getReviewRecord(reviewId));
     }
 
     @GetMapping("/{candidate_id}/reviews")
-    public ApiResponse<?> listReviews(@PathVariable("candidate_id") String candidateId) {
+    public ApiResponse<?> listReviews(
+            HttpServletRequest request, @PathVariable("candidate_id") String candidateId) {
+        requireReviewReadAccess(request, ConsoleActionType.LIST);
         List<CandidateReviewRecord> records = reviewService.listReviewsByCandidate(candidateId);
         return ApiResponse.ok(records);
     }
 
     private void requireReviewAccess(HttpServletRequest request) {
+        requireReviewReadAccess(request, ConsoleActionType.REVIEW);
+    }
+
+    private void requireReviewReadAccess(HttpServletRequest request, ConsoleActionType actionType) {
         ActorContext context = actorContextResolver.resolve(request);
-        accessPolicy.require(context, ConsoleActionType.REVIEW, ConsoleResourceType.CONSOLE_REVIEW);
+        accessPolicy.require(context, actionType, ConsoleResourceType.CONSOLE_REVIEW);
         actorContextResolver.bindToLegacyAuditContext(context);
     }
 }

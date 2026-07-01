@@ -60,12 +60,23 @@ class ConsoleRuntimeControllerTest {
     }
 
     @Test
-    void evaluationReviewerCanReadRuntimeDetail() throws Exception {
+    void evaluationReviewerCannotReadRuntimeDetail() throws Exception {
         String runtimeId = startRuntimeWithPatientInput();
 
         mockMvc.perform(get("/api/v1/debug/console/runtime-sessions/{runtime_id}", runtimeId)
                         .header("X-Debug-Token", "test-secret")
                         .header(ActorContextResolver.DEBUG_ROLES_HEADER, "EVALUATION_REVIEWER"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    void systemAdminCanReadRuntimeDetail() throws Exception {
+        String runtimeId = startRuntimeWithPatientInput();
+
+        mockMvc.perform(get("/api/v1/debug/console/runtime-sessions/{runtime_id}", runtimeId)
+                        .header("X-Debug-Token", "test-secret")
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "SYSTEM_ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.runtime_id").value(runtimeId))
                 .andExpect(jsonPath("$.data.input_history").doesNotExist())

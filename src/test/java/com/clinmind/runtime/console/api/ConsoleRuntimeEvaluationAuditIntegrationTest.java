@@ -64,7 +64,7 @@ class ConsoleRuntimeEvaluationAuditIntegrationTest {
 
         mockMvc.perform(get("/api/v1/debug/console/runtime-sessions/{runtime_id}", runtimeId)
                         .header("X-Debug-Token", "test-secret")
-                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "EVALUATION_REVIEWER"))
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "SYSTEM_ADMIN"))
                 .andExpect(status().isOk());
 
         MvcResult evalResult = mockMvc.perform(post("/api/v1/debug/evaluations/runs")

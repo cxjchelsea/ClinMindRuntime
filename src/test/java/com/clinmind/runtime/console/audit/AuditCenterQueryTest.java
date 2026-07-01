@@ -91,6 +91,25 @@ class AuditCenterQueryTest {
                 .isEqualTo("AUDIT_QUERY_INVALID");
     }
 
+    @Test
+    void recordsConsoleAuditQueryWithAuditLogResourceType() {
+        auditCenterService.queryAuditLogs(actor(), null, null, null, null, null, null, null, 10);
+
+        var records = auditLogService.query(new com.clinmind.runtime.audit.AuditLogQuery(
+                java.util.Optional.empty(),
+                java.util.Optional.of(AuditActionType.QUERY_CONSOLE_AUDIT),
+                java.util.Optional.empty(),
+                java.util.Optional.empty(),
+                java.util.Optional.empty(),
+                java.util.Optional.empty(),
+                java.util.Optional.empty(),
+                5));
+
+        assertThat(records).isNotEmpty();
+        assertThat(records.get(0).resourceType()).isEqualTo(AuditResourceType.AUDIT_LOG);
+        assertThat(records.get(0).resourceId()).isEqualTo("audit-center");
+    }
+
     private static ActorContext actor() {
         return new ActorContext(
                 "auditor-a",

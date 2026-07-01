@@ -161,7 +161,25 @@ postgres CI / Docker 兼容性修复
 
 ---
 
-# 六、进入 Phase 5-P2 前的条件
+# 六、P2 前 Cleanup Backlog（已完成）
+
+以下项已在 P1 冻结后、P2 启动前完成：
+
+## 6.1 RolePolicy 与设计矩阵对齐
+
+`EVALUATION_REVIEWER` 对 Runtime 已收紧为 **summary/list only**（与 `docs/Phase5_P1_RBAC与AuditCenter设计.md` §五矩阵一致）；Evaluation 仍保留 summary/detail。
+
+## 6.2 Review API 读路径接入 AccessPolicy
+
+`CandidateReviewController` 的 `GET /reviews/{review_id}` 与 `GET /{candidate_id}/reviews` 已接入 `AccessPolicy`（`READ_DETAIL` / `LIST` + `CONSOLE_REVIEW`）；默认无 role 时为 `READ_ONLY_OBSERVER`，返回 403。
+
+## 6.3 Audit Center 自审计 resource 语义
+
+`AuditCenterService.recordConsoleAuditQuery` 已改用 `AuditResourceType.AUDIT_LOG` + `resourceId=audit-center`（新增 enum 值，schema 无需 migration）。
+
+---
+
+# 七、进入 Phase 5-P2 前的条件
 
 进入下一阶段前需要先完成：
 
@@ -183,7 +201,7 @@ Audit Center UI
 
 ---
 
-# 七、最终结论
+# 八、最终结论
 
 Phase 5-P1 已完成「可查、可控、可审计、不泄露、不越界」的最小 Console 治理边界。  
 后续工作应在新 Phase 文档中立项，而不是继续向 P1 范围追加能力。

@@ -51,11 +51,13 @@ class CandidateReviewControllerTest {
                 .path("review_id")
                 .asText();
 
-        mockMvc.perform(get("/api/v1/debug/candidates/reviews/" + reviewId))
+        mockMvc.perform(get("/api/v1/debug/candidates/reviews/" + reviewId)
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.candidate_id").value(candidateId));
 
-        mockMvc.perform(get("/api/v1/debug/candidates/" + candidateId + "/reviews"))
+        mockMvc.perform(get("/api/v1/debug/candidates/" + candidateId + "/reviews")
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].decision").value("APPROVE"));
 

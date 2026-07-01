@@ -279,6 +279,16 @@ Phase5-P1 完成需要满足：
 [-] 完整 Docker Compose / 部署运维
 ```
 
+## 10.1 P2 前 Cleanup（已完成）
+
+详见 `docs/Phase5_P1冻结记录.md` §六：
+
+```text
+[x] RolePolicy：EVALUATION_REVIEWER 对 Runtime 收紧为 summary/list，与 design 矩阵一致
+[x] CandidateReviewController：GET review 路径接入 AccessPolicy
+[x] AuditCenterService：QUERY_CONSOLE_AUDIT 使用 AuditResourceType.AUDIT_LOG
+```
+
 ---
 
 # 十一、当前下一步
