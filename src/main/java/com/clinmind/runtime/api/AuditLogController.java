@@ -40,6 +40,7 @@ public class AuditLogController {
                 parseActionType(actionType),
                 parseResourceType(resourceType),
                 Optional.ofNullable(resourceId),
+                Optional.empty(),
                 Optional.ofNullable(from),
                 Optional.ofNullable(to),
                 limit);

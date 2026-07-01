@@ -67,6 +67,7 @@ public class JdbcAuditLogStore implements AuditLogStore {
             Optional<AuditActionType> actionType,
             Optional<AuditResourceType> resourceType,
             Optional<String> resourceId,
+            Optional<AuditResultStatus> resultStatus,
             Optional<Instant> from,
             Optional<Instant> to,
             int limit) {
@@ -92,6 +93,10 @@ public class JdbcAuditLogStore implements AuditLogStore {
         resourceId.ifPresent(value -> {
             sql.append(" and resource_id = ?");
             params.add(value);
+        });
+        resultStatus.ifPresent(value -> {
+            sql.append(" and result_status = ?");
+            params.add(value.name());
         });
         from.ifPresent(value -> {
             sql.append(" and created_at >= ?");

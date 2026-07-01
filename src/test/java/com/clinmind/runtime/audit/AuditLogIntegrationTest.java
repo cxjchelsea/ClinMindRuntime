@@ -60,6 +60,7 @@ class AuditLogIntegrationTest {
                         java.util.Optional.of(runId),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10)))
                 .isNotEmpty();
     }

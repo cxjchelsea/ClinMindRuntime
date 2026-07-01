@@ -54,6 +54,7 @@ class CandidateReviewAuditIntegrationTest {
                         java.util.Optional.of(trainingCandidateId),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10)))
                 .isNotEmpty();
     }

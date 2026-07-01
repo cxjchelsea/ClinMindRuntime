@@ -34,6 +34,7 @@ public class InMemoryAuditLogStore implements AuditLogStore {
             java.util.Optional<AuditActionType> actionType,
             java.util.Optional<AuditResourceType> resourceType,
             java.util.Optional<String> resourceId,
+            java.util.Optional<AuditResultStatus> resultStatus,
             java.util.Optional<java.time.Instant> from,
             java.util.Optional<java.time.Instant> to,
             int limit) {
@@ -42,6 +43,7 @@ public class InMemoryAuditLogStore implements AuditLogStore {
                 .filter(record -> actionType.isEmpty() || actionType.get() == record.actionType())
                 .filter(record -> resourceType.isEmpty() || resourceType.get() == record.resourceType())
                 .filter(record -> resourceId.isEmpty() || resourceId.get().equals(record.resourceId()))
+                .filter(record -> resultStatus.isEmpty() || resultStatus.get() == record.resultStatus())
                 .filter(record -> from.isEmpty() || !record.createdAt().isBefore(from.get()))
                 .filter(record -> to.isEmpty() || !record.createdAt().isAfter(to.get()))
                 .sorted(Comparator.comparing(AuditLogRecord::createdAt).reversed())

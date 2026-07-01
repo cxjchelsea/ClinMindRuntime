@@ -104,12 +104,14 @@ class ConsoleRuntimeEvaluationAuditIntegrationTest {
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10)))
                 .isNotEmpty();
 
         assertThat(auditLogService.query(new AuditLogQuery(
                         java.util.Optional.empty(),
                         java.util.Optional.of(AuditActionType.QUERY_CONSOLE_EVALUATION),
+                        java.util.Optional.empty(),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),

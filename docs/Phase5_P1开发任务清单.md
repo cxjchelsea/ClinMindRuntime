@@ -179,26 +179,26 @@ P1 必须保证：
 
 # 七、Phase5-P1-E：Audit Center 查询增强
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] ConsoleAuditCenterController
-[ ] AuditCenterService
-[ ] GET /api/v1/debug/console/audit-center/audit-logs
-[ ] GET /api/v1/debug/console/audit-center/audit-logs/{audit_id}
-[ ] GET /api/v1/debug/console/audit-center/summary
-[ ] filters: actor/action/resource/result/time/limit
-[ ] pagination / limit guard
+[x] ConsoleAuditCenterController
+[x] AuditCenterService
+[x] GET /api/v1/debug/console/audit-center/audit-logs
+[x] GET /api/v1/debug/console/audit-center/audit-logs/{audit_id}
+[x] GET /api/v1/debug/console/audit-center/summary
+[x] filters: actor/action/resource/result/time/limit
+[x] pagination / limit guard
 ```
 
 测试：
 
 ```text
-[ ] AuditCenterQueryTest
-[ ] AuditCenterSummaryTest
-[ ] AuditCenterAccessPolicyTest
+[x] AuditCenterQueryTest
+[x] AuditCenterSummaryTest
+[x] AuditCenterAccessPolicyTest
 ```
 
 验收标准：

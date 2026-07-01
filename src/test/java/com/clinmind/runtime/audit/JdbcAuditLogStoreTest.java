@@ -54,6 +54,7 @@ class JdbcAuditLogStoreTest extends AbstractPostgresIntegrationTest {
                         java.util.Optional.of("gen_jdbc_001"),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10))
                 .hasSize(1);
     }

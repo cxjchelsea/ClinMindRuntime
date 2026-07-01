@@ -54,6 +54,7 @@ class CandidateGenerationAuditIntegrationTest {
                         java.util.Optional.of(generationId),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10))
                 .get(0);
 

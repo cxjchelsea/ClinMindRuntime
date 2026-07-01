@@ -46,6 +46,7 @@ class InMemoryAuditLogStoreTest {
                         java.util.Optional.of("rt_001"),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10))
                 .hasSize(1);
     }

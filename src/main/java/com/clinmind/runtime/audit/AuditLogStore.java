@@ -16,6 +16,7 @@ public interface AuditLogStore {
             Optional<AuditActionType> actionType,
             Optional<AuditResourceType> resourceType,
             Optional<String> resourceId,
+            Optional<AuditResultStatus> resultStatus,
             Optional<Instant> from,
             Optional<Instant> to,
             int limit);

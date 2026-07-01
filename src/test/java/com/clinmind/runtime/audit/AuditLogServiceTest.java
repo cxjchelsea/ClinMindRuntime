@@ -74,6 +74,7 @@ class AuditLogServiceTest {
                         java.util.Optional.of("eval_run_001"),
                         java.util.Optional.empty(),
                         java.util.Optional.empty(),
+                        java.util.Optional.empty(),
                         10)))
                 .hasSize(1);
     }

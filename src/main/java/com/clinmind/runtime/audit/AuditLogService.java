@@ -63,6 +63,7 @@ public class AuditLogService {
                 query.actionType(),
                 query.resourceType(),
                 query.resourceId(),
+                query.resultStatus(),
                 query.from(),
                 query.to(),
                 query.limit());
