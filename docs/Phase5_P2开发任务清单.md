@@ -101,24 +101,24 @@ P2 必须保证：
 
 # 五、Phase5-P2-C：Runtime / Evaluation 页面
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] RuntimePage
-[ ] Runtime list / detail
-[ ] EvaluationPage
-[ ] Evaluation list / detail
-[ ] loading / error / empty state
+[x] RuntimePage
+[x] Runtime list / detail
+[x] EvaluationPage
+[x] Evaluation list / detail
+[x] loading / error / empty state
 ```
 
 测试：
 
 ```text
-[ ] RuntimePageTest
-[ ] EvaluationPageTest
-[ ] SensitiveFieldRenderGuard for runtime
+[x] RuntimePageTest
+[x] EvaluationPageTest
+[x] SensitiveFieldRenderGuard for runtime
 ```
 
 验收标准：
@@ -271,14 +271,14 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P2-C：Runtime / Evaluation 页面
+Phase5-P2-D：Candidate / Review Queue 页面
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase5-P2-C 状态从 [ ] 改为 [/]。
-2. 只实现 RuntimePage 与 EvaluationPage 列表/详情。
-3. 不直接实现 Candidate / Review / Audit 全部页面。
+1. 将 Phase5-P2-D 状态从 [ ] 改为 [/]。
+2. 只实现 CandidatePage、ReviewQueuePage 与 review 表单。
+3. 不直接实现 Audit Center 全部页面。
 4. 不实现正式登录、Docker Compose、RAG、模型训练或正式审核平台。
 ```

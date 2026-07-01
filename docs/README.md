@@ -17,14 +17,14 @@ Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
 Phase 4-P1：候选治理与安全加固已完成并冻结。
 Phase 5-P0：持久化与治理底座已完成并冻结。
 Phase 5-P1：最小 Console 与访问治理已完成并冻结。
-Phase 5-P2：最小前端 Console MVP — P2-B 已完成，当前进入 P2-C。
+Phase 5-P2：最小前端 Console MVP — P2-C 已完成，当前进入 P2-D。
 ```
 
 当前最优先任务：
 
 ```text
 1. 阅读 docs/Phase5_P2开发任务清单.md。
-2. 进入 Phase5-P2-C：Runtime / Evaluation 页面。
+2. 进入 Phase5-P2-D：Candidate / Review Queue 页面。
 3. 保持 Phase 1–5 后端 mvn test 回归通过。
 4. console-web 只调用 Safe Console API，不展示敏感字段。
 5. 继续禁止 RAG、Python Provider、模型训练、正式审核平台和 ApprovedExperience 自动生效。
@@ -167,7 +167,7 @@ Phase 5-P2：最小前端 Console MVP — P2-B 已完成，当前进入 P2-C。
 
 ```text
 1. 阅读 docs/Phase5_P2开发任务清单.md。
-2. 进入 Phase5-P2-C：Runtime / Evaluation 页面。
+2. 进入 Phase5-P2-D：Candidate / Review Queue 页面。
 3. 保持 Phase1/2/3/4/5 后端回归与 console-web 前端测试通过。
 ```
 
