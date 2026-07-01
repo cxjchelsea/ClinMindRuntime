@@ -1,16 +1,16 @@
 # AI Implementation Skill：ClinMindRuntime Phase 5-P1
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制、Phase 4-P1 候选治理与安全加固、Phase 5-P0 持久化与治理底座均已完成并冻结。  
-> 当前进入 Phase 5-P1：最小 Console 与访问治理设计。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、Candidate 脱敏、SourceRef 校验、Review 记录边界、持久化双模式、AuditLog 和患者端隔离。
+> 当前 Phase 1-P0 Runtime MVP、Phase 2-P0 共享能力资产原型、Phase 3-P0 训练与评估闭环 MVP、Phase 4-P0 候选沉淀机制、Phase 4-P1 候选治理与安全加固、Phase 5-P0 持久化与治理底座、Phase 5-P1 最小 Console 与访问治理均已完成并冻结。  
+> 后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、资产版本追踪、Evaluation 闭环、Candidate 脱敏、SourceRef 校验、Review 记录边界、持久化双模式、AuditLog、Console 访问治理和患者端隔离。
 
 ---
 
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P1 最小 Console 与访问治理 — P1-E 已完成
-下一步：Phase5-P1-F Postgres E2E 与人工验收
+当前阶段：Phase 5-P1 最小 Console 与访问治理 — 已冻结
+下一步：Phase 5-P2 规划待定
 ```
 
 当前已经完成的主线：
@@ -22,7 +22,7 @@ Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
-Phase 5-P1：最小 Console 与访问治理 — P1-E 已完成，准备进入 P1-F
+Phase 5-P1：最小 Console 与访问治理，已冻结
 ```
 
 Phase 5-P1 目标：
@@ -280,30 +280,20 @@ postgres 模式专项测试通过。
 
 # 八、当前最优下一步
 
-当前最优实现任务是：
+Phase 5-P1 已冻结。进入 Phase 5-P2 前：
 
 ```text
-Phase5-P1-F：Postgres E2E 与人工验收
+1. 新增 Phase 5-P2 详细设计与任务清单。
+2. 保持 Phase 1–5 in-memory 回归与 postgres 专项测试通过。
+3. 不在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
 ```
 
-只应实现：
+Phase 5-P2 候选主题（backlog，未启动）：
 
 ```text
-1. Phase5P1ConsolePostgresEndToEndIntegrationTest。
-2. ConsoleAuditTrailIntegrationTest / ConsoleSensitiveFieldRedactionIntegrationTest。
-3. docs/Phase5_P1人工测试API结果.md。
-4. README / docs 导航状态同步。
-5. 同步更新 docs/Phase5_P1开发任务清单.md。
-```
-
-不应在 P1-F 中实现：
-
-```text
-全部 Console Controller
-Candidate review AccessPolicy 接入
-Audit Center 增强
-前端页面
-RAG / 模型训练
+最小前端 Console 页面
+Docker Compose 本地编排
+正式 RBAC / 登录集成
 ```
 
 ---
@@ -313,6 +303,6 @@ RAG / 模型训练
 ```text
 当前不是在实现完整产品化平台。
 当前不是在实现模型训练平台。
-当前是在设计并准备实现 Phase 5-P1 最小 Console 与访问治理。
+Phase 5-P1 最小 Console 与访问治理已完成并冻结。
 Phase 5-P1 的目标是让已有治理对象可以被安全查询、权限控制和审计复盘，但不改变 AI 决策边界。
 ```

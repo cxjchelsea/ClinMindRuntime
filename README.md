@@ -2,7 +2,7 @@
 
 受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理、持久化治理底座与最小 Console 治理，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 5-P1 Design Ready**（Phase 1–4 已落地并冻结；Phase 5-P0 持久化与治理底座已实现并冻结；Phase 5-P1 最小 Console 与访问治理设计已完成）
+当前版本：**Phase 5-P1 已冻结**（Phase 1–4 已落地并冻结；Phase 5-P0 持久化与治理底座已冻结；Phase 5-P1 最小 Console 与访问治理已实现并冻结）
 
 ## 项目定位
 
@@ -28,9 +28,9 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 4-P0 | ExperienceCandidate / TrainingExampleCandidate 候选沉淀机制、Candidate debug API | 已冻结 |
 | Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
 | Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog、Persistence health / Audit API | 已冻结 |
-| Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 设计完成，准备实现 P1-A |
+| Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
 
-Phase 5-P1 设计见 [`docs/Phase5_P1最小Console与访问治理_实现规格.md`](docs/Phase5_P1最小Console与访问治理_实现规格.md)。Phase 5-P0 冻结记录见 [`docs/Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md)。
+Phase 5-P1 冻结记录见 [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)。Phase 5-P0 冻结记录见 [`docs/Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md)。
 
 ## 快速启动
 
@@ -102,14 +102,16 @@ Content-Type: application/json
 | [`docs/Phase5_P1_RBAC与AuditCenter设计.md`](docs/Phase5_P1_RBAC与AuditCenter设计.md) | RBAC-lite 与 Audit Center 设计 |
 | [`docs/Phase5_P1Console_API与测试设计.md`](docs/Phase5_P1Console_API与测试设计.md) | Console API 与测试设计 |
 | [`docs/Phase5_P1开发任务清单.md`](docs/Phase5_P1开发任务清单.md) | Phase 5-P1 实现顺序 |
+| [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md) | Phase 5-P1 冻结依据 |
+| [`docs/Phase5_P1人工测试API结果.md`](docs/Phase5_P1人工测试API结果.md) | Phase 5-P1 人工 / E2E 验收记录 |
 | [`docs/Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md) | Phase 5-P0 冻结依据 |
 | [`docs/AI_IMPLEMENTATION_SKILL.md`](docs/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor/Agent） |
 
 ## 下一阶段
 
-**Phase 5-P1-A**：ActorContext 与 RBAC-lite 基础。
+**Phase 5-P2 规划待定**（如最小前端 Console、Docker Compose、正式 RBAC 等）。
 
-只应实现 ActorContext、DebugRole、ConsoleActionType、ConsoleResourceType、ActorContextResolver、AccessPolicy / RolePolicy 与基础测试，不应直接跳到全部 Console API、前端页面、RAG、模型训练、正式 RBAC 或审核平台。
+Phase 5-P1 已完成 ActorContext、RBAC-lite、Safe DTO、Console 查询 API、Audit Center 与 postgres E2E；不应再向 P1 范围追加能力。
 
 ## License
 

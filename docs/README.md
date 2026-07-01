@@ -16,17 +16,17 @@ Phase 3-P0：训练与评估闭环 MVP 已完成并冻结。
 Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
 Phase 4-P1：候选治理与安全加固已完成并冻结。
 Phase 5-P0：持久化与治理底座已完成并冻结。
-Phase 5-P1：最小 Console 与访问治理详细设计已建立。
-当前阶段：Phase 5-P1 implementation ready，下一步是 Phase5-P1-A ActorContext 与 RBAC-lite 基础。
+Phase 5-P1：最小 Console 与访问治理已完成并冻结。
+当前阶段：Phase 5-P2 规划待定。
 ```
 
 当前最优先任务：
 
 ```text
-1. 读取 docs/Phase5_P1开发任务清单.md。
-2. 将 Phase5-P1-A 状态从 [ ] 改为 [/]。
-3. 只实现 ActorContext / DebugRole / AccessPolicy / RolePolicy 与基础测试。
-4. 不直接实现全部 Console API，不做前端页面。
+1. 阅读 docs/Phase5_P1冻结记录.md 了解 P1 边界。
+2. 新增 Phase 5-P2 详细设计与任务清单（如需要）。
+3. 保持 Phase 1–5 in-memory 回归与 postgres 专项测试通过。
+4. 不在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
 5. 继续禁止提前接入 RAG、Python Provider、模型训练、正式审核平台和 ApprovedExperience 自动生效。
 ```
 
@@ -85,17 +85,19 @@ Phase 5-P1：最小 Console 与访问治理详细设计已建立。
 | 文档 | 状态 | 用途 |
 |---|---|---|
 | `docs/README.md` | 活跃 | 文档导航入口 |
+| `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
 | `docs/项目展示导读.md` | 活跃 | 面向面试官 / 自我复盘的项目导读 |
 
-## 3.2 当前实现约束文档：Phase 5-P1
+## 3.2 已冻结 Phase 文档：Phase 5-P1
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
-| `docs/Phase5_P1开发任务清单.md` | 活跃 | Phase5-P1-A 到 P1-F 实现顺序与验收标准 |
-| `docs/Phase5_P1最小Console与访问治理_实现规格.md` | 当前基线 | Phase5-P1 总体实现规格 |
-| `docs/Phase5_P1_RBAC与AuditCenter设计.md` | 当前基线 | ActorContext、RBAC-lite、Audit Center 设计 |
-| `docs/Phase5_P1Console_API与测试设计.md` | 当前基线 | Console API、安全 DTO、测试和人工验收依据 |
+| `docs/Phase5_P1冻结记录.md` | 已冻结 | Phase5-P1 冻结依据、边界与 P2 检查项 |
+| `docs/Phase5_P1人工测试API结果.md` | 验收归档 | Phase5-P1 人工 / E2E 验收记录 |
+| `docs/Phase5_P1开发任务清单.md` | 归档 | Phase5-P1-A 到 P1-F 实现顺序（已完成） |
+| `docs/Phase5_P1最小Console与访问治理_实现规格.md` | 冻结基线 | Phase5-P1 总体实现规格 |
+| `docs/Phase5_P1_RBAC与AuditCenter设计.md` | 冻结基线 | ActorContext、RBAC-lite、Audit Center 设计 |
+| `docs/Phase5_P1Console_API与测试设计.md` | 冻结基线 | Console API、安全 DTO、测试和人工验收依据 |
 
 ## 3.3 已冻结 Phase 文档：Phase 5-P0
 
@@ -138,8 +140,8 @@ Phase 5-P1：最小 Console 与访问治理详细设计已建立。
 # 四、当前不应做什么
 
 ```text
-1. 不应向 Phase 4-P0 / Phase 4-P1 / Phase 5-P0 继续堆新能力（均已冻结）。
-2. 不应跳过 Phase5-P1-A 直接实现全部 Console API。
+1. 不应向 Phase 4-P0 / Phase 4-P1 / Phase 5-P0 / Phase 5-P1 继续堆新能力（均已冻结）。
+2. 不应在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
 3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
 4. 不应提前做完整前端 Console。
 5. 不应提前实现模型训练 / 后训练。
@@ -154,10 +156,9 @@ Phase 5-P1：最小 Console 与访问治理详细设计已建立。
 # 五、当前建议做什么
 
 ```text
-1. 以 docs/Phase5_P1开发任务清单.md 作为当前实现顺序依据。
-2. 先进入 Phase5-P1-A：ActorContext 与 RBAC-lite 基础。
-3. 只实现 ActorContext / DebugRole / AccessPolicy / RolePolicy 与基础测试。
-4. 保持 Phase1/2/3/4/5-P0 回归测试通过（含 postgres 专项）。
+1. 阅读 docs/Phase5_P1冻结记录.md 了解 P1 边界。
+2. 新增 Phase 5-P2 详细设计与任务清单（如需要）。
+3. 保持 Phase1/2/3/4/5 in-memory 回归与 postgres 专项测试通过。
 ```
 
 ---
@@ -176,4 +177,4 @@ Phase 5-P1：最小 Console 与访问治理详细设计已建立。
 
 # 七、最终结论
 
-当前文档体系已支撑 Phase5-P1 实现。Phase3-P0、Phase4-P0、Phase4-P1、Phase5-P0 均已冻结，Phase5-P1 详细设计已建立，下一步应进入 Phase5-P1-A：ActorContext 与 RBAC-lite 基础。
+当前文档体系已支撑 Phase 1–5-P1 全链路。Phase3-P0、Phase4-P0、Phase4-P1、Phase5-P0、Phase5-P1 均已冻结，下一步进入 Phase 5-P2 规划。

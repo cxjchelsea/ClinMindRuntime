@@ -214,24 +214,25 @@ P1 必须保证：
 
 # 八、Phase5-P1-F：Postgres E2E 与人工验收
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] Phase5P1ConsolePostgresEndToEndIntegrationTest
-[ ] ConsoleAuditTrailIntegrationTest
-[ ] ConsoleSensitiveFieldRedactionIntegrationTest
-[ ] docs/Phase5_P1人工测试API结果.md
-[ ] README / docs 导航状态同步
+[x] Phase5P1ConsolePostgresEndToEndIntegrationTest
+[x] ConsoleAuditTrailIntegrationTest
+[x] ConsoleSensitiveFieldRedactionIntegrationTest
+[x] docs/Phase5_P1人工测试API结果.md
+[x] docs/Phase5_P1冻结记录.md
+[x] README / docs 导航状态同步
 ```
 
 测试：
 
 ```text
-[ ] in-memory 全量回归
-[ ] postgres 专项回归
-[ ] Phase5P1ConsolePostgresEndToEndIntegrationTest
+[x] in-memory 全量回归（405 项）
+[x] postgres 专项回归（23 项，RUN_POSTGRES_TESTS=true + Docker）
+[x] Phase5P1ConsolePostgresEndToEndIntegrationTest
 ```
 
 验收标准：
@@ -282,17 +283,17 @@ Phase5-P1 完成需要满足：
 
 # 十一、当前下一步
 
-当前下一步：
+Phase 5-P1 已全部完成并冻结。
 
 ```text
-Phase5-P1-B：Safe Console DTO Mapper
+docs/Phase5_P1冻结记录.md
+docs/Phase5_P1人工测试API结果.md
 ```
 
-开始实现前必须：
+进入 Phase 5-P2 前：
 
 ```text
-1. 将 Phase5-P1-B 状态从 [ ] 改为 [/]。
-2. 只实现 SafeConsoleDtoMapper 与安全 DTO。
-3. 不直接实现 Console Controller。
-4. 不实现前端页面、RAG、模型训练、正式 RBAC 或审核平台。
+1. 新增 Phase 5-P2 详细设计与任务清单。
+2. 保持 Phase 1–5 回归与 postgres 专项测试通过。
+3. 不在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
 ```
