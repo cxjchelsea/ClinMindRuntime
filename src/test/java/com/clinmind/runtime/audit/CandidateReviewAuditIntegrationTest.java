@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.clinmind.runtime.console.access.ActorContextResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ class CandidateReviewAuditIntegrationTest {
         mockMvc.perform(post(
                         "/api/v1/debug/candidates/training-example-candidates/" + trainingCandidateId + "/review")
                         .header("X-Debug-Actor", "reviewer-b")
+                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

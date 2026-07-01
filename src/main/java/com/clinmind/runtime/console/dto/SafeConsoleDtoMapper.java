@@ -1,6 +1,7 @@
 package com.clinmind.runtime.console.dto;
 
 import com.clinmind.runtime.audit.AuditLogRecord;
+import com.clinmind.runtime.candidate.CandidateGenerationResult;
 import com.clinmind.runtime.candidate.CandidateSourceRef;
 import com.clinmind.runtime.candidate.ExperienceCandidate;
 import com.clinmind.runtime.candidate.TrainingExampleCandidate;
@@ -163,6 +164,17 @@ public class SafeConsoleDtoMapper {
                 record.resultStatus().name(),
                 record.createdAt(),
                 SensitiveFieldPolicy.sanitizeMetadata(record.metadata()));
+    }
+
+    public CandidateGenerationConsoleSummaryDto toGenerationSummary(CandidateGenerationResult result) {
+        return new CandidateGenerationConsoleSummaryDto(
+                result.generationId(),
+                result.sourceEvaluationRunId(),
+                result.experienceCandidates().size(),
+                result.trainingExampleCandidates().size(),
+                result.skippedItems().size(),
+                result.startedAt(),
+                result.completedAt());
     }
 
     private EvaluationItemConsoleSummaryDto toEvaluationItemSummary(EvaluationItemResult item) {

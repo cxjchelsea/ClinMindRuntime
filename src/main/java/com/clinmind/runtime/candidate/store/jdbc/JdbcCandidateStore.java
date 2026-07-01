@@ -1,8 +1,11 @@
 package com.clinmind.runtime.candidate.store.jdbc;
 
 import com.clinmind.runtime.candidate.CandidateGenerationResult;
+import com.clinmind.runtime.candidate.CandidateReviewStatus;
+import com.clinmind.runtime.candidate.CandidateRiskLevel;
 import com.clinmind.runtime.candidate.ExperienceCandidate;
 import com.clinmind.runtime.candidate.TrainingExampleCandidate;
+import com.clinmind.runtime.candidate.TrainingTaskType;
 import com.clinmind.runtime.candidate.store.CandidateNotFoundException;
 import com.clinmind.runtime.candidate.store.CandidateStore;
 import com.clinmind.runtime.persistence.CandidateSnapshotMapper;
@@ -83,6 +86,22 @@ public class JdbcCandidateStore implements CandidateStore {
     }
 
     @Override
+    public List<CandidateGenerationResult> listGenerationResults(String sourceEvaluationRunId, int limit) {
+        List<String> generationIds = jdbcTemplate.query(
+                """
+                select generation_id from candidate_generations
+                where (? is null or source_evaluation_run_id = ?)
+                order by coalesce(completed_at, started_at) desc, generation_id desc
+                limit ?
+                """,
+                (rs, rowNum) -> rs.getString("generation_id"),
+                blankToNull(sourceEvaluationRunId),
+                blankToNull(sourceEvaluationRunId),
+                limit);
+        return generationIds.stream().map(this::getGenerationResult).toList();
+    }
+
+    @Override
     public List<ExperienceCandidate> listExperienceCandidates(String generationId) {
         getGenerationResult(generationId);
         return jdbcTemplate.query(
@@ -93,6 +112,49 @@ public class JdbcCandidateStore implements CandidateStore {
                 (rs, rowNum) -> candidateSnapshotMapper.experienceFromJson(
                         jsonSnapshotMapper.readJsonb(rs.getObject("candidate_snapshot"))),
                 generationId);
+    }
+
+    @Override
+    public List<ExperienceCandidate> listExperienceCandidates(
+            CandidateReviewStatus reviewStatus, CandidateRiskLevel riskLevel, int limit) {
+        return jdbcTemplate.query(
+                """
+                select candidate_snapshot from experience_candidates
+                where (? is null or review_status = ?)
+                  and (? is null or risk_level = ?)
+                order by created_at desc, candidate_id desc
+                limit ?
+                """,
+                (rs, rowNum) -> candidateSnapshotMapper.experienceFromJson(
+                        jsonSnapshotMapper.readJsonb(rs.getObject("candidate_snapshot"))),
+                reviewStatus == null ? null : reviewStatus.name(),
+                reviewStatus == null ? null : reviewStatus.name(),
+                riskLevel == null ? null : riskLevel.name(),
+                riskLevel == null ? null : riskLevel.name(),
+                limit);
+    }
+
+    @Override
+    public List<TrainingExampleCandidate> listTrainingExampleCandidates(
+            CandidateReviewStatus reviewStatus, CandidateRiskLevel riskLevel, TrainingTaskType taskType, int limit) {
+        return jdbcTemplate.query(
+                """
+                select candidate_snapshot from training_example_candidates
+                where (? is null or review_status = ?)
+                  and (? is null or risk_level = ?)
+                  and (? is null or task_type = ?)
+                order by created_at desc, candidate_id desc
+                limit ?
+                """,
+                (rs, rowNum) -> candidateSnapshotMapper.trainingFromJson(
+                        jsonSnapshotMapper.readJsonb(rs.getObject("candidate_snapshot"))),
+                reviewStatus == null ? null : reviewStatus.name(),
+                reviewStatus == null ? null : reviewStatus.name(),
+                riskLevel == null ? null : riskLevel.name(),
+                riskLevel == null ? null : riskLevel.name(),
+                taskType == null ? null : taskType.name(),
+                taskType == null ? null : taskType.name(),
+                limit);
     }
 
     @Override
@@ -304,5 +366,9 @@ public class JdbcCandidateStore implements CandidateStore {
 
     private static Timestamp toTimestamp(java.time.Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 }

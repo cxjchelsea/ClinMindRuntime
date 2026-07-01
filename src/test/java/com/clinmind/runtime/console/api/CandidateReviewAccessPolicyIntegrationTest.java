@@ -1,25 +1,29 @@
-package com.clinmind.runtime.api;
+package com.clinmind.runtime.console.api;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.clinmind.runtime.console.access.ActorContextResolver;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CandidateReviewControllerTest {
+@TestPropertySource(
+        properties = {
+            "clinmind.debug-api.require-debug-token=true",
+            "clinmind.debug-api.debug-token=test-secret"
+        })
+class CandidateReviewAccessPolicyIntegrationTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -27,75 +31,58 @@ class CandidateReviewControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void reviewsExperienceCandidateViaApi() throws Exception {
-        String candidateId = generateAndGetExperienceCandidateId();
+    void observerCannotReviewCandidate() throws Exception {
+        String candidateId = generateExperienceCandidateId();
 
-        MvcResult reviewResult = mockMvc.perform(post(
-                        "/api/v1/debug/candidates/experience-candidates/" + candidateId + "/review")
-                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER")
+        mockMvc.perform(post("/api/v1/debug/candidates/experience-candidates/" + candidateId + "/review")
+                        .header("X-Debug-Token", "test-secret")
+                        .header(ActorContextResolver.DEBUG_ACTOR_HEADER, "observer-a")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "decision": "APPROVE",
-                                  "reason": "Valid synthetic safety lesson",
-                                  "reviewer": "debug-reviewer"
+                                  "reason": "Should be denied",
+                                  "reviewer": "observer-a"
                                 }
                                 """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.review_id").value(containsString("cand_rev_")))
-                .andExpect(jsonPath("$.data.to_status").value("APPROVED"))
-                .andReturn();
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("ACCESS_DENIED"));
 
-        String reviewId = OBJECT_MAPPER.readTree(reviewResult.getResponse().getContentAsString())
-                .path("data")
-                .path("review_id")
-                .asText();
-
-        mockMvc.perform(get("/api/v1/debug/candidates/reviews/" + reviewId))
+        mockMvc.perform(get("/api/v1/debug/candidates/experience-candidates/" + candidateId)
+                        .header("X-Debug-Token", "test-secret"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.candidate_id").value(candidateId));
-
-        mockMvc.perform(get("/api/v1/debug/candidates/" + candidateId + "/reviews"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].decision").value("APPROVE"));
-
-        mockMvc.perform(get("/api/v1/debug/candidates/experience-candidates/" + candidateId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.review_status").value("APPROVED"));
+                .andExpect(jsonPath("$.data.review_status").value("REVIEW_REQUIRED"));
     }
 
     @Test
-    void invalidReviewTransitionReturnsError() throws Exception {
-        String candidateId = generateAndGetExperienceCandidateId();
+    void candidateReviewerCanApproveWithoutAutoActivationSideEffects() throws Exception {
+        String candidateId = generateExperienceCandidateId();
 
         mockMvc.perform(post("/api/v1/debug/candidates/experience-candidates/" + candidateId + "/review")
-                        .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "decision": "REJECT",
-                                  "reason": "Reject first",
-                                  "reviewer": "debug-reviewer"
-                                }
-                                """))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(post("/api/v1/debug/candidates/experience-candidates/" + candidateId + "/review")
+                        .header("X-Debug-Token", "test-secret")
                         .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CANDIDATE_REVIEWER")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "decision": "APPROVE",
-                                  "reason": "Try again",
-                                  "reviewer": "debug-reviewer"
+                                  "reason": "Approved for governance only",
+                                  "reviewer": "candidate-reviewer-a"
                                 }
                                 """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error.code").value("CANDIDATE_NOT_REVIEWABLE"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.to_status").value("APPROVED"));
+
+        mockMvc.perform(get("/api/v1/debug/candidates/experience-candidates/" + candidateId)
+                        .header("X-Debug-Token", "test-secret"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.review_status").value("APPROVED"))
+                .andExpect(jsonPath("$.data.approved_experience_id").doesNotExist())
+                .andExpect(jsonPath("$.data.training_dataset_version").doesNotExist());
     }
 
-    private String generateAndGetExperienceCandidateId() throws Exception {
+    private String generateExperienceCandidateId() throws Exception {
         MvcResult evalResult = mockMvc.perform(post("/api/v1/debug/evaluations/runs")
+                        .header("X-Debug-Token", "test-secret")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -109,7 +96,6 @@ class CandidateReviewControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String runId = OBJECT_MAPPER.readTree(evalResult.getResponse().getContentAsString())
                 .path("data")
                 .path("run_id")
@@ -117,22 +103,25 @@ class CandidateReviewControllerTest {
 
         MvcResult genResult = mockMvc.perform(post(
                         "/api/v1/debug/candidates/generations/from-evaluation/" + runId)
+                        .header("X-Debug-Token", "test-secret")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String generationId = OBJECT_MAPPER.readTree(genResult.getResponse().getContentAsString())
                 .path("data")
                 .path("generation_id")
                 .asText();
 
         MvcResult listResult = mockMvc.perform(get(
-                        "/api/v1/debug/candidates/generations/" + generationId + "/experience-candidates"))
+                        "/api/v1/debug/candidates/generations/" + generationId + "/experience-candidates")
+                        .header("X-Debug-Token", "test-secret"))
                 .andExpect(status().isOk())
                 .andReturn();
-
-        JsonNode candidates = OBJECT_MAPPER.readTree(listResult.getResponse().getContentAsString()).path("data");
-        return candidates.path(0).path("candidate_id").asText();
+        return OBJECT_MAPPER.readTree(listResult.getResponse().getContentAsString())
+                .path("data")
+                .path(0)
+                .path("candidate_id")
+                .asText();
     }
 }

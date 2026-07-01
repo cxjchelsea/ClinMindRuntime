@@ -144,26 +144,26 @@ P1 必须保证：
 
 # 六、Phase5-P1-D：Console Candidate / Review Queue API
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] ConsoleCandidateController
-[ ] GET /api/v1/debug/console/candidate-generations
-[ ] GET /api/v1/debug/console/candidates
-[ ] GET /api/v1/debug/console/candidates/{candidate_id}
-[ ] GET /api/v1/debug/console/review-queue
-[ ] existing review API 接入 AccessPolicy
-[ ] 查询 / review 行为写 AuditLog
+[x] ConsoleCandidateController
+[x] GET /api/v1/debug/console/candidate-generations
+[x] GET /api/v1/debug/console/candidates
+[x] GET /api/v1/debug/console/candidates/{candidate_id}
+[x] GET /api/v1/debug/console/review-queue
+[x] existing review API 接入 AccessPolicy
+[x] 查询 / review 行为写 AuditLog
 ```
 
 测试：
 
 ```text
-[ ] ConsoleCandidateControllerTest
-[ ] ConsoleReviewQueueTest
-[ ] CandidateReviewAccessPolicyIntegrationTest
+[x] ConsoleCandidateControllerTest
+[x] ConsoleReviewQueueTest
+[x] CandidateReviewAccessPolicyIntegrationTest
 ```
 
 验收标准：

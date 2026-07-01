@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P1 最小 Console 与访问治理 — P1-C 已完成
-下一步：Phase5-P1-D Console Candidate / Review Queue API
+当前阶段：Phase 5-P1 最小 Console 与访问治理 — P1-D 已完成
+下一步：Phase5-P1-E Audit Center 查询增强
 ```
 
 当前已经完成的主线：

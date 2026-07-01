@@ -1,9 +1,13 @@
 package com.clinmind.runtime.candidate.store;
 
 import com.clinmind.runtime.candidate.CandidateGenerationResult;
+import com.clinmind.runtime.candidate.CandidateReviewStatus;
+import com.clinmind.runtime.candidate.CandidateRiskLevel;
 import com.clinmind.runtime.candidate.ExperienceCandidate;
 import com.clinmind.runtime.candidate.TrainingExampleCandidate;
+import com.clinmind.runtime.candidate.TrainingTaskType;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +40,20 @@ public class InMemoryCandidateStore implements CandidateStore {
     }
 
     @Override
+    public List<CandidateGenerationResult> listGenerationResults(String sourceEvaluationRunId, int limit) {
+        return generationResults.values().stream()
+                .filter(result -> sourceEvaluationRunId == null
+                        || sourceEvaluationRunId.isBlank()
+                        || sourceEvaluationRunId.equals(result.sourceEvaluationRunId()))
+                .sorted(Comparator.comparing(
+                                CandidateGenerationResult::completedAt,
+                                Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(CandidateGenerationResult::generationId, Comparator.reverseOrder()))
+                .limit(limit)
+                .toList();
+    }
+
+    @Override
     public List<ExperienceCandidate> listExperienceCandidates(String generationId) {
         return getGenerationResult(generationId).experienceCandidates();
     }
@@ -43,6 +61,34 @@ public class InMemoryCandidateStore implements CandidateStore {
     @Override
     public List<TrainingExampleCandidate> listTrainingExampleCandidates(String generationId) {
         return getGenerationResult(generationId).trainingExampleCandidates();
+    }
+
+    @Override
+    public List<ExperienceCandidate> listExperienceCandidates(
+            CandidateReviewStatus reviewStatus, CandidateRiskLevel riskLevel, int limit) {
+        return experienceCandidates.values().stream()
+                .filter(candidate -> reviewStatus == null || reviewStatus == candidate.reviewStatus())
+                .filter(candidate -> riskLevel == null || riskLevel == candidate.riskLevel())
+                .sorted(Comparator.comparing(
+                                ExperienceCandidate::createdAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(ExperienceCandidate::candidateId, Comparator.reverseOrder()))
+                .limit(limit)
+                .toList();
+    }
+
+    @Override
+    public List<TrainingExampleCandidate> listTrainingExampleCandidates(
+            CandidateReviewStatus reviewStatus, CandidateRiskLevel riskLevel, TrainingTaskType taskType, int limit) {
+        return trainingExampleCandidates.values().stream()
+                .filter(candidate -> reviewStatus == null || reviewStatus == candidate.reviewStatus())
+                .filter(candidate -> riskLevel == null || riskLevel == candidate.riskLevel())
+                .filter(candidate -> taskType == null || taskType == candidate.taskType())
+                .sorted(Comparator.comparing(
+                                TrainingExampleCandidate::createdAt,
+                                Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(TrainingExampleCandidate::candidateId, Comparator.reverseOrder()))
+                .limit(limit)
+                .toList();
     }
 
     @Override
