@@ -12,7 +12,7 @@
 冻结状态：已冻结
 当前项目阶段：Phase 5-P1 freeze complete / Phase 5-P2 planning pending
 冻结日期：2026-07-01
-代码基线：commit abc74e2
+代码基线：commit 84c2122
 ```
 
 Phase 5-P1 已完成的主线：

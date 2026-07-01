@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |------|------|
 | 验收日期 | 2026-07-01 |
-| 代码基线 | commit `abc74e2` |
+| 代码基线 | commit `84c2122` |
 | 验收结论 | **通过** — in-memory 405 项全绿；postgres 专项 23 项（含 `Phase5P1ConsolePostgresEndToEndIntegrationTest`，需 Docker + `RUN_POSTGRES_TESTS=true`） |
 | 启动方式（in-memory） | `mvn -DskipTests package` → `java -jar target/clinmind-runtime-0.1.0-SNAPSHOT.jar` |
 | 启动方式（postgres） | `java -jar ... --spring.profiles.active=postgres`（需本地 PostgreSQL） |
