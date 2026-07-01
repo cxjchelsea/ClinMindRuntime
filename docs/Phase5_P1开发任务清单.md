@@ -37,27 +37,28 @@ P1 必须保证：
 
 # 三、Phase5-P1-A：ActorContext 与 RBAC-lite 基础
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] ActorContext
-[ ] DebugRole
-[ ] ConsoleActionType
-[ ] ConsoleResourceType
-[ ] ActorContextResolver
-[ ] RolePolicy / AccessPolicy
-[ ] AccessDeniedException
-[ ] ApiExceptionHandler 错误码映射
+[x] ActorContext
+[x] DebugRole
+[x] ConsoleActionType
+[x] ConsoleResourceType
+[x] ActorContextResolver
+[x] RolePolicy / AccessPolicy
+[x] AccessDeniedException
+[x] ApiExceptionHandler 错误码映射
+[x] ActorContextFilter
 ```
 
 测试：
 
 ```text
-[ ] ActorContextResolverTest
-[ ] AccessPolicyTest
-[ ] ConsoleAccessDeniedTest
+[x] ActorContextResolverTest
+[x] AccessPolicyTest
+[x] ConsoleAccessDeniedTest
 ```
 
 验收标准：
@@ -284,14 +285,14 @@ Phase5-P1 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P1-A：ActorContext 与 RBAC-lite 基础
+Phase5-P1-B：Safe Console DTO Mapper
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase5-P1-A 状态从 [ ] 改为 [/]。
-2. 只实现 ActorContext / DebugRole / AccessPolicy 及基础测试。
-3. 不直接实现所有 Console API。
+1. 将 Phase5-P1-B 状态从 [ ] 改为 [/]。
+2. 只实现 SafeConsoleDtoMapper 与安全 DTO。
+3. 不直接实现 Console Controller。
 4. 不实现前端页面、RAG、模型训练、正式 RBAC 或审核平台。
 ```

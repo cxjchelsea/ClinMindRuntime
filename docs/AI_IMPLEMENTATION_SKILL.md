@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P1 最小 Console 与访问治理 — 设计已建立
-下一步：Phase5-P1-A ActorContext 与 RBAC-lite 基础
+当前阶段：Phase 5-P1 最小 Console 与访问治理 — P1-A 已完成
+下一步：Phase5-P1-B Safe Console DTO Mapper
 ```
 
 当前已经完成的主线：
@@ -22,7 +22,7 @@ Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
-Phase 5-P1：最小 Console 与访问治理设计，准备进入 P1-A
+Phase 5-P1：最小 Console 与访问治理 — P1-A 已完成，准备进入 P1-B
 ```
 
 Phase 5-P1 目标：
@@ -283,30 +283,27 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P1-A：ActorContext 与 RBAC-lite 基础
+Phase5-P1-B：Safe Console DTO Mapper
 ```
 
 只应实现：
 
 ```text
-1. ActorContext / DebugRole / ConsoleActionType / ConsoleResourceType。
-2. ActorContextResolver。
-3. AccessPolicy / RolePolicy。
-4. AccessDeniedException 和错误码映射。
-5. 基础单元测试。
-6. 同步更新 docs/Phase5_P1开发任务清单.md。
+1. SafeConsoleDtoMapper。
+2. Runtime / Evaluation / Candidate / Review / Audit console DTO。
+3. 敏感字段 denylist / allowlist。
+4. SafeConsoleDtoMapperTest / ConsoleSensitiveFieldRedactionTest。
+5. 同步更新 docs/Phase5_P1开发任务清单.md。
 ```
 
-不应在 P1-A 中实现：
+不应在 P1-B 中实现：
 
 ```text
-全部 Console API
+全部 Console Controller
+Candidate review AccessPolicy 接入
+Audit Center 增强
 前端页面
-RAG
-模型训练
-正式 RBAC / 登录
-正式审核平台
-ApprovedExperience 自动生效
+RAG / 模型训练
 ```
 
 ---

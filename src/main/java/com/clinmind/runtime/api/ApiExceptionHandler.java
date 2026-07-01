@@ -5,6 +5,9 @@ import com.clinmind.runtime.candidate.review.CandidateReviewException;
 import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidationException;
 import com.clinmind.runtime.candidate.store.CandidateNotFoundException;
 import com.clinmind.runtime.candidate.store.CandidateResourceType;
+import com.clinmind.runtime.console.access.AccessDeniedException;
+import com.clinmind.runtime.console.access.ActorContextRequiredException;
+import com.clinmind.runtime.console.access.InvalidDebugRoleException;
 import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -63,6 +66,24 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleApiException(ApiException ex) {
         return ResponseEntity.status(ex.getStatus())
                 .body(ApiResponse.fail(new ApiError(ex.getCode(), ex.getMessage())));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.fail(new ApiError("ACCESS_DENIED", ex.getMessage())));
+    }
+
+    @ExceptionHandler(InvalidDebugRoleException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidDebugRole(InvalidDebugRoleException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.fail(new ApiError("INVALID_DEBUG_ROLE", ex.getMessage())));
+    }
+
+    @ExceptionHandler(ActorContextRequiredException.class)
+    public ResponseEntity<ApiResponse<Void>> handleActorContextRequired(ActorContextRequiredException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.fail(new ApiError("ACTOR_CONTEXT_REQUIRED", ex.getMessage())));
     }
 
     private static String resolveCandidateNotFoundCode(CandidateNotFoundException ex) {
