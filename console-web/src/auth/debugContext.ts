@@ -1,2 +1,3 @@
-/** Debug context state — implemented in Phase 5-P2-B. */
-export {};
+export * from './debugContextTypes';
+export { DebugContextProvider, useDebugContext } from './DebugContextProvider';
+export { DebugContextPanel } from './DebugContextPanel';

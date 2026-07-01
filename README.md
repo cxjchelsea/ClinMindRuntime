@@ -2,7 +2,7 @@
 
 受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理、持久化治理底座与最小 Console 治理，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 5-P2 进行中（P2-A 已完成）**（Phase 1–5-P1 已落地/冻结；最小前端 Console MVP 实现中）
+当前版本：**Phase 5-P2 进行中（P2-B 已完成）**（Phase 1–5-P1 已落地/冻结；最小前端 Console MVP 实现中）
 
 ## 项目定位
 
@@ -29,7 +29,7 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
 | Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog、Persistence health / Audit API | 已冻结 |
 | Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
-| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | P2-A 已完成，P2-B 进行中 |
+| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | P2-B 已完成，P2-C 进行中 |
 
 Phase 5-P1 冻结记录见 [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)。Phase 5-P2 规格见 [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md)。
 
@@ -53,7 +53,7 @@ npm install
 npm run dev
 ```
 
-开发服务器默认 `http://localhost:5173`，`/api` 代理至后端 `8080`。需先启动 Java 后端（P2-B 起对接 Console API）。
+开发服务器默认 `http://localhost:5173`，侧边栏 **Debug Context** 可配置 Token / Actor / Roles 并测试连接；`/api` 代理至后端 `8080`。
 
 ## 运行一次 Runtime（患者端）
 
@@ -120,7 +120,7 @@ Content-Type: application/json
 
 ## 下一阶段
 
-**Phase 5-P2-B**：Console API Client 与 Debug Context（`console-web/`）。
+**Phase 5-P2-C**：Runtime / Evaluation 页面（`console-web/`）。
 
 P2-A 已完成 Vite + React 基础布局；不应跳过 P2-B 直接实现全部页面，也不应实现正式登录、Docker Compose、RAG 或模型训练。
 

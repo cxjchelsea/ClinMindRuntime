@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P2 最小前端 Console MVP — P2-A 已完成
-下一步：Phase5-P2-B Console API Client 与 Debug Context
+当前阶段：Phase 5-P2 最小前端 Console MVP — P2-B 已完成
+下一步：Phase5-P2-C Runtime / Evaluation 页面
 ```
 
 当前已经完成的主线：
@@ -23,7 +23,7 @@ Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
 Phase 5-P1：最小 Console 与访问治理，已冻结
-Phase 5-P2：最小前端 Console MVP — P2-A 已完成
+Phase 5-P2：最小前端 Console MVP — P2-B 已完成
 ```
 
 Phase 5-P2 目标：
@@ -263,22 +263,21 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P2-B：Console API Client 与 Debug Context
+Phase5-P2-C：Runtime / Evaluation 页面
 ```
 
 只应实现：
 
 ```text
-1. console-web/src/api/consoleClient.ts 与 types.ts。
-2. DebugContextPanel / debugContext 状态。
-3. 请求统一 header 注入与错误码映射。
-4. 同步更新 docs/Phase5_P2开发任务清单.md。
+1. RuntimePage / EvaluationPage 列表与详情。
+2. loading / error / empty 状态组件。
+3. 同步更新 docs/Phase5_P2开发任务清单.md。
 ```
 
-不应在 P2-B 中实现：
+不应在 P2-C 中实现：
 
 ```text
-全部数据页面（Runtime / Evaluation / Candidate / Review / Audit）
+Candidate / Review Queue / Audit Center 全部页面
 正式登录系统
 Docker Compose
 RAG / 模型训练

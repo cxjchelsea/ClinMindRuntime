@@ -1,8 +1,18 @@
 import { Outlet } from 'react-router-dom';
+import { DebugContextPanel } from '../auth/DebugContextPanel';
+import { useDebugContext } from '../auth/DebugContextProvider';
+import { rolesLabel } from '../auth/debugContextTypes';
+import { ErrorBanner } from '../components/ErrorBanner';
 import './AppShell.css';
 import { Sidebar } from './Sidebar';
 
+function apiStatusLabel(apiBaseUrl: string): string {
+  return apiBaseUrl.trim() ? apiBaseUrl : '/api → localhost:8080 (proxy)';
+}
+
 export function AppShell() {
+  const { context } = useDebugContext();
+
   return (
     <div className="app-shell">
       <header className="app-shell__header">
@@ -13,22 +23,24 @@ export function AppShell() {
         <div className="app-shell__status">
           <span className="app-shell__status-item">
             <span className="app-shell__status-label">API</span>
-            <span>/api → localhost:8080</span>
+            <span>{apiStatusLabel(context.apiBaseUrl)}</span>
           </span>
           <span className="app-shell__status-item">
             <span className="app-shell__status-label">Actor</span>
-            <span>—</span>
+            <span>{context.actor || '—'}</span>
           </span>
           <span className="app-shell__status-item">
             <span className="app-shell__status-label">Roles</span>
-            <span>—</span>
+            <span>{rolesLabel(context.roles)}</span>
           </span>
         </div>
       </header>
       <aside className="app-shell__sidebar">
         <Sidebar />
+        <DebugContextPanel />
       </aside>
       <main className="app-shell__main">
+        <ErrorBanner />
         <Outlet />
       </main>
     </div>

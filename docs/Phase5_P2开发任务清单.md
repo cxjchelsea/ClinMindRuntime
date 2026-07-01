@@ -68,25 +68,25 @@ P2 必须保证：
 
 # 四、Phase5-P2-B：Console API Client 与 Debug Context
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] consoleClient.ts
-[ ] ApiResponse / Console DTO types
-[ ] DebugContextPanel
-[ ] apiBaseUrl / token / actor / roles 状态
-[ ] 请求统一 header 注入
-[ ] 错误码统一映射
+[x] consoleClient.ts
+[x] ApiResponse / Console DTO types
+[x] DebugContextPanel
+[x] apiBaseUrl / token / actor / roles 状态
+[x] 请求统一 header 注入
+[x] 错误码统一映射
 ```
 
 测试：
 
 ```text
-[ ] consoleClient header test
-[ ] error mapping test
-[ ] DebugContextPanelTest
+[x] consoleClient header test
+[x] error mapping test
+[x] DebugContextPanelTest
 ```
 
 验收标准：
@@ -271,14 +271,14 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P2-B：Console API Client 与 Debug Context
+Phase5-P2-C：Runtime / Evaluation 页面
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase5-P2-B 状态从 [ ] 改为 [/]。
-2. 只实现 consoleClient、DebugContextPanel 与请求 header 注入。
-3. 不直接实现全部数据页面。
+1. 将 Phase5-P2-C 状态从 [ ] 改为 [/]。
+2. 只实现 RuntimePage 与 EvaluationPage 列表/详情。
+3. 不直接实现 Candidate / Review / Audit 全部页面。
 4. 不实现正式登录、Docker Compose、RAG、模型训练或正式审核平台。
 ```

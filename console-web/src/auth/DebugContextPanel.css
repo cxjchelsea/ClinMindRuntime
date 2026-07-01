@@ -1,0 +1,91 @@
+.debug-panel {
+  margin: 1rem 0.75rem 0;
+  padding: 0.875rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.debug-panel__title {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.debug-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.625rem;
+  font-size: 0.8125rem;
+  color: #cbd5e1;
+}
+
+.debug-panel__field input {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.8125rem;
+}
+
+.debug-panel__hint {
+  color: #64748b;
+  font-size: 0.6875rem;
+}
+
+.debug-panel__roles {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0 0;
+  border: none;
+}
+
+.debug-panel__roles legend {
+  padding: 0;
+  margin-bottom: 0.375rem;
+  font-size: 0.8125rem;
+  color: #cbd5e1;
+}
+
+.debug-panel__role {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.debug-panel__test-btn {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background: #1e4976;
+  color: #fff;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.debug-panel__test-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.debug-panel__status {
+  margin: 0.625rem 0 0;
+  font-size: 0.75rem;
+}
+
+.debug-panel__status--ok {
+  color: #86efac;
+}
+
+.debug-panel__status--error {
+  color: #fca5a5;
+}
