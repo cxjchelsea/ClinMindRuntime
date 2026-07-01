@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P1 最小 Console 与访问治理 — P1-A 已完成
-下一步：Phase5-P1-B Safe Console DTO Mapper
+当前阶段：Phase 5-P1 最小 Console 与访问治理 — P1-B 已完成
+下一步：Phase5-P1-C Console Runtime / Evaluation 查询 API
 ```
 
 当前已经完成的主线：
@@ -22,7 +22,7 @@ Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
-Phase 5-P1：最小 Console 与访问治理 — P1-A 已完成，准备进入 P1-B
+Phase 5-P1：最小 Console 与访问治理 — P1-B 已完成，准备进入 P1-C
 ```
 
 Phase 5-P1 目标：
@@ -283,20 +283,21 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P1-B：Safe Console DTO Mapper
+Phase5-P1-C：Console Runtime / Evaluation 查询 API
 ```
 
 只应实现：
 
 ```text
-1. SafeConsoleDtoMapper。
-2. Runtime / Evaluation / Candidate / Review / Audit console DTO。
-3. 敏感字段 denylist / allowlist。
-4. SafeConsoleDtoMapperTest / ConsoleSensitiveFieldRedactionTest。
-5. 同步更新 docs/Phase5_P1开发任务清单.md。
+1. ConsoleRuntimeController / ConsoleEvaluationController。
+2. ConsoleQueryService。
+3. GET /api/v1/debug/console/runtime-sessions 与详情。
+4. GET /api/v1/debug/console/evaluation-runs 与详情。
+5. 接入 AccessPolicy 与 SafeConsoleDtoMapper。
+6. 同步更新 docs/Phase5_P1开发任务清单.md。
 ```
 
-不应在 P1-B 中实现：
+不应在 P1-C 中实现：
 
 ```text
 全部 Console Controller

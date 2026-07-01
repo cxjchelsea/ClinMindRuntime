@@ -74,25 +74,25 @@ P1 必须保证：
 
 # 四、Phase5-P1-B：Safe Console DTO Mapper
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] SafeConsoleDtoMapper
-[ ] Runtime console summary DTO
-[ ] Evaluation console summary DTO
-[ ] Candidate console summary/detail DTO
-[ ] Review console summary DTO
-[ ] Audit console summary DTO
-[ ] 敏感字段 denylist / allowlist
+[x] SafeConsoleDtoMapper
+[x] Runtime console summary DTO
+[x] Evaluation console summary DTO
+[x] Candidate console summary/detail DTO
+[x] Review console summary DTO
+[x] Audit console summary DTO
+[x] 敏感字段 denylist / allowlist
 ```
 
 测试：
 
 ```text
-[ ] SafeConsoleDtoMapperTest
-[ ] ConsoleSensitiveFieldRedactionTest
+[x] SafeConsoleDtoMapperTest
+[x] ConsoleSensitiveFieldRedactionTest
 ```
 
 验收标准：
