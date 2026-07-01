@@ -1,9 +1,11 @@
 package com.clinmind.runtime.storage;
 
 import com.clinmind.runtime.state.RuntimeState;
+import com.clinmind.runtime.state.RuntimeStatus;
 import com.clinmind.runtime.state.RuntimeTrace;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,6 +74,21 @@ public class InMemoryRuntimeStore implements RuntimeStore {
             throw new RuntimeNotFoundException(runtimeId);
         }
         return traces.getOrDefault(runtimeId, List.of()).stream()
+                .map(this::deepCopy)
+                .toList();
+    }
+
+    @Override
+    public List<RuntimeState> list(String sessionId, RuntimeStatus status, int limit) {
+        return states.values().stream()
+                .filter(state -> sessionId == null
+                        || sessionId.isBlank()
+                        || sessionId.equals(state.getSessionId()))
+                .filter(state -> status == null || status == state.getRuntimeStatus())
+                .sorted(Comparator.comparing(
+                                RuntimeState::getUpdatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(RuntimeState::getRuntimeId, Comparator.reverseOrder()))
+                .limit(limit)
                 .map(this::deepCopy)
                 .toList();
     }

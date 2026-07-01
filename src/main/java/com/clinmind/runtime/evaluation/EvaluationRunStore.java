@@ -13,4 +13,6 @@ public interface EvaluationRunStore {
     RuntimeCaseExecution getExecution(String runId, String caseId);
 
     List<RuntimeCaseExecution> listExecutions(String runId);
+
+    List<EvaluationRun> list(String caseSetId, EvaluationRunStatus status, int limit);
 }

@@ -108,27 +108,27 @@ P1 必须保证：
 
 # 五、Phase5-P1-C：Console Runtime / Evaluation 查询 API
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] ConsoleRuntimeController
-[ ] ConsoleEvaluationController
-[ ] ConsoleQueryService
-[ ] GET /api/v1/debug/console/runtime-sessions
-[ ] GET /api/v1/debug/console/runtime-sessions/{runtime_id}
-[ ] GET /api/v1/debug/console/evaluation-runs
-[ ] GET /api/v1/debug/console/evaluation-runs/{run_id}
-[ ] 查询行为写 AuditLog
+[x] ConsoleRuntimeController
+[x] ConsoleEvaluationController
+[x] ConsoleQueryService
+[x] GET /api/v1/debug/console/runtime-sessions
+[x] GET /api/v1/debug/console/runtime-sessions/{runtime_id}
+[x] GET /api/v1/debug/console/evaluation-runs
+[x] GET /api/v1/debug/console/evaluation-runs/{run_id}
+[x] 查询行为写 AuditLog
 ```
 
 测试：
 
 ```text
-[ ] ConsoleRuntimeControllerTest
-[ ] ConsoleEvaluationControllerTest
-[ ] ConsoleRuntimeEvaluationAuditIntegrationTest
+[x] ConsoleRuntimeControllerTest
+[x] ConsoleEvaluationControllerTest
+[x] ConsoleRuntimeEvaluationAuditIntegrationTest
 ```
 
 验收标准：

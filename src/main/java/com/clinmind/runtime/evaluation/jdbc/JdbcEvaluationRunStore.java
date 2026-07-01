@@ -1,6 +1,7 @@
 package com.clinmind.runtime.evaluation.jdbc;
 
 import com.clinmind.runtime.evaluation.EvaluationItemResult;
+import com.clinmind.runtime.evaluation.EvaluationRunStatus;
 import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.evaluation.EvaluationRun;
 import com.clinmind.runtime.evaluation.EvaluationRunStore;
@@ -168,6 +169,25 @@ public class JdbcEvaluationRunStore implements EvaluationRunStore {
                 runId);
     }
 
+    @Override
+    public List<EvaluationRun> list(String caseSetId, EvaluationRunStatus status, int limit) {
+        List<String> runIds = jdbcTemplate.query(
+                """
+                select run_id from evaluation_runs
+                where (? is null or case_set_id = ?)
+                  and (? is null or status = ?)
+                order by coalesce(started_at, completed_at) desc, run_id desc
+                limit ?
+                """,
+                (rs, rowNum) -> rs.getString("run_id"),
+                blankToNull(caseSetId),
+                blankToNull(caseSetId),
+                status == null ? null : status.name(),
+                status == null ? null : status.name(),
+                limit);
+        return runIds.stream().map(this::get).toList();
+    }
+
     private List<EvaluationItemResult> loadItems(String runId) {
         return jdbcTemplate.query(
                 "select item_snapshot from evaluation_items where run_id = ? order by created_at",
@@ -186,5 +206,9 @@ public class JdbcEvaluationRunStore implements EvaluationRunStore {
 
     private static Timestamp toTimestamp(Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 }

@@ -1,5 +1,7 @@
 package com.clinmind.runtime.evaluation;
 
+import com.clinmind.runtime.evaluation.EvaluationRunStatus;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,5 +54,19 @@ public class InMemoryEvaluationRunStore implements EvaluationRunStore {
             return List.of();
         }
         return List.copyOf(runExecutions.values());
+    }
+
+    @Override
+    public List<EvaluationRun> list(String caseSetId, EvaluationRunStatus status, int limit) {
+        return runs.values().stream()
+                .filter(run -> caseSetId == null
+                        || caseSetId.isBlank()
+                        || caseSetId.equals(run.config().caseSetId()))
+                .filter(run -> status == null || status == run.status())
+                .sorted(Comparator.comparing(
+                                EvaluationRun::startedAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(EvaluationRun::runId, Comparator.reverseOrder()))
+                .limit(limit)
+                .toList();
     }
 }

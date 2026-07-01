@@ -3,6 +3,7 @@ package com.clinmind.runtime.storage.jdbc;
 import com.clinmind.runtime.persistence.JsonSnapshotMapper;
 import com.clinmind.runtime.persistence.RuntimeSnapshotMapper;
 import com.clinmind.runtime.state.RuntimeState;
+import com.clinmind.runtime.state.RuntimeStatus;
 import com.clinmind.runtime.state.RuntimeTrace;
 import com.clinmind.runtime.storage.InMemoryRuntimeStore;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
@@ -118,6 +119,25 @@ public class JdbcRuntimeStore implements RuntimeStore {
         return delegateCache.getTraces(runtimeId);
     }
 
+    @Override
+    public List<RuntimeState> list(String sessionId, RuntimeStatus status, int limit) {
+        List<String> runtimeIds = jdbcTemplate.query(
+                """
+                select runtime_id from runtime_sessions
+                where (? is null or session_id = ?)
+                  and (? is null or runtime_status = ?)
+                order by updated_at desc, runtime_id desc
+                limit ?
+                """,
+                (rs, rowNum) -> rs.getString("runtime_id"),
+                blankToNull(sessionId),
+                blankToNull(sessionId),
+                status == null ? null : status.name(),
+                status == null ? null : status.name(),
+                limit);
+        return runtimeIds.stream().map(this::get).toList();
+    }
+
     private void persistSession(RuntimeState state) {
         Instant createdAt = state.getCreatedAt() == null ? Instant.now() : state.getCreatedAt();
         Instant updatedAt = state.getUpdatedAt() == null ? createdAt : state.getUpdatedAt();
@@ -173,5 +193,9 @@ public class JdbcRuntimeStore implements RuntimeStore {
                 delegateCache.addTrace(trace);
             }
         }
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 }
