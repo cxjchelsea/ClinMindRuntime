@@ -22,7 +22,7 @@ Phase 3-P0：训练与评估闭环 MVP，已冻结
 Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
-Phase 5-P1：最小 Console 与访问治理 — P1-C 已完成，准备进入 P1-D
+Phase 5-P1：最小 Console 与访问治理 — P1-D 已完成，准备进入 P1-E
 ```
 
 Phase 5-P1 目标：
@@ -283,21 +283,20 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P1-D：Console Candidate / Review Queue API
+Phase5-P1-E：Audit Center 查询增强
 ```
 
 只应实现：
 
 ```text
-1. ConsoleCandidateController。
-2. GET /api/v1/debug/console/candidate-generations / candidates / review-queue。
-3. 接入 AccessPolicy 与 SafeConsoleDtoMapper。
-4. existing review API 接入 AccessPolicy。
-5. 查询 / review 行为写 AuditLog。
-6. 同步更新 docs/Phase5_P1开发任务清单.md。
+1. ConsoleAuditCenterController / AuditCenterService。
+2. GET /api/v1/debug/console/audit-center/audit-logs 与详情 / summary。
+3. filters / pagination / limit guard。
+4. AUDIT_REVIEWER 访问控制与安全 metadata 映射。
+5. 同步更新 docs/Phase5_P1开发任务清单.md。
 ```
 
-不应在 P1-D 中实现：
+不应在 P1-E 中实现：
 
 ```text
 全部 Console Controller
