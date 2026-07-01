@@ -122,7 +122,7 @@ Content-Type: application/json
 
 **Phase 5-P2-C**：Runtime / Evaluation 页面（`console-web/`）。
 
-P2-A 已完成 Vite + React 基础布局；不应跳过 P2-B 直接实现全部页面，也不应实现正式登录、Docker Compose、RAG 或模型训练。
+P2-B 已完成 API Client 与 Debug Context；不应跳过 P2-C 直接实现全部页面，也不应实现正式登录、Docker Compose、RAG 或模型训练。
 
 ## License
 
