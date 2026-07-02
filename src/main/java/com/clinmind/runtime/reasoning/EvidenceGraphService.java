@@ -1,8 +1,9 @@
 package com.clinmind.runtime.reasoning;
 
+import com.clinmind.runtime.evidence.mapper.EvidenceCandidateToGraphMapper;
 import com.clinmind.runtime.evidence.EvidenceCandidate;
 import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
-import com.clinmind.runtime.evidence.mapper.EvidenceCandidateToGraphMapper;
+import com.clinmind.runtime.evidence.graph.mapper.GraphEvidenceCandidateToGraphMapper;
 import com.clinmind.runtime.asset.AssetRuntimeSupport;
 import com.clinmind.runtime.asset.TestRecommendationAsset;
 import com.clinmind.runtime.provider.TestRecommendationProvider;
@@ -11,6 +12,10 @@ import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.DDxCandidate;
 import com.clinmind.runtime.state.EvidenceGraph;
 import com.clinmind.runtime.state.EvidenceGraphItem;
+import com.clinmind.runtime.evidence.graph.GraphEvidenceCandidate;
+import com.clinmind.runtime.evidence.graph.GraphEvidenceSnapshot;
+import com.clinmind.runtime.state.EvidenceGraphPathEntry;
+import com.clinmind.runtime.state.EvidenceGraphRelationEntry;
 import com.clinmind.runtime.state.EvidenceGraphRefEntry;
 import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.RuntimeState;
@@ -41,12 +46,17 @@ public class EvidenceGraphService {
         List<EvidenceCandidate> ragCandidates = acceptedRagCandidates(state);
         List<String> ragSummaries = EvidenceCandidateToGraphMapper.toSupportingSummaries(ragCandidates);
         List<EvidenceGraphRefEntry> ragRefs = EvidenceCandidateToGraphMapper.toGraphRefs(ragCandidates);
+        List<GraphEvidenceCandidate> graphCandidates = acceptedGraphCandidates(state);
+        List<String> graphSummaries = GraphEvidenceCandidateToGraphMapper.toRelationSummaries(graphCandidates);
+        List<EvidenceGraphRelationEntry> graphRefs = GraphEvidenceCandidateToGraphMapper.toRelationEntries(graphCandidates);
+        List<EvidenceGraphPathEntry> graphPaths = GraphEvidenceCandidateToGraphMapper.toPathEntries(graphCandidates);
 
         for (DDxCandidate candidate : state.getDifferentialBoard().candidates()) {
             List<String> supporting = new ArrayList<>(buildSupportingEvidence(caseFrame, candidate));
             supporting.addAll(ragSummaries);
+            supporting.addAll(graphSummaries);
             List<String> missing = buildMissingEvidence(caseFrame, knowledge, candidate, combinedText);
-            List<String> nextQuestions = buildNextQuestions(knowledge, combinedText, ragCandidates);
+            List<String> nextQuestions = buildNextQuestions(knowledge, combinedText, ragCandidates, graphCandidates);
             List<String> recommendedTests = buildRecommendedTests(state, knowledge, candidate);
 
             items.add(new EvidenceGraphItem(
@@ -58,7 +68,10 @@ public class EvidenceGraphService {
                     candidate.status(),
                     nextQuestions,
                     recommendedTests,
-                    ragRefs));
+                    ragRefs,
+                    graphRefs,
+                    graphPaths,
+                    graphSummaries));
         }
         return new EvidenceGraph(items);
     }
@@ -69,6 +82,26 @@ public class EvidenceGraphService {
             return List.of();
         }
         return snapshot.acceptedCandidates();
+    }
+
+    private List<GraphEvidenceCandidate> acceptedGraphCandidates(RuntimeState state) {
+        GraphEvidenceSnapshot snapshot = state.getGraphEvidence();
+        if (snapshot == null || snapshot.acceptedCandidates().isEmpty()) {
+            return List.of();
+        }
+        return snapshot.acceptedCandidates();
+    }
+
+    private List<String> buildNextQuestions(
+            KnowledgeContext knowledge,
+            String combinedText,
+            List<EvidenceCandidate> ragCandidates,
+            List<GraphEvidenceCandidate> graphCandidates) {
+        List<String> questions = buildNextQuestions(knowledge, combinedText, ragCandidates);
+        for (GraphEvidenceCandidate candidate : graphCandidates) {
+            questions.addAll(candidate.suggestedQuestions());
+        }
+        return questions;
     }
 
     private List<String> buildNextQuestions(

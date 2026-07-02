@@ -1,0 +1,369 @@
+package_id: phase7-default
+version: phase7-kg-lite-0.1.0
+nodes:
+  # chest_pain
+  - node_id: symptom_chest_pain
+    node_type: SYMPTOM
+    name: 胸痛
+    normalized_name: chest_pain
+    symptom_group: chest_pain
+    tags: [胸闷, 胸痛]
+    version: 0.1.0
+  - node_id: risk_signal_sweating
+    node_type: RISK_SIGNAL
+    name: 出汗
+    normalized_name: sweating
+    symptom_group: chest_pain
+    risk_level: HIGH
+    tags: [出汗]
+    version: 0.1.0
+  - node_id: risk_signal_activity_chest
+    node_type: RISK_SIGNAL
+    name: 活动后胸闷
+    normalized_name: activity_chest_pain
+    symptom_group: chest_pain
+    risk_level: HIGH
+    tags: [活动后加重, 活动后胸闷]
+    version: 0.1.0
+  - node_id: diagnosis_acs_rule_out
+    node_type: DIAGNOSIS
+    name: 急性冠脉综合征需排除
+    normalized_name: acute_coronary_syndrome_rule_out
+    symptom_group: chest_pain
+    tags: [acute_coronary_syndrome_rule_out]
+    version: 0.1.0
+  - node_id: diagnosis_non_cardiac
+    node_type: DIAGNOSIS
+    name: 非心源性胸痛
+    normalized_name: non_cardiac_chest_pain
+    symptom_group: chest_pain
+    tags: [non_cardiac_chest_pain]
+    version: 0.1.0
+  - node_id: test_ecg
+    node_type: TEST
+    name: 心电图
+    normalized_name: ecg
+    symptom_group: chest_pain
+    tags: [ECG, 心电图]
+    version: 0.1.0
+  - node_id: test_troponin
+    node_type: TEST
+    name: 肌钙蛋白
+    normalized_name: troponin
+    symptom_group: chest_pain
+    tags: [troponin]
+    version: 0.1.0
+  - node_id: question_radiation_pain
+    node_type: QUESTION_SLOT
+    name: 是否放射痛
+    normalized_name: radiation_pain
+    symptom_group: chest_pain
+    tags: [放射痛, 是否放射痛]
+    version: 0.1.0
+  - node_id: evidence_chunk_chest_pain_001
+    node_type: EVIDENCE
+    name: 胸痛风险信号证据
+    chunk_id: chunk_chest_pain_001
+    symptom_group: chest_pain
+    source_ref: synthetic_safety_guide_chest_pain
+    version: 0.1.0
+  - node_id: evidence_chunk_chest_pain_002
+    node_type: EVIDENCE
+    name: 胸痛鉴别证据
+    chunk_id: chunk_chest_pain_002
+    symptom_group: chest_pain
+    source_ref: synthetic_clinical_pathway_chest_pain
+    version: 0.1.0
+  - node_id: evidence_chunk_chest_pain_003
+    node_type: EVIDENCE
+    name: 胸痛问诊证据
+    chunk_id: chunk_chest_pain_003
+    symptom_group: chest_pain
+    source_ref: synthetic_safety_guide_chest_pain
+    version: 0.1.0
+
+  # fever
+  - node_id: symptom_fever
+    node_type: SYMPTOM
+    name: 发热
+    normalized_name: fever
+    symptom_group: fever
+    tags: [发热, 发烧]
+    version: 0.1.0
+  - node_id: risk_signal_high_fever
+    node_type: RISK_SIGNAL
+    name: 高热
+    normalized_name: high_fever
+    symptom_group: fever
+    risk_level: HIGH
+    tags: [高热, 体温]
+    version: 0.1.0
+  - node_id: diagnosis_viral_infection
+    node_type: DIAGNOSIS
+    name: 病毒感染
+    normalized_name: viral_infection
+    symptom_group: fever
+    tags: [viral_infection]
+    version: 0.1.0
+  - node_id: diagnosis_sepsis_rule_out
+    node_type: DIAGNOSIS
+    name: 败血症需排除
+    normalized_name: sepsis_rule_out
+    symptom_group: fever
+    tags: [sepsis_rule_out]
+    version: 0.1.0
+  - node_id: test_blood_culture
+    node_type: TEST
+    name: 血培养
+    normalized_name: blood_culture
+    symptom_group: fever
+    tags: [blood_culture]
+    version: 0.1.0
+  - node_id: question_fever_duration
+    node_type: QUESTION_SLOT
+    name: 热程
+    normalized_name: fever_duration
+    symptom_group: fever
+    tags: [持续时间, 热程]
+    version: 0.1.0
+  - node_id: evidence_chunk_fever_001
+    node_type: EVIDENCE
+    name: 发热常见病因证据
+    chunk_id: chunk_fever_001
+    symptom_group: fever
+    source_ref: synthetic_clinical_pathway_fever
+    version: 0.1.0
+  - node_id: evidence_chunk_fever_002
+    node_type: EVIDENCE
+    name: 发热危险信号证据
+    chunk_id: chunk_fever_002
+    symptom_group: fever
+    source_ref: synthetic_safety_guide_fever
+    version: 0.1.0
+  - node_id: evidence_chunk_fever_003
+    node_type: EVIDENCE
+    name: 发热问诊证据
+    chunk_id: chunk_fever_003
+    symptom_group: fever
+    source_ref: synthetic_clinical_pathway_fever
+    version: 0.1.0
+
+  # abdominal_pain
+  - node_id: symptom_abdominal_pain
+    node_type: SYMPTOM
+    name: 腹痛
+    normalized_name: abdominal_pain
+    symptom_group: abdominal_pain
+    tags: [腹痛]
+    version: 0.1.0
+  - node_id: risk_signal_severe_abdominal
+    node_type: RISK_SIGNAL
+    name: 剧烈腹痛
+    normalized_name: severe_abdominal_pain
+    symptom_group: abdominal_pain
+    risk_level: HIGH
+    tags: [剧烈腹痛, 持续加重]
+    version: 0.1.0
+  - node_id: diagnosis_acute_abdomen
+    node_type: DIAGNOSIS
+    name: 急腹症需排除
+    normalized_name: acute_abdomen_rule_out
+    symptom_group: abdominal_pain
+    tags: [acute_abdomen_rule_out]
+    version: 0.1.0
+  - node_id: diagnosis_appendicitis
+    node_type: DIAGNOSIS
+    name: 阑尾炎需排除
+    normalized_name: appendicitis_rule_out
+    symptom_group: abdominal_pain
+    tags: [appendicitis_rule_out]
+    version: 0.1.0
+  - node_id: test_abdominal_ultrasound
+    node_type: TEST
+    name: 腹部超声
+    normalized_name: abdominal_ultrasound
+    symptom_group: abdominal_pain
+    tags: [ultrasound]
+    version: 0.1.0
+  - node_id: question_pain_location
+    node_type: QUESTION_SLOT
+    name: 腹痛定位
+    normalized_name: pain_location
+    symptom_group: abdominal_pain
+    tags: [起始部位, 右下腹]
+    version: 0.1.0
+  - node_id: evidence_chunk_abdominal_pain_001
+    node_type: EVIDENCE
+    name: 腹痛危险信号证据
+    chunk_id: chunk_abdominal_pain_001
+    symptom_group: abdominal_pain
+    source_ref: synthetic_safety_guide_abdominal_pain
+    version: 0.1.0
+  - node_id: evidence_chunk_abdominal_pain_002
+    node_type: EVIDENCE
+    name: 腹痛鉴别证据
+    chunk_id: chunk_abdominal_pain_002
+    symptom_group: abdominal_pain
+    source_ref: synthetic_clinical_pathway_abdominal_pain
+    version: 0.1.0
+  - node_id: evidence_chunk_abdominal_pain_003
+    node_type: EVIDENCE
+    name: 腹痛问诊证据
+    chunk_id: chunk_abdominal_pain_003
+    symptom_group: abdominal_pain
+    source_ref: synthetic_clinical_pathway_abdominal_pain
+    version: 0.1.0
+
+edges:
+  # chest_pain edges
+  - edge_id: edge_symptom_chest_associated_acs
+    from_node_id: symptom_chest_pain
+    to_node_id: diagnosis_acs_rule_out
+    relation_type: ASSOCIATED_WITH
+    weight: 0.6
+    confidence: 0.7
+    version: 0.1.0
+  - edge_id: edge_sweating_red_flag_acs
+    from_node_id: risk_signal_sweating
+    to_node_id: diagnosis_acs_rule_out
+    relation_type: RED_FLAG_FOR
+    weight: 0.85
+    confidence: 0.88
+    version: 0.1.0
+  - edge_id: edge_activity_red_flag_acs
+    from_node_id: risk_signal_activity_chest
+    to_node_id: diagnosis_acs_rule_out
+    relation_type: RED_FLAG_FOR
+    weight: 0.9
+    confidence: 0.9
+    version: 0.1.0
+  - edge_id: edge_evidence_chest_001_for_acs
+    from_node_id: evidence_chunk_chest_pain_001
+    to_node_id: diagnosis_acs_rule_out
+    relation_type: EVIDENCE_FOR
+    weight: 0.92
+    confidence: 0.9
+    version: 0.1.0
+  - edge_id: edge_evidence_chest_002_for_non_cardiac
+    from_node_id: evidence_chunk_chest_pain_002
+    to_node_id: diagnosis_non_cardiac
+    relation_type: EVIDENCE_FOR
+    weight: 0.75
+    confidence: 0.78
+    version: 0.1.0
+  - edge_id: edge_acs_suggests_ecg
+    from_node_id: diagnosis_acs_rule_out
+    to_node_id: test_ecg
+    relation_type: SUGGESTS_TEST
+    weight: 0.88
+    confidence: 0.85
+    version: 0.1.0
+  - edge_id: edge_acs_suggests_troponin
+    from_node_id: diagnosis_acs_rule_out
+    to_node_id: test_troponin
+    relation_type: SUGGESTS_TEST
+    weight: 0.86
+    confidence: 0.84
+    version: 0.1.0
+  - edge_id: edge_evidence_chest_001_question_radiation
+    from_node_id: evidence_chunk_chest_pain_001
+    to_node_id: question_radiation_pain
+    relation_type: SUGGESTS_QUESTION
+    weight: 0.8
+    confidence: 0.82
+    version: 0.1.0
+  - edge_id: edge_evidence_chest_003_question_radiation
+    from_node_id: evidence_chunk_chest_pain_003
+    to_node_id: question_radiation_pain
+    relation_type: SUGGESTS_QUESTION
+    weight: 0.78
+    confidence: 0.8
+    version: 0.1.0
+
+  # fever edges
+  - edge_id: edge_symptom_fever_associated_viral
+    from_node_id: symptom_fever
+    to_node_id: diagnosis_viral_infection
+    relation_type: ASSOCIATED_WITH
+    weight: 0.65
+    confidence: 0.7
+    version: 0.1.0
+  - edge_id: edge_high_fever_red_flag_sepsis
+    from_node_id: risk_signal_high_fever
+    to_node_id: diagnosis_sepsis_rule_out
+    relation_type: RED_FLAG_FOR
+    weight: 0.88
+    confidence: 0.86
+    version: 0.1.0
+  - edge_id: edge_evidence_fever_001_for_viral
+    from_node_id: evidence_chunk_fever_001
+    to_node_id: diagnosis_viral_infection
+    relation_type: EVIDENCE_FOR
+    weight: 0.8
+    confidence: 0.82
+    version: 0.1.0
+  - edge_id: edge_evidence_fever_002_for_sepsis
+    from_node_id: evidence_chunk_fever_002
+    to_node_id: diagnosis_sepsis_rule_out
+    relation_type: EVIDENCE_FOR
+    weight: 0.9
+    confidence: 0.88
+    version: 0.1.0
+  - edge_id: edge_sepsis_suggests_blood_culture
+    from_node_id: diagnosis_sepsis_rule_out
+    to_node_id: test_blood_culture
+    relation_type: SUGGESTS_TEST
+    weight: 0.85
+    confidence: 0.83
+    version: 0.1.0
+  - edge_id: edge_evidence_fever_003_question_duration
+    from_node_id: evidence_chunk_fever_003
+    to_node_id: question_fever_duration
+    relation_type: SUGGESTS_QUESTION
+    weight: 0.76
+    confidence: 0.78
+    version: 0.1.0
+
+  # abdominal_pain edges
+  - edge_id: edge_symptom_abd_associated_acute
+    from_node_id: symptom_abdominal_pain
+    to_node_id: diagnosis_acute_abdomen
+    relation_type: ASSOCIATED_WITH
+    weight: 0.62
+    confidence: 0.68
+    version: 0.1.0
+  - edge_id: edge_severe_abd_red_flag_acute
+    from_node_id: risk_signal_severe_abdominal
+    to_node_id: diagnosis_acute_abdomen
+    relation_type: RED_FLAG_FOR
+    weight: 0.9
+    confidence: 0.9
+    version: 0.1.0
+  - edge_id: edge_evidence_abd_001_for_acute
+    from_node_id: evidence_chunk_abdominal_pain_001
+    to_node_id: diagnosis_acute_abdomen
+    relation_type: EVIDENCE_FOR
+    weight: 0.91
+    confidence: 0.89
+    version: 0.1.0
+  - edge_id: edge_evidence_abd_002_for_appendicitis
+    from_node_id: evidence_chunk_abdominal_pain_002
+    to_node_id: diagnosis_appendicitis
+    relation_type: EVIDENCE_FOR
+    weight: 0.82
+    confidence: 0.8
+    version: 0.1.0
+  - edge_id: edge_appendicitis_suggests_ultrasound
+    from_node_id: diagnosis_appendicitis
+    to_node_id: test_abdominal_ultrasound
+    relation_type: SUGGESTS_TEST
+    weight: 0.84
+    confidence: 0.82
+    version: 0.1.0
+  - edge_id: edge_evidence_abd_003_question_location
+    from_node_id: evidence_chunk_abdominal_pain_003
+    to_node_id: question_pain_location
+    relation_type: SUGGESTS_QUESTION
+    weight: 0.77
+    confidence: 0.79
+    version: 0.1.0

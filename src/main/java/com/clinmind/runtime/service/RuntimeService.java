@@ -18,6 +18,8 @@ import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
 import com.clinmind.runtime.agent.capability.CapabilityOrchestrationService;
 import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
 import com.clinmind.runtime.evidence.capability.EvidenceCapabilityOrchestrator;
+import com.clinmind.runtime.evidence.graph.GraphEvidenceSnapshot;
+import com.clinmind.runtime.evidence.graph.capability.GraphEvidenceCapabilityOrchestrator;
 import com.clinmind.runtime.agent.inquiry.InquiryQuestionCandidate;
 import com.clinmind.runtime.asset.AssetLoadErrorCode;
 import com.clinmind.runtime.asset.AssetLoadException;
@@ -71,6 +73,7 @@ public class RuntimeService {
     private final AuditLogService auditLogService;
     private final CapabilityOrchestrationService capabilityOrchestrationService;
     private final EvidenceCapabilityOrchestrator evidenceCapabilityOrchestrator;
+    private final GraphEvidenceCapabilityOrchestrator graphEvidenceCapabilityOrchestrator;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -90,7 +93,8 @@ public class RuntimeService {
             AssetPackageRepository assetPackageRepository,
             AuditLogService auditLogService,
             CapabilityOrchestrationService capabilityOrchestrationService,
-            EvidenceCapabilityOrchestrator evidenceCapabilityOrchestrator) {
+            EvidenceCapabilityOrchestrator evidenceCapabilityOrchestrator,
+            GraphEvidenceCapabilityOrchestrator graphEvidenceCapabilityOrchestrator) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -109,6 +113,7 @@ public class RuntimeService {
         this.auditLogService = auditLogService;
         this.capabilityOrchestrationService = capabilityOrchestrationService;
         this.evidenceCapabilityOrchestrator = evidenceCapabilityOrchestrator;
+        this.graphEvidenceCapabilityOrchestrator = graphEvidenceCapabilityOrchestrator;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -249,6 +254,10 @@ public class RuntimeService {
             state.setEvidenceRetrieval(evidenceRetrieval);
 
             state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
+
+            GraphEvidenceSnapshot graphEvidence = graphEvidenceCapabilityOrchestrator.orchestrate(state);
+            state.setGraphEvidence(graphEvidence);
+
             state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));
             state.setQuestionTestPolicy(questionTestPolicyService.decideNextAction(state));
             runOutputPipeline(state);

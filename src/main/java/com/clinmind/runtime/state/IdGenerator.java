@@ -58,4 +58,20 @@ public final class IdGenerator {
     public static String evidenceTraceId() {
         return "evidence_trace_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String graphRetrievalId() {
+        return "graph_ret_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String graphCandidateId() {
+        return "graph_cand_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String graphTraceId() {
+        return "graph_trace_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String graphPathId() {
+        return "graph_path_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

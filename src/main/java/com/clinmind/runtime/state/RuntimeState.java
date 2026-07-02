@@ -2,6 +2,7 @@ package com.clinmind.runtime.state;
 
 import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
 import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
+import com.clinmind.runtime.evidence.graph.GraphEvidenceSnapshot;
 import com.clinmind.runtime.asset.AssetUsedRecord;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class RuntimeState {
     private List<AssetUsedRecord> assetsUsed;
     private AgentOrchestrationSnapshot agentOrchestration;
     private EvidenceRetrievalSnapshot evidenceRetrieval;
+    private GraphEvidenceSnapshot graphEvidence;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -269,6 +271,14 @@ public class RuntimeState {
 
     public void setEvidenceRetrieval(EvidenceRetrievalSnapshot evidenceRetrieval) {
         this.evidenceRetrieval = evidenceRetrieval;
+    }
+
+    public GraphEvidenceSnapshot getGraphEvidence() {
+        return graphEvidence;
+    }
+
+    public void setGraphEvidence(GraphEvidenceSnapshot graphEvidence) {
+        this.graphEvidence = graphEvidence;
     }
 
     public Instant getCreatedAt() {
