@@ -172,25 +172,25 @@ P2 必须保证：
 
 # 七、Phase5-P2-E：Audit Center 页面
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] AuditCenterPage
-[ ] audit summary
-[ ] audit log list
-[ ] filters
-[ ] audit detail
-[ ] permission error display
+[x] AuditCenterPage
+[x] audit summary
+[x] audit log list
+[x] filters
+[x] audit detail
+[x] permission error display
 ```
 
 测试：
 
 ```text
-[ ] AuditCenterPageTest
-[ ] AuditCenterFlowTest
-[ ] PermissionErrorFlowTest
+[x] AuditCenterPageTest
+[x] AuditCenterFlowTest
+[x] PermissionErrorFlowTest
 ```
 
 验收标准：
@@ -271,14 +271,14 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P2-E：Audit Center 页面
+Phase5-P2-F：前端集成验收与归档
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase5-P2-E 状态从 [ ] 改为 [/]。
-2. 只实现 AuditCenterPage 与 audit summary / log list / filters / detail。
-3. 不直接实现 P2-F 归档或正式登录、Docker Compose、RAG、模型训练。
-4. 不实现后端 Console API 大改。
+1. 将 Phase5-P2-F 状态从 [ ] 改为 [/]。
+2. 补齐 ConsoleAppSmokeTest、SensitiveFieldRedactionRenderTest 与人工验收文档。
+3. 确认 npm run test / npm run build 全绿。
+4. 不实现正式登录、Docker Compose、RAG、模型训练或后端 Console API 大改。
 ```

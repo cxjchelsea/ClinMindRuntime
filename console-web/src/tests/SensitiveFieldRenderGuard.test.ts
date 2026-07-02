@@ -50,4 +50,18 @@ describe('SensitiveFieldRenderGuard', () => {
     expect(JSON.stringify(safe)).not.toContain('"input"');
     expect(JSON.stringify(safe)).toContain('sanitizer');
   });
+
+  it('filters sensitive keys from audit metadata summary', () => {
+    const safe = toSafeDisplayRecord({
+      audit_id: 'a1',
+      metadata_summary: {
+        mode: 'in-memory',
+        patient_output: 'hidden',
+        input: { text: 'secret' },
+      },
+    });
+    expect(JSON.stringify(safe)).not.toContain('patient_output');
+    expect(JSON.stringify(safe)).not.toContain('"input"');
+    expect(JSON.stringify(safe)).toContain('in-memory');
+  });
 });

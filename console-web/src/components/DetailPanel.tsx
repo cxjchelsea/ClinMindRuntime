@@ -54,6 +54,13 @@ const FIELD_LABELS: Record<string, string> = {
   risk_level: 'Risk Level',
   sanitization_status: 'Sanitization Status',
   source_ref: 'Source Ref',
+  audit_id: 'Audit ID',
+  actor: 'Actor',
+  action_type: 'Action Type',
+  resource_type: 'Resource Type',
+  resource_id: 'Resource ID',
+  result_status: 'Result Status',
+  metadata_summary: 'Metadata Summary',
 };
 
 export function DetailPanel({
