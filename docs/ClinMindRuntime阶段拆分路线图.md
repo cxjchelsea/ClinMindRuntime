@@ -612,26 +612,29 @@ Phase5-P0-F：权限、审计、发布、回滚
 ```text
 Phase 1-P0：Runtime MVP
 Phase 2-P0：共享能力资产原型
-Phase 3-P0：详细设计
+Phase 3-P0：训练与评估闭环 MVP（已冻结）
+Phase 4-P0 / P4-P1：候选沉淀与治理（已冻结）
+Phase 5-P0：持久化与治理底座（已冻结）
+Phase 5-P1：最小 Console API 与访问治理（已冻结）
+Phase 5-P2：最小前端 Console MVP（已完成）
 ```
 
-当前最应该开始的实现任务是：
+当前无强制实现任务。若继续演进，应从后置任务立项：
 
 ```text
-Phase3-P0-A：Evaluation 数据结构
+正式登录 / OAuth
+Docker Compose
+完整产品化前端 / Training Center
+Python AI Provider / RAG / GraphRAG
+模型训练 / 后训练
 ```
 
-暂不应该开始：
+暂不应该在未立项时开始：
 
 ```text
-模型训练
-Python AI Provider
-RAG / GraphRAG
-MCP
-LangGraph
-前端 Training Center
-数据库持久化
-经验自动进化
+破坏 Safe DTO 或 Console RBAC-lite 边界
+ApprovedExperience 自动生效
+正式医生审核平台语义
 ```
 
 ---

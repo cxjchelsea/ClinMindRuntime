@@ -300,10 +300,12 @@ docs/Phase5_P1冻结记录.md
 docs/Phase5_P1人工测试API结果.md
 ```
 
-进入 Phase 5-P2 前：
+Phase 5-P2 已完成并归档：
 
 ```text
-1. 新增 Phase 5-P2 详细设计与任务清单。
-2. 保持 Phase 1–5 回归与 postgres 专项测试通过。
-3. 不在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
+docs/Phase5_P2开发任务清单.md
+docs/Phase5_P2人工测试结果.md
+docs/Phase5_P1冻结记录.md
 ```
+
+当前无强制下一 Phase；后置任务见 Phase5_P2开发任务清单 §十。

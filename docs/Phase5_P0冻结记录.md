@@ -10,7 +10,7 @@
 ```text
 冻结阶段：Phase 5-P0
 冻结状态：已冻结
-当前项目阶段：Phase 5-P0 freeze complete / Phase 5-P1 planning pending
+当前项目阶段：Phase 5-P0 已冻结（后续 Phase 5-P1/P2 均已完成，见各自冻结/验收记录）
 冻结日期：2026-06-30
 代码基线：commit 2ad656d
 ```

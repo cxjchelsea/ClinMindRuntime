@@ -63,7 +63,7 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 8. docs/数据安全与合规边界规划.md
 ```
 
-阅读目标：明确 Phase 5-P1 当前只允许按任务清单做最小 Console API、RBAC-lite、Audit Center 查询增强和安全 DTO，不得跳到 RAG、模型训练、完整前端 Console、正式 RBAC 或正式审核平台。
+阅读目标：了解 Phase 1–5-P2 已交付能力；P1/P2 文档作为冻结与归档基线；后置任务须单独立项，不得跳到 RAG、模型训练、完整产品化前端或正式 OAuth。
 
 ## 2.3 架构学习 / 自我复盘
 
@@ -88,15 +88,16 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 | `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
 | `docs/项目展示导读.md` | 活跃 | 面向面试官 / 自我复盘的项目导读 |
 
-## 3.2 当前实现约束文档：Phase 5-P2
+## 3.2 已归档实现约束文档：Phase 5-P2
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/Phase5_P2开发任务清单.md` | 活跃 | Phase5-P2-A 到 P2-F 实现顺序与验收标准 |
-| `docs/Phase5_P2最小前端Console_MVP_实现规格.md` | 当前基线 | Phase5-P2 总体实现规格 |
-| `docs/Phase5_P2前端信息架构与页面设计.md` | 当前基线 | 页面结构、导航与展示边界 |
-| `docs/Phase5_P2_API对接与前端状态管理设计.md` | 当前基线 | Console API Client、Debug Context |
-| `docs/Phase5_P2前端安全边界与测试设计.md` | 当前基线 | 前端安全边界与测试分层 |
+| `docs/Phase5_P2开发任务清单.md` | 已归档 | Phase5-P2-A 到 P2-F 实现顺序（已完成） |
+| `docs/Phase5_P2人工测试结果.md` | 验收归档 | Phase5-P2 前端 build / test / 联调验收 |
+| `docs/Phase5_P2最小前端Console_MVP_实现规格.md` | 归档基线 | Phase5-P2 总体实现规格 |
+| `docs/Phase5_P2前端信息架构与页面设计.md` | 归档基线 | 页面结构、导航与展示边界 |
+| `docs/Phase5_P2_API对接与前端状态管理设计.md` | 归档基线 | Console API Client、Debug Context |
+| `docs/Phase5_P2前端安全边界与测试设计.md` | 归档基线 | 前端安全边界与测试分层 |
 
 ## 3.3 已冻结 Phase 文档：Phase 5-P1
 
@@ -139,10 +140,11 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 |---|---|---|
 | `docs/ClinMindRuntime完整系统设计.md` | 稳定基线 | 系统长期定位 |
 | `docs/ClinMindRuntime阶段拆分路线图.md` | 稳定基线 | Phase 1–5 的长期演进顺序 |
-| `docs/ClinMindRuntime技术实现总方案.md` | 活跃 | 代码分层与依赖方向 |
+| `docs/ClinMindRuntime技术实现总方案.md` | 活跃 | 代码分层、包结构、当前实现状态与后置边界 |
+| `docs/架构文档缺口审查清单.md` | 活跃 | 文档覆盖审查与阶段判断 |
 | `docs/数据库持久化设计.md` | 规划基线 | 长期数据库设计，Phase5-P0 已完成第一版落地 |
 | `docs/数据安全与合规边界规划.md` | 规划基线 | 隐私、脱敏、debug API 与训练数据边界 |
-| `docs/平台前端与Console规划.md` | 规划基线 | P1 只做最小 Console API，不做完整前端 |
+| `docs/平台前端与Console规划.md` | 规划基线 | 完整产品化前端仍后置；P5-P2 已实现 console-web/ 最小 MVP |
 | `docs/部署与运维规划.md` | 后续规划 | P1 不做完整部署平台 |
 
 ---
@@ -151,9 +153,9 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 
 ```text
 1. 不应向 Phase 4-P0 / Phase 4-P1 / Phase 5-P0 / Phase 5-P1 继续堆新能力（均已冻结）。
-2. 不应在 P1 冻结范围内追加 Console / RBAC / Audit 大能力。
+2. 不应在 P2 归档范围内无立项地扩展 Console API 或 console-web/ 大能力。
 3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
-4. 不应提前做完整前端 Console。
+4. 不应提前做完整产品化前端 / Training Center（最小 console-web/ 已交付）。
 5. 不应提前实现模型训练 / 后训练。
 6. 不应实现正式登录 / JWT / OAuth / 多租户。
 7. 不应实现正式医生审核平台。

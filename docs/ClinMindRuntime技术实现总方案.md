@@ -36,31 +36,39 @@ docs/模型训练与后训练规划.md
 
 # 二、当前实现状态
 
-当前仓库状态：
+当前仓库状态（2026-06-25 基线）：
 
 ```text
-Phase 1-P0：Runtime MVP 已完成。
-Phase 2-P0：共享能力资产原型已完成。
-Phase 3-P0：详细设计已完成，代码实现尚未开始。
+Phase 1-P0：Runtime MVP — 已完成。
+Phase 2-P0：共享能力资产原型 — 已完成。
+Phase 3-P0：训练与评估闭环 MVP — 已冻结。
+Phase 4-P0：候选沉淀机制 + debug API — 已冻结。
+Phase 4-P1：候选治理与安全加固 — 已冻结。
+Phase 5-P0：持久化与治理底座（PostgreSQL 双模式、AuditLog）— 已冻结。
+Phase 5-P1：最小 Console API、RBAC-lite、Audit Center、Safe DTO — 已冻结。
+Phase 5-P2：最小前端 Console MVP（console-web/）— 已完成。
 ```
 
-当前最优实现任务：
+当前无强制实现主线。后置可选方向：
 
 ```text
-Phase3-P0-A：Evaluation 数据结构
-```
-
-当前禁止提前实现：
-
-```text
-Python AI Provider
-真实 RAG / GraphRAG
+正式登录 / JWT / OAuth
+Docker Compose 一键编排
+完整产品化前端 / Training Center
+Python AI Provider / RAG / GraphRAG
 模型训练 / 后训练
 MCP / LangGraph / Agent SDK
-PostgreSQL / Redis / pgvector / Neo4j
-前端 Training Center
-完整权限系统
-真实医生审核流
+```
+
+当前禁止提前实现（在未立项的新 Phase 中）：
+
+```text
+真实 RAG / GraphRAG 作为 Runtime 主控
+模型训练 / 后训练自动生效
+MCP / LangGraph / Agent SDK 替代 SafetyGate
+正式医生审核平台语义
+ApprovedExperience / TrainingDatasetVersion 自动发布
+破坏 Safe DTO 或 Console RBAC-lite 边界
 ```
 
 ---
@@ -71,7 +79,7 @@ PostgreSQL / Redis / pgvector / Neo4j
 
 ```text
 1. API Layer
-   对外暴露 Runtime API、debug/internal API、未来 Console API。
+   对外暴露 Runtime API、debug/internal API、Phase 5-P1 Console API（/api/v1/debug/console/**）。
 
 2. Application / Orchestration Layer
    负责编排 Runtime 主流程、Evaluation 执行流、Proposal 生成流。
@@ -83,7 +91,7 @@ PostgreSQL / Redis / pgvector / Neo4j
    负责读取可替换资产、知识、能力档案、经验、未来模型 Provider 和外部工具。
 
 5. Storage / Repository Layer
-   当前使用 in-memory 与 YAML；后续演进到 PostgreSQL、Redis、pgvector。
+   in-memory 与 PostgreSQL 双实现（Phase 5-P0）；YAML 资产包与 Evaluation 病例集；Redis / pgvector 仍后置。
 
 6. Integration Layer
    后续连接 Python AI Provider、RAG、GraphRAG、MCP、外部 LLM、模型服务。
@@ -321,77 +329,44 @@ Integration 不直接调用 PatientOutput。
 
 # 五、核心包结构规划
 
-当前与近期建议结构：
+当前已实现结构（节选）：
 
 ```text
 src/main/java/com/clinmind/runtime/
-  api/
-    RuntimeController.java
-    PatientRuntimeController.java
-    AssetController.java
-    DebugRuntimeController.java
-    EvaluationController.java        # Phase 3-P0-G
-
-  runtime/
-    RuntimeService.java
-    RuntimeStore.java
-
-  state/
-    RuntimeState.java
-    RuntimeStatus.java
-    RuntimeMode.java
-    WorkMode.java
-    RuntimeTrace.java
-
+  api/                             # Runtime / debug REST 入口
+  runtime/                         # RuntimeService、RuntimeStore
+  state/                           # RuntimeState、RuntimeTrace
   trace/
-    TraceStep.java
-    RuntimeTraceAspect.java
-    RuntimeTraceCollector.java
-
-  entry/
-  caseframe/
-  knowledge/
-  experience/
-  safety/
-  reasoning/
-  boundary/
-  output/
-
+  entry/ caseframe/ knowledge/ experience/
+  safety/ reasoning/ boundary/ output/
   asset/
-    model/
-    repository/
-    provider/
+  provider/                        # YAML Asset Provider
+  evaluation/                      # runner、scorer、result、proposal
+  candidate/                       # 候选生成、脱敏、review、store
+  audit/                           # AuditLog（Phase 5-P0）
+  persistence/                     # snapshot mapper、jdbc store
+  storage/                         # in-memory store
+  console/                         # Phase 5-P1：access、api、dto、audit query
+  config/
+  service/
 
-  evaluation/
-    model/                         # Phase3-P0-A
-    repository/                    # Phase3-P0-B
-    runner/                        # Phase3-P0-C
-    scorer/                        # Phase3-P0-D
-    result/                        # Phase3-P0-E
-    proposal/                      # Phase3-P0-F
-    api/                           # Phase3-P0-G
-
-  training/                        # Phase 3-P1 / Phase 4 后置
-  integration/                     # Phase 4/5 后置
-  common/
-    error/
-    response/
-    time/
+console-web/                       # Phase 5-P2：Vite + React 最小 Console MVP
+  src/pages/                       # Runtime / Evaluation / Candidate / Review / Audit
+  src/api/consoleClient.ts
+  src/auth/DebugContextProvider.tsx
+  src/components/SensitiveFieldRenderGuard.ts
 ```
 
 测试结构：
 
 ```text
 src/test/java/com/clinmind/runtime/
-  phase1 regression tests
-  asset tests
-  evaluation/
-    model/
-    repository/
-    runner/
-    scorer/
-    proposal/
-    api/
+  phase1–5 回归与集成测试
+  console/                         # Console API、RBAC、Safe DTO、Audit
+  persistence/                     # jdbc、postgres E2E
+
+console-web/src/tests/
+  35 项 vitest（smoke、页面流、敏感字段渲染）
 ```
 
 资源结构：
@@ -400,6 +375,7 @@ src/test/java/com/clinmind/runtime/
 src/main/resources/
   assets/packages/phase2-default/
   evaluation/case-sets/phase3-default/
+  db/migration/                    # Flyway（postgres 模式）
   application.yml
 ```
 
@@ -688,41 +664,43 @@ ExperienceCandidate
 TrainingExampleCandidate
 ```
 
-## 9.3 Phase 5
+## 9.3 Phase 5（分 P0 / P1 / P2 已交付 vs 仍后置）
 
-PostgreSQL 承载：
+**Phase 5-P0 已落地（PostgreSQL 治理底座）：**
 
 ```text
-Runtime sessions
-RuntimeTrace
-AssetPackage metadata
-EvaluationCaseSet
-EvaluationRun / EvaluationResult
-CapabilityProfileUpdateProposal
-ExperienceCandidate
-TrainingDatasetVersion
-ModelProviderMetadata
+Runtime / Evaluation / Candidate / Review snapshot
+Jdbc*Store + InMemory*Store 双实现
 AuditLog
-User / Role / Permission
+Flyway migration
+Persistence health / Audit debug API
 ```
 
-Redis 承载：
+**Phase 5-P1 已落地（最小 Console API）：**
 
 ```text
-session cache
-short-term context cache
-lock
-rate limit
-job progress
+ActorContext / RBAC-lite / AccessPolicy
+SafeConsoleDtoMapper
+/api/v1/debug/console/**（Runtime、Evaluation、Candidate、Review Queue、Audit Center）
+Console 查询与 review 写 AuditLog
 ```
 
-pgvector 承载：
+**Phase 5-P2 已落地（最小前端 Console MVP）：**
 
 ```text
-evidence embeddings
-similar case embeddings
-experience embeddings
-trace error embeddings
+console-web/ — Runtime / Evaluation / Candidate / Review Queue / Audit Center 页面
+DebugContextPanel、consoleClient、SensitiveFieldRenderGuard
+```
+
+**仍后置（完整 Phase 5 平台化愿景）：**
+
+```text
+Redis（session cache、lock、rate limit）
+pgvector（evidence / case / experience embeddings）
+Python AI Provider service
+Docker Compose 一键编排
+完整 Training Center / Model Registry UI
+正式 User / Role / OAuth
 ```
 
 ---
@@ -757,17 +735,34 @@ trace error embeddings
 不得作为 patient-facing client 使用。
 ```
 
-## 10.4 Future Console API
+## 10.4 Console API 与前端 MVP（Phase 5-P1 / P2 已实现）
 
-Phase 5 后置，用于：
+**后端 Console API（P1，/api/v1/debug/console/**）：**
+
+```text
+Runtime / Evaluation 列表与 Safe DTO 详情
+Candidate / Review Queue 查询
+Candidate review（复用 debug review API + AccessPolicy）
+Audit Center summary / audit-logs / filters
+RBAC-lite：X-Debug-Actor / X-Debug-Roles + AccessPolicy
+```
+
+**前端最小 MVP（P2，console-web/）：**
+
+```text
+AppShell + Sidebar + DebugContextPanel
+五页治理界面与 review 表单
+只消费 Safe Console API；SensitiveFieldRenderGuard 二次过滤
+```
+
+**仍后置的完整平台 Console：**
 
 ```text
 Training Center
-Asset Console
-Runtime Console
-Evaluation Center
+Asset Console（完整资产管理 UI）
 Model Registry
-Audit Center
+正式登录 / 多租户
+Docker Compose 部署编排
 ```
 
 ---
@@ -907,13 +902,13 @@ broken-package fail-safe 测试通过。
 
 # 十五、部署演进方案
 
-## 15.1 当前阶段
+## 15.1 当前阶段（Phase 5-P2 已完成）
 
 ```text
-Maven package
-java -jar
-本地运行
-JUnit / Postman 验收
+后端：Maven package → java -jar（in-memory 默认；--spring.profiles.active=postgres 可选）
+前端：cd console-web && npm install && npm run dev（http://localhost:5173，/api 代理 8080）
+验收：mvn test + console-web npm run test（35 项）+ npm run build
+人工记录：docs/Phase5_P2人工测试结果.md
 ```
 
 ## 15.2 Phase 5
@@ -977,61 +972,79 @@ ExperienceCandidate、TrainingExampleCandidate、feedback/outcome、trace analys
 Python AI Provider prototype、embedding、RAG、GraphRAG、similar case retrieval。
 ```
 
-## Phase 5
+## Phase 5-P0
 
 ```text
-PostgreSQL、pgvector、React Console、Python Provider service、Model Registry、Audit、Security、Docker Compose。
+PostgreSQL 持久化、Repository 双实现、AuditLog、Flyway、Persistence health API。
+```
+
+## Phase 5-P1
+
+```text
+Console API、RBAC-lite、SafeConsoleDtoMapper、Audit Center 查询增强。
+```
+
+## Phase 5-P2
+
+```text
+console-web/ 最小前端 Console MVP；Debug Context；五页治理界面；前端安全边界与 vitest。
+```
+
+## Phase 5 后置（未实现）
+
+```text
+pgvector、Redis、Python Provider service、Docker Compose、完整 Training Center、正式 OAuth。
 ```
 
 ---
 
-# 十七、禁止提前实现内容
+# 十七、禁止提前实现内容（P2 完成后仍有效）
 
 ```text
-1. 不在 Phase 3-P0 接 Python AI Provider。
-2. 不在 Phase 3-P0 接 RAG / GraphRAG。
-3. 不在 Phase 3-P0 接 MCP / LangGraph / Agent SDK。
-4. 不在 Phase 3-P0 训练模型。
-5. 不在 Phase 3-P0 接 PostgreSQL / Redis / pgvector / Neo4j。
-6. 不在 Phase 3-P0 做前端 Training Center。
+1. 不接 Python AI Provider 作为 Runtime 主控。
+2. 不接 RAG / GraphRAG 绕过 SafetyGate / DecisionBoundary。
+3. 不接 MCP / LangGraph / Agent SDK 替代 Runtime 主控。
+4. 不在未立项 Phase 中训练基础大模型或自动发布训练集。
+5. 不破坏 in-memory / postgres 双模式与 InMemory 实现。
+6. 不做完整产品化 Training Center / 正式登录 / 多租户（最小 console-web/ 已交付）。
 7. 不让 Provider / Model / LLM / MCP 替代 Runtime 主控。
 8. 不让任何模块绕过 SafetyGate / DecisionBoundary。
-9. 不自动上线 CapabilityProfile。
+9. 不自动上线 CapabilityProfile 或 ApprovedExperience。
 10. 不自动把 RuntimeTrace 变成经验或训练数据。
+11. 不通过 Console 或前端扩大 Safe DTO 暴露面（患者原文、clinician_report、raw training input）。
+12. 不把 Candidate review 当作正式临床审核或自动生效机制。
 ```
 
 ---
 
 # 十八、当前最优下一步
 
-当前最优实现任务仍然是：
+Phase 5-P2 已完成，无强制实现任务。
+
+若继续演进，应从后置任务立项（见 `docs/Phase5_P2开发任务清单.md` §十）：
 
 ```text
-Phase3-P0-A：Evaluation 数据结构
+1. 正式登录 / JWT / OAuth
+2. Docker Compose 本地编排
+3. 完整产品化前端 / Training Center
+4. Python AI Provider / RAG / GraphRAG
+5. 模型训练 / 后训练
 ```
 
-具体动作：
+维护与回归优先：
 
 ```text
-1. 读取 docs/Phase3_开发任务清单.md。
-2. 将 Phase3-P0-A 标记为 [/]。
-3. 新增 evaluation/model 下的基础数据结构。
-4. 编写基础单元测试。
-5. 将完成项标记为 [x]。
+1. 保持 mvn test 与 console-web npm run test / build 全绿。
+2. 文档变更同步 docs/README.md 与 AI_IMPLEMENTATION_SKILL.md。
+3. 不破坏 Phase 1–5 已冻结边界。
 ```
 
-不应在该任务中实现：
+不应在未立项时直接实现：
 
 ```text
-EvaluationRunner
-Scorer
-CapabilityProfile 更新
-Python Provider
-RAG / GraphRAG
-MCP
-模型训练
-数据库持久化
-前端
+后端 Console API 大改
+ApprovedExperience 自动生效
+正式医生审核平台
 ```
 
 ---

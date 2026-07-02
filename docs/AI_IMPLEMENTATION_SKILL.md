@@ -1,8 +1,7 @@
 # AI Implementation Skill：ClinMindRuntime Phase 5-P2
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1–4、Phase 5-P0 持久化与治理底座、Phase 5-P1 最小 Console 与访问治理均已完成并冻结。  
-> 当前进入 **Phase 5-P2：最小前端 Console MVP**。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、Evaluation 闭环、Candidate 脱敏、持久化双模式、AuditLog、Console 访问治理和患者端隔离。
+> 当前 Phase 1–5-P2 均已落地；Phase 5-P0/P1 已冻结，Phase 5-P2 最小前端 Console MVP 已完成。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、Evaluation 闭环、Candidate 脱敏、持久化双模式、AuditLog、Console 访问治理和患者端隔离。
 
 ---
 
@@ -74,74 +73,45 @@ AI 实现时必须优先参考以下文档，优先级从高到低：
 解释：
 
 ```text
-Phase 5-P1 文档优先指导当前新增能力。
-docs/Phase5_P0冻结记录.md 是 P0 冻结边界依据。
-docs/平台前端与Console规划.md 是长期规划，不是 P1 实现完整前端的理由。
-Phase5-P1 只实现最小 Console API 与访问治理。
+Phase 5-P2 已完成；P2 规格与验收记录是维护与演进时的首要约束。
+Phase 5-P1/P0 冻结记录是 Console API 与持久化边界依据。
+docs/平台前端与Console规划.md 约束完整产品化前端，不否定已落地的 console-web/ 最小 MVP。
 ```
 
 ---
 
 # 三、当前允许实现的内容
 
-当前只允许按 Phase5-P1-A 到 Phase5-P1-F 顺序推进。
+Phase 5-P2 已全部完成。当前无强制实现任务；若继续演进，只能从 Phase5_P2开发任务清单 §十 后置任务中立项。
 
-## 3.1 Phase5-P1-A：ActorContext 与 RBAC-lite 基础
-
-```text
-ActorContext
-DebugRole
-ConsoleActionType
-ConsoleResourceType
-ActorContextResolver
-RolePolicy / AccessPolicy
-AccessDeniedException
-ApiExceptionHandler 错误码映射
-```
-
-## 3.2 Phase5-P1-B：Safe Console DTO Mapper
+## 3.1 已交付：Phase 5-P1 Console API（冻结）
 
 ```text
+ActorContext / RBAC-lite / AccessPolicy
 SafeConsoleDtoMapper
-Runtime / Evaluation / Candidate / Review / Audit console DTO
-敏感字段 denylist / allowlist
-```
-
-## 3.3 Phase5-P1-C：Console Runtime / Evaluation 查询 API
-
-```text
 GET /api/v1/debug/console/runtime-sessions
-GET /api/v1/debug/console/runtime-sessions/{runtime_id}
 GET /api/v1/debug/console/evaluation-runs
-GET /api/v1/debug/console/evaluation-runs/{run_id}
+GET /api/v1/debug/console/candidates / review-queue
+GET /api/v1/debug/console/audit-center/**
+Candidate review API + AccessPolicy
 ```
 
-## 3.4 Phase5-P1-D：Console Candidate / Review Queue API
+## 3.2 已交付：Phase 5-P2 前端 Console MVP（归档）
 
 ```text
-GET /api/v1/debug/console/candidate-generations
-GET /api/v1/debug/console/candidates
-GET /api/v1/debug/console/candidates/{candidate_id}
-GET /api/v1/debug/console/review-queue
-existing review API 接入 AccessPolicy
+console-web/ — Vite + React + TypeScript
+Runtime / Evaluation / Candidate / Review Queue / Audit Center 页面
+DebugContextPanel、consoleClient、SensitiveFieldRenderGuard
+Review 表单（APPROVE / REJECT / DEPRECATE）
+35 项 vitest；npm run build 通过
 ```
 
-## 3.5 Phase5-P1-E：Audit Center 查询增强
+## 3.3 允许的维护类改动
 
 ```text
-GET /api/v1/debug/console/audit-center/audit-logs
-GET /api/v1/debug/console/audit-center/audit-logs/{audit_id}
-GET /api/v1/debug/console/audit-center/summary
-filters / pagination / limit guard
-```
-
-## 3.6 Phase5-P1-F：Postgres E2E 与人工验收
-
-```text
-Phase5P1ConsolePostgresEndToEndIntegrationTest
-ConsoleAuditTrailIntegrationTest
-ConsoleSensitiveFieldRedactionIntegrationTest
-docs/Phase5_P1人工测试API结果.md
+bug fix、测试补强、文档同步
+不破坏 Safe DTO、RBAC-lite、AuditLog 与前端敏感字段过滤
+保持 mvn test 与 console-web npm run test 回归
 ```
 
 ---
@@ -154,7 +124,7 @@ docs/Phase5_P1人工测试API结果.md
 3. 不接 MCP / LangGraph / Agent SDK 作为 Runtime 主控。
 4. 不训练基础大模型。
 5. 不实现 SFT / RLHF / DPO / RFT / 蒸馏训练链路。
-6. 不做完整前端 Training Center / Runtime Console。
+6. 不做完整产品化 Training Center / 正式 Runtime Console（最小 console-web/ MVP 已交付，不在此禁）。
 7. 不做正式登录系统 / JWT / OAuth / 多租户。
 8. 不做正式医生审核平台。
 9. 不自动上线 ApprovedExperience。
@@ -169,85 +139,73 @@ docs/Phase5_P1人工测试API结果.md
 如果任务中出现上述需求，AI 必须回复：
 
 ```text
-该能力属于后续 Phase，不属于当前 Phase 5-P1 最小 Console 与访问治理。本次只保留为 backlog 或文档规划，不实现真实能力。
+该能力属于后续 Phase，不属于当前 Phase 5-P2 归档范围。本次只保留为 backlog 或文档规划，不实现真实能力。
 ```
 
 ---
 
-# 五、Phase 5-P1 架构约束
+# 五、Phase 5 架构约束（P1 Console API + P2 前端 MVP）
 
 ```text
 1. RuntimeService 仍然是 Runtime 主控入口。
 2. Console API 只能查询和治理已有对象，不能改变 Runtime 决策。
 3. Console API 必须经过 DebugTokenFilter 和 AccessPolicy。
-4. Service 只能依赖 Store / Repository interface，不感知 in-memory 或 postgres 实现。
-5. Console API 不得直接返回 domain object / snapshot raw json。
-6. SafeConsoleDtoMapper 必须过滤患者原文、clinician_report、未脱敏 candidate input。
-7. Candidate review_status 即使为 APPROVED，也不代表 Runtime 可用。
-8. Console 查询和 review 操作必须写 AuditLog。
-9. AuditLog 不得保存未脱敏患者原文。
-10. 所有改动必须保持 Phase1/2/3/4/5-P0 回归通过。
+4. console-web/ 只调用 Safe Console API，不得绕过 DTO 获取 raw 数据。
+5. Service 只能依赖 Store / Repository interface，不感知 in-memory 或 postgres 实现。
+6. Console API 不得直接返回 domain object / snapshot raw json。
+7. SafeConsoleDtoMapper 与 SensitiveFieldRenderGuard 必须过滤患者原文、clinician_report、未脱敏 candidate input。
+8. Candidate review_status 即使为 APPROVED，也不代表 Runtime 可用。
+9. Console 查询和 review 操作必须写 AuditLog。
+10. 所有改动必须保持 Phase1/2/3/4/5-P0/P1/P2 回归通过。
 ```
 
 ---
 
 # 六、任务清单同步规则
 
-每次实现 Phase 5-P1 代码前，必须同步更新：
+若新开 Phase 或做后置任务立项，必须同步更新对应任务清单与 `docs/README.md`。
+
+对 Phase 5-P2 归档后的维护改动：
 
 ```text
-docs/Phase5_P1开发任务清单.md
-```
-
-实现前：
-
-```text
-1. 读取 docs/Phase5_P1开发任务清单.md。
-2. 确认当前任务属于 Phase5-P1-A 到 Phase5-P1-F 的哪一项。
-3. 将正在处理的任务从 [ ] 改为 [/]。
-4. 如果任务不在清单中，先补清单，不要直接实现。
-```
-
-实现后：
-
-```text
-1. 将已完成任务从 [/] 改为 [x]。
-2. 如果任务部分完成，保持 [/] 并说明原因。
-3. 如果任务被阻塞，将状态改为 [!] 并说明原因。
+1. 不擅自新增未立项的 Phase 子任务。
+2. 若修复 bug 或补测试，在 commit / PR 说明中注明影响范围。
+3. 若改动 Console API 或 console-web/，同步检查 Safe DTO 与 SensitiveField 测试。
 ```
 
 ---
 
 # 七、测试约束
 
-Phase 5-P1 必须同时保护 in-memory 回归和 postgres 持久化专项测试。
+Phase 5 必须同时保护后端 in-memory / postgres 回归与 console-web 前端测试。
 
-至少包含：
+后端至少包含（P1 已交付，P2 不得破坏）：
 
 ```text
-ActorContextResolverTest
-AccessPolicyTest
+ActorContextResolverTest / AccessPolicyTest
 SafeConsoleDtoMapperTest
-ConsoleRuntimeControllerTest
-ConsoleEvaluationControllerTest
-ConsoleCandidateControllerTest
-ConsoleAuditCenterControllerTest
-ConsoleAccessDeniedControllerTest
+Console*ControllerTest
 ConsoleAuditTrailIntegrationTest
 ConsoleSensitiveFieldRedactionIntegrationTest
 Phase5P1ConsolePostgresEndToEndIntegrationTest
 ```
 
-每次 Phase 5-P1 改动后，必须尽量保持：
+前端至少包含（P2 已交付）：
 
 ```text
-Phase 1 Runtime 回归通过。
-Phase 2 Asset Provider 回归通过。
-Phase 3 Evaluation 回归通过。
-Phase 4 Candidate / Review 回归通过。
-Phase 5-P0 Persistence / AuditLog 回归通过。
-in-memory 模式可启动。
-postgres 模式专项测试通过。
+ConsoleAppSmoke.test.tsx
+SensitiveFieldRedactionRender.test.tsx
+RuntimePage / EvaluationPage / CandidatePage / ReviewQueueFlow
+AuditCenterPage / AuditCenterFlow / PermissionErrorFlow
+npm run build && npm run test（35 项）
+```
+
+每次改动后，必须尽量保持：
+
+```text
+Phase 1–5 后端 mvn test 回归通过。
+console-web npm run test / npm run build 通过。
+in-memory 与 postgres 专项测试可复现。
 ```
 
 如果无法实际运行测试，必须在回复或提交说明中明确：

@@ -242,4 +242,4 @@ Admin 页面：可发布、回滚、授权和查看审计。
 
 前端平台的价值是展示和治理 Runtime，而不是替代 Runtime。
 
-Phase 5 前不应把精力投入完整前端。等 Runtime、Asset、Evaluation、Experience 和 Model Provider 边界稳定后，再做 Console 才有意义。
+Phase 5-P2 已交付 `console-web/` 最小治理 Console MVP（Runtime / Evaluation / Candidate / Review Queue / Audit Center）。本文档仍约束**完整产品化**前端（Training Center、Model Registry、正式登录、多租户等），这些能力仍后置。
