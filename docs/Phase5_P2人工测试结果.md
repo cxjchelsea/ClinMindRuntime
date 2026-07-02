@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |------|------|
 | 验收日期 | 2026-06-25 |
-| 代码基线 | commit `feat(phase5-p2-f)`（P2-A～P2-F 全链路） |
+| 代码基线 | commit `270b015` |
 | 验收结论 | **通过** — 前端 35 项 vitest 全绿；`npm run build` 通过；后端 `mvn test` 回归通过（exit 0，Phase 1–5 未被破坏） |
 | 后端启动 | `mvn -DskipTests package` → `java -jar target/clinmind-runtime-0.1.0-SNAPSHOT.jar` |
 | 前端启动 | `cd console-web && npm install && npm run dev` → `http://localhost:5173` |
