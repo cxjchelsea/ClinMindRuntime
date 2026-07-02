@@ -1,8 +1,8 @@
 # ClinMindRuntime 文档导航
 
-> 本文件是 `docs/` 目录入口，用于说明当前文档体系如何阅读、哪些文档是当前权威入口、哪些是专项设计、哪些是 Phase 冻结记录、哪些是后续规划。  
-> 当前文档体系采用“总设计 → 项目设计地图 → 专项设计 → Phase 实现规格 → 开发任务清单 → 代码 → 冻结记录”的层级关系。  
-> 当前仅做 **逻辑归档**，暂不大规模移动文件路径，避免破坏 README、冻结记录、AI_IMPLEMENTATION_SKILL 和历史 Phase 文档中的引用。
+> 本文件是 `docs/` 目录入口，用于说明当前文档体系如何阅读、哪些文档是当前权威入口、哪些是专项设计、哪些是 Phase 实现规格、哪些是实现约束。  
+> 当前文档已经完成物理目录重构：入口、总设计、专项设计、Phase 实现和实现约束已分别归入独立目录。  
+> 后续新增 Phase 6-P0 文档时，应直接放入 `docs/3-phase实现/`。
 
 ---
 
@@ -24,133 +24,169 @@ Phase 5-P2：最小前端 Console MVP 已完成并冻结。
 当前总设计状态：
 
 ```text
-docs/ClinMindRuntime完整系统设计.md 已升级为 v2.2。
-项目定位已从 Runtime-first 治理主干升级为：受控医疗 AI Agent Runtime 与能力治理平台。
+docs/1-总设计/ClinMindRuntime完整系统设计.md 已升级为 v2.2。
+项目定位：受控医疗 AI Agent Runtime 与能力治理平台。
 ```
 
 当前文档整理状态：
 
 ```text
-1. docs/00_项目设计地图.md 已建立。
-2. 项目采用逻辑归档，不立即物理搬迁文件。
-3. 专项文档通过设计地图挂接到总设计下。
-4. 进入 Phase 6-P0 前，需要继续同步路线图、技术实现总方案和剩余专项文档定位块。
+1. docs/ 已完成分层目录重构。
+2. docs/0-项目入口/00_项目设计地图.md 是文档体系总入口。
+3. docs/1-总设计/ 保存总设计、阶段路线图、技术实现总方案和全局架构支撑文档。
+4. docs/2-专项设计/ 保存各能力域专项设计文档。
+5. docs/3-phase实现/ 保存 Phase 1–5 的实现规格、任务清单、测试结果和冻结记录；后续 Phase 6 文档也放这里。
+6. docs/4-实现约束/ 保存 AI_IMPLEMENTATION_SKILL.md。
 ```
 
 ---
 
-# 二、推荐阅读顺序
-
-## 2.1 面试官 / 第一次看项目
+# 二、当前目录结构
 
 ```text
-1. docs/项目展示导读.md
-2. docs/00_项目设计地图.md
-3. docs/ClinMindRuntime完整系统设计.md
-4. docs/ClinMindRuntime技术实现总方案.md
-5. docs/Phase5冻结记录.md
-6. docs/Phase5_P2冻结记录.md
-7. docs/架构模式与设计模式说明.md
+docs/
+  README.md
+
+  0-项目入口/
+    00_项目设计地图.md
+    项目展示导读.md
+    架构文档缺口审查清单.md
+
+  1-总设计/
+    ClinMindRuntime完整系统设计.md
+    ClinMindRuntime阶段拆分路线图.md
+    ClinMindRuntime技术实现总方案.md
+    全局技术栈与架构选型.md
+    架构模式与设计模式说明.md
+
+  2-专项设计/
+    AI前沿技术选型与接入规划.md
+    医学知识库与RAG构建规划.md
+    模型训练与后训练规划.md
+    数据安全与合规边界规划.md
+    数据库持久化设计.md
+    平台前端与Console规划.md
+    部署与运维规划.md
+    测试与CI总方案.md
+
+  3-phase实现/
+    Phase1_* / Phase2_* / Phase3_* / Phase4_* / Phase5_*
+    Phase3_P0冻结记录.md
+    Phase4_P0冻结记录.md
+    Phase4_P1冻结记录.md
+    Phase5_P0冻结记录.md
+    Phase5_P1冻结记录.md
+    Phase5_P2冻结记录.md
+    Phase5冻结记录.md
+
+  4-实现约束/
+    AI_IMPLEMENTATION_SKILL.md
+```
+
+---
+
+# 三、推荐阅读顺序
+
+## 3.1 面试官 / 第一次看项目
+
+```text
+1. docs/0-项目入口/项目展示导读.md
+2. docs/0-项目入口/00_项目设计地图.md
+3. docs/1-总设计/ClinMindRuntime完整系统设计.md
+4. docs/1-总设计/ClinMindRuntime技术实现总方案.md
+5. docs/3-phase实现/Phase5冻结记录.md
+6. docs/3-phase实现/Phase5_P2冻结记录.md
+7. docs/1-总设计/架构模式与设计模式说明.md
 ```
 
 阅读目标：快速理解项目为什么不是普通 RAG / Agent Demo，而是一个以 Runtime 主控、Agent / RAG / Model / Tool 受控接入、Evaluation / Audit / Governance 闭环的医疗 AI Runtime 项目。
 
-## 2.2 后续设计 / AI 编码工具
+## 3.2 后续设计 / AI 编码工具
 
 ```text
-1. docs/00_项目设计地图.md
-2. docs/ClinMindRuntime完整系统设计.md
-3. docs/AI_IMPLEMENTATION_SKILL.md
-4. docs/ClinMindRuntime阶段拆分路线图.md
-5. docs/ClinMindRuntime技术实现总方案.md
+1. docs/0-项目入口/00_项目设计地图.md
+2. docs/1-总设计/ClinMindRuntime完整系统设计.md
+3. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
+4. docs/1-总设计/ClinMindRuntime阶段拆分路线图.md
+5. docs/1-总设计/ClinMindRuntime技术实现总方案.md
 6. 当前 Phase 实现规格
 7. 当前 Phase 开发任务清单
-8. docs/测试与CI总方案.md
-9. docs/数据安全与合规边界规划.md
+8. docs/2-专项设计/测试与CI总方案.md
+9. docs/2-专项设计/数据安全与合规边界规划.md
 ```
 
 阅读目标：先确认当前阶段、允许范围和禁止边界，再进入具体实现。
 
-## 2.3 架构学习 / 自我复盘
+## 3.3 架构学习 / 自我复盘
 
 ```text
-1. docs/00_项目设计地图.md
-2. docs/ClinMindRuntime完整系统设计.md
-3. docs/架构模式与设计模式说明.md
-4. docs/ClinMindRuntime阶段拆分路线图.md
-5. docs/全局技术栈与架构选型.md
-6. docs/数据库持久化设计.md
-7. docs/平台前端与Console规划.md
+1. docs/0-项目入口/00_项目设计地图.md
+2. docs/1-总设计/ClinMindRuntime完整系统设计.md
+3. docs/1-总设计/架构模式与设计模式说明.md
+4. docs/1-总设计/ClinMindRuntime阶段拆分路线图.md
+5. docs/1-总设计/全局技术栈与架构选型.md
+6. docs/2-专项设计/数据库持久化设计.md
+7. docs/2-专项设计/平台前端与Console规划.md
 ```
 
 ---
 
-# 三、逻辑归档分组
+# 四、文档分组说明
 
-当前文件仍主要保留在 `docs/` 根目录下，但在逻辑上分为以下几组。
-
-## 3.1 项目入口与导航组
+## 4.1 项目入口与导航组
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
 | `README.md` | 活跃 | 仓库根入口，说明当前项目状态和阅读入口 |
 | `docs/README.md` | 活跃 | docs 目录导航入口 |
-| `docs/00_项目设计地图.md` | 活跃 / 权威入口 | 说明总设计、专项设计、Phase 文档、实现约束和冻结记录之间的关系 |
-| `docs/项目展示导读.md` | 活跃 | 面向阅读者 / 面试官的项目导读 |
-| `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
-| `docs/架构文档缺口审查清单.md` | 活跃 | 检查文档缺口、过期状态和后续补文档顺序 |
+| `docs/0-项目入口/00_项目设计地图.md` | 活跃 / 权威入口 | 说明总设计、专项设计、Phase 文档、实现约束和冻结记录之间的关系 |
+| `docs/0-项目入口/项目展示导读.md` | 活跃 | 面向阅读者 / 面试官的项目导读 |
+| `docs/0-项目入口/架构文档缺口审查清单.md` | 活跃 | 检查文档缺口、过期状态和后续补文档顺序 |
 
-## 3.2 总设计组
+## 4.2 总设计组
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/ClinMindRuntime完整系统设计.md` | 活跃 / 权威 | 定义项目定位、八个能力域、五层架构、统一 Runtime 主链路、AI 前沿技术覆盖矩阵 |
-| `docs/ClinMindRuntime技术实现总方案.md` | 活跃 / 待同步 | 代码分层、包结构、当前实现状态与后续实现结构 |
-| `docs/ClinMindRuntime阶段拆分路线图.md` | 活跃 / 待同步 | Phase 1–10 的长期演进顺序 |
-| `docs/全局技术栈与架构选型.md` | 专项支撑 / 全局 | Java、Spring Boot、React、PostgreSQL、Python、pgvector 等选型 |
-| `docs/架构模式与设计模式说明.md` | 专项支撑 / 全局 | Provider、Policy、Validator、Store、Strategy 等工程模式说明 |
+| `docs/1-总设计/ClinMindRuntime完整系统设计.md` | 活跃 / 权威 | 定义项目定位、八个能力域、五层架构、统一 Runtime 主链路、AI 前沿技术覆盖矩阵 |
+| `docs/1-总设计/ClinMindRuntime技术实现总方案.md` | 活跃 | 代码分层、包结构、统一 Runtime 主链路、Capability Orchestration、AgentExecutionLayer、Runtime Validation |
+| `docs/1-总设计/ClinMindRuntime阶段拆分路线图.md` | 活跃 | Phase 1–10 的长期演进顺序 |
+| `docs/1-总设计/全局技术栈与架构选型.md` | 活跃 | Java、Spring Boot、React、PostgreSQL、Python、pgvector 等选型 |
+| `docs/1-总设计/架构模式与设计模式说明.md` | 活跃 | Provider、Policy、Validator、Store、Strategy、AgentRuntime 等工程模式说明 |
 
-## 3.3 专项设计组
+## 4.3 专项设计组
 
 | 文档 | 状态 | 对应总设计位置 |
 |---|---|---|
-| `docs/AI前沿技术选型与接入规划.md` | 专项设计 / 技术雷达 | Agent 受控执行域；Tool / MCP / Skills；模型能力域 |
-| `docs/医学知识库与RAG构建规划.md` | 专项设计 | 医学知识与证据域；RAG / KG-lite / GraphRAG |
-| `docs/模型训练与后训练规划.md` | 专项设计 | 模型能力与 Provider 域 |
-| `docs/数据安全与合规边界规划.md` | 专项设计 | 输出边界与安全治理域；Audit；脱敏 |
-| `docs/数据库持久化设计.md` | 专项设计 | Storage / Integration 层 |
-| `docs/平台前端与Console规划.md` | 专项设计 | 平台治理层；Console / Review Queue / Audit Center |
-| `docs/部署与运维规划.md` | 专项设计 / 后置 | 部署、运维、Docker、发布 |
-| `docs/测试与CI总方案.md` | 专项设计 | 测试、CI、回归与质量治理 |
+| `docs/2-专项设计/AI前沿技术选型与接入规划.md` | 专项设计 / 技术雷达 | Agent 受控执行域；Tool / MCP / Skills；模型能力域 |
+| `docs/2-专项设计/医学知识库与RAG构建规划.md` | 专项设计 | 医学知识与证据域；RAG / KG-lite / GraphRAG |
+| `docs/2-专项设计/模型训练与后训练规划.md` | 专项设计 | 模型能力与 Provider 域 |
+| `docs/2-专项设计/数据安全与合规边界规划.md` | 专项设计 | 输出边界与安全治理域；Audit；脱敏 |
+| `docs/2-专项设计/数据库持久化设计.md` | 专项设计 | Storage / Integration 层 |
+| `docs/2-专项设计/平台前端与Console规划.md` | 专项设计 | 平台治理层；Console / Review Queue / Audit Center |
+| `docs/2-专项设计/部署与运维规划.md` | 专项设计 / 后置 | 部署、运维、Docker、发布 |
+| `docs/2-专项设计/测试与CI总方案.md` | 专项设计 | 测试、CI、回归与质量治理 |
 
 专项文档不是直接编码依据。进入实现前，必须先形成对应 Phase 实现规格和开发任务清单。
 
-## 3.4 Phase 实现规格组
+## 4.4 Phase 实现规格与冻结归档组
 
 | 阶段 | 状态 | 代表文档 |
 |---|---|---|
-| Phase 5-P2 | 已冻结 | `docs/Phase5_P2冻结记录.md`、`docs/Phase5_P2开发任务清单.md`、`docs/Phase5_P2最小前端Console_MVP_实现规格.md` |
-| Phase 5-P1 | 已冻结 | `docs/Phase5_P1冻结记录.md`、`docs/Phase5_P1最小Console与访问治理_实现规格.md` |
-| Phase 5-P0 | 已冻结 | `docs/Phase5_P0冻结记录.md`、`docs/Phase5_P0持久化与治理底座_实现规格.md` |
-| Phase 4 及更早 | 已冻结 | `docs/Phase4_P1冻结记录.md`、`docs/Phase4_P0冻结记录.md`、`docs/Phase3_P0冻结记录.md` |
-| Phase 6-P0 | 待设计 | `docs/Phase6_P0受控Agent执行层_实现规格.md`、`docs/Phase6_P0开发任务清单.md` 待新增 |
+| Phase 1–2 | 已完成 | `docs/3-phase实现/Phase1_*`、`docs/3-phase实现/Phase2_*` |
+| Phase 3 | 已冻结 | `docs/3-phase实现/Phase3_*`、`docs/3-phase实现/Phase3_P0冻结记录.md` |
+| Phase 4 | 已冻结 | `docs/3-phase实现/Phase4_*`、`docs/3-phase实现/Phase4_P0冻结记录.md`、`docs/3-phase实现/Phase4_P1冻结记录.md` |
+| Phase 5 | 已冻结 | `docs/3-phase实现/Phase5_*`、`docs/3-phase实现/Phase5冻结记录.md` |
+| Phase 6-P0 | 待设计 | `docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md`、`docs/3-phase实现/Phase6_P0Agent_API与测试设计.md`、`docs/3-phase实现/Phase6_P0开发任务清单.md` 待新增 |
 
-## 3.5 Phase 冻结归档组
+## 4.5 实现约束组
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/Phase5冻结记录.md` | 已冻结 | Phase 5 全阶段归档依据 |
-| `docs/Phase5_P2冻结记录.md` | 已冻结 | Phase 5-P2 冻结依据 |
-| `docs/Phase5_P1冻结记录.md` | 已冻结 | Phase 5-P1 冻结依据 |
-| `docs/Phase5_P0冻结记录.md` | 已冻结 | Phase 5-P0 冻结依据 |
-| `docs/Phase4_P1冻结记录.md` | 已冻结 | Phase 4-P1 冻结依据 |
-| `docs/Phase4_P0冻结记录.md` | 已冻结 | Phase 4-P0 冻结依据 |
-| `docs/Phase3_P0冻结记录.md` | 已冻结 | Phase 3-P0 冻结依据 |
-| `docs/Phase*_人工测试*.md` | 验收归档 | 人工测试和 E2E 验收记录 |
+| `docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
 
 ---
 
-# 四、专项文档如何用于实现
+# 五、专项文档如何用于实现
 
 正确链路：
 
@@ -175,38 +211,38 @@ Phase 开发任务清单
 示例：做 Agent
 
 ```text
-docs/ClinMindRuntime完整系统设计.md
+docs/1-总设计/ClinMindRuntime完整系统设计.md
 ↓
-docs/AI前沿技术选型与接入规划.md
+docs/2-专项设计/AI前沿技术选型与接入规划.md
 ↓
-docs/Phase6_P0受控Agent执行层_实现规格.md
+docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md
 ↓
-docs/Phase6_P0开发任务清单.md
+docs/3-phase实现/Phase6_P0开发任务清单.md
 ↓
 代码实现
 ↓
-docs/Phase6_P0冻结记录.md
+docs/3-phase实现/Phase6_P0冻结记录.md
 ```
 
 示例：做 RAG
 
 ```text
-docs/ClinMindRuntime完整系统设计.md
+docs/1-总设计/ClinMindRuntime完整系统设计.md
 ↓
-docs/医学知识库与RAG构建规划.md
+docs/2-专项设计/医学知识库与RAG构建规划.md
 ↓
-docs/Phase7_P0RAG_EvidenceProvider_实现规格.md
+docs/3-phase实现/Phase7_P0RAG_EvidenceProvider_实现规格.md
 ↓
-docs/Phase7_P0开发任务清单.md
+docs/3-phase实现/Phase7_P0开发任务清单.md
 ↓
 代码实现
 ↓
-docs/Phase7_P0冻结记录.md
+docs/3-phase实现/Phase7_P0冻结记录.md
 ```
 
 ---
 
-# 五、当前不应做什么
+# 六、当前不应做什么
 
 ```text
 1. 不应向 Phase 1–5 已冻结阶段继续堆新能力。
@@ -218,46 +254,35 @@ docs/Phase7_P0冻结记录.md
 7. 不应实现正式医生审核平台。
 8. 不应实现 ApprovedExperience 自动生效或 TrainingDatasetVersion 发布。
 9. 不应把专项规划文档当作当前实现完成状态。
-10. 不应大规模移动 docs 文件，除非同步更新全部引用并保留迁移提示。
 ```
 
 ---
 
-# 六、当前建议做什么
+# 七、当前建议做什么
 
 ```text
-1. 阅读 docs/00_项目设计地图.md，确认文档体系关系。
-2. 阅读 docs/ClinMindRuntime完整系统设计.md，确认 v2.2 总设计。
-3. 保持逻辑归档，不急于物理搬迁文件。
-4. 更新 docs/ClinMindRuntime阶段拆分路线图.md，使其与总设计 v2.2 对齐。
-5. 更新 docs/ClinMindRuntime技术实现总方案.md，加入 Capability Orchestration 与 AgentExecutionLayer。
-6. 为剩余专项文档补充文档定位块。
-7. 新增 Phase6_P0 受控 Agent 执行层实现规格与开发任务清单。
-```
-
----
-
-# 七、文档维护规则
-
-```text
-1. 新增重要文档后，必须更新本文件。
-2. 新增或修改实现约束后，必须更新 AI_IMPLEMENTATION_SKILL.md。
-3. 发现新的架构缺口后，必须更新 架构文档缺口审查清单.md。
-4. 进入新 Phase 前，必须先把规划文档升级为实现规格。
-5. 每个专项文档应在开头加入“文档定位块”。
-6. 不再凭感觉判断文档是否完整，以 docs/00_项目设计地图.md 和 docs/架构文档缺口审查清单.md 为准。
-7. 如未来物理移动文件，必须同步更新 README、docs/README、AI_IMPLEMENTATION_SKILL 和所有文档内引用。
+1. 保持 Phase 1–5 冻结边界。
+2. 新增 docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md。
+3. 新增 docs/3-phase实现/Phase6_P0Agent_API与测试设计.md。
+4. 新增 docs/3-phase实现/Phase6_P0开发任务清单.md。
+5. 建立 Phase 6-P0 文档后，再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
 ```
 
 ---
 
 # 八、最终结论
 
-当前文档体系已支撑 Phase 1–5 全链路，并已通过 `docs/00_项目设计地图.md` 将专项设计文档挂接到总设计之下。
+当前文档体系已经从平铺式 `docs/` 目录，整理为分层目录结构：
 
-当前采用逻辑归档，不进行大规模文件夹搬迁。
+```text
+项目入口
+→ 总设计
+→ 专项设计
+→ Phase 实现
+→ 实现约束
+```
 
-下一步不是直接写代码，而是同步路线图、技术实现总方案和剩余专项文档定位块，然后进入：
+下一步不是继续横向新增规划文档，而是进入：
 
 ```text
 Phase 6-P0：受控 Agent 执行层 MVP
