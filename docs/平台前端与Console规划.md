@@ -1,5 +1,13 @@
 # 平台前端与 Console 规划
 
+> 上位总设计：`docs/ClinMindRuntime完整系统设计.md`  
+> 文档地图：`docs/00_项目设计地图.md`  
+> 对应能力域 / 架构层：平台治理层；Runtime Console；Evaluation Center；Review Queue；Audit Center；生产级 Console 规划  
+> 当前状态：专项设计 / 已部分落地  
+> 当前实现：Phase 5-P1 已实现最小 Console API、RBAC-lite、Safe DTO、Audit Center；Phase 5-P2 已实现 `console-web/` 最小前端 Console MVP；完整产品化前端、正式登录、多租户、Training Center、Model Registry 仍后置  
+> 对应 Phase：Phase 5-P1/P2 已落地最小治理 Console；Phase 10-P0 继续扩展生产级平台治理  
+> 实现入口：前端新增能力必须以对应 Phase 的前端信息架构、API 对接、安全边界和测试设计为直接依据。
+
 > 本文档定义 ClinMindRuntime 后续平台前端的页面结构、角色边界、核心 Console、交互目标和接入阶段。  
 > 前端不是 Phase 1–3 的主线，不应提前实现；本文档用于约束 Phase 5 平台化时如何展示 Runtime、Asset、Evaluation、Experience、Model 和 Audit 能力。
 
