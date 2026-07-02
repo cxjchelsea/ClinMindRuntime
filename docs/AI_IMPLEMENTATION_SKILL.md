@@ -1,7 +1,8 @@
-# AI Implementation Skill：ClinMindRuntime（Phase 5 已冻结）
+# AI Implementation Skill：ClinMindRuntime（Phase 5 已冻结，Phase 6-P0 设计准备）
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> 当前 Phase 1–5 均已落地并冻结（Phase 5 含 P0 持久化、P1 Console API、P2 前端 MVP）。后续修改不得破坏 Runtime 主控、安全门、输出边界、Provider 抽象、Evaluation 闭环、Candidate 脱敏、持久化双模式、AuditLog、Console 访问治理和患者端隔离。
+> 当前 Phase 1–5 均已落地并冻结（Phase 5 含 P0 持久化、P1 Console API、P2 前端 MVP）。  
+> 总设计已升级为 v2.2：受控医疗 AI Agent Runtime 与能力治理平台。后续实现必须遵循“统一 Runtime 主链路 + Capability Orchestration + Runtime Validation”的主控结构。
 
 ---
 
@@ -9,7 +10,8 @@
 
 ```text
 当前阶段：Phase 5 已全部冻结（P0 / P1 / P2）
-下一步：无强制主线（见 Phase5冻结记录.md §六 后置任务）
+当前文档状态：总设计 v2.2 已完成，docs/00_项目设计地图.md 已建立
+下一步：Phase 6-P0 受控 Agent 执行层 MVP 的文档设计准备
 ```
 
 当前已经完成的主线：
@@ -22,129 +24,139 @@ Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
 Phase 5-P1：最小 Console 与访问治理，已冻结
-Phase 5-P2：最小前端 Console MVP — 已冻结
+Phase 5-P2：最小前端 Console MVP，已冻结
 ```
 
-Phase 5-P2 目标：
+当前项目权威定位：
 
 ```text
-实现 console-web/ 最小治理界面，只消费 Phase 5-P1 Safe Console API，不暴露敏感字段、不改变 Runtime 决策边界。
+ClinMindRuntime = 受控医疗 AI Agent Runtime 与能力治理平台。
+
+不是普通 RAG 医疗问答。
+不是自由自治式医疗 Agent。
+不是模型直接回答患者。
+不是多 Agent Demo。
 ```
 
-Phase 5-P2 推荐链路：
+当前统一主链路：
 
 ```text
-Frontend Console (console-web/)
-→ Debug Token / Actor / Roles 输入
-→ Console API Client
-→ /api/v1/debug/console/**
-→ Safe DTO Response
-→ 列表 / 详情 / Review 操作 / Audit Center
-```
-
-重要说明：
-
-```text
-Phase 5-P2 不是完整生产前端。
-Phase 5-P2 不是正式登录 / OAuth / JWT 阶段。
-Phase 5-P2 不是 RAG 或模型训练阶段。
-Phase 5-P2 只做最小前端 Console MVP，对接已有 Console API。
+用户 / 医生输入
+→ Runtime API
+→ RuntimeService
+→ EntryAssessment
+→ RuntimeState / CaseFrame
+→ KnowledgeContext / ExperienceContext
+→ SafetyGate
+→ Capability Orchestration
+→ Agent / RAG / Model / Tool 受控调用
+→ Runtime Validation
+→ Runtime 采纳 / 部分采纳 / 拒绝 / 降级
+→ DDx Board / EvidenceGraph / QuestionPolicy
+→ DecisionBoundary
+→ PatientOutput / ClinicianReport
+→ RuntimeTrace / AuditLog
+→ Evaluation
+→ Candidate / TrainingExample / CapabilityProfile Proposal
+→ Review / Governance
+→ 通过评估后进入下一轮 Runtime 可用能力
 ```
 
 ---
 
 # 二、权威文档优先级
 
-AI 实现时必须优先参考以下文档，优先级从高到低：
+AI 实现或修改本仓库时，必须优先参考以下文档，优先级从高到低：
 
 ```text
-1. docs/Phase5冻结记录.md
-2. docs/Phase5_P2开发任务清单.md
-3. docs/Phase5_P2最小前端Console_MVP_实现规格.md
-4. docs/Phase5_P2前端信息架构与页面设计.md
-5. docs/Phase5_P2_API对接与前端状态管理设计.md
-6. docs/Phase5_P2前端安全边界与测试设计.md
-7. docs/Phase5_P1冻结记录.md
-8. docs/Phase5_P1最小Console与访问治理_实现规格.md
-9. docs/Phase5_P0冻结记录.md
-10. docs/README.md
+1. docs/00_项目设计地图.md
+2. docs/ClinMindRuntime完整系统设计.md
+3. docs/README.md
+4. docs/Phase5冻结记录.md
+5. docs/Phase5_P2冻结记录.md
+6. docs/Phase5_P2人工测试结果.md
+7. docs/ClinMindRuntime阶段拆分路线图.md
+8. docs/ClinMindRuntime技术实现总方案.md
+9. 当前 Phase 实现规格（若已存在）
+10. 当前 Phase 开发任务清单（若已存在）
 ```
 
 解释：
 
 ```text
-Phase 5-P2 已完成；P2 规格与验收记录是维护与演进时的首要约束。
-Phase 5-P1/P0 冻结记录是 Console API 与持久化边界依据。
-docs/平台前端与Console规划.md 约束完整产品化前端，不否定已落地的 console-web/ 最小 MVP。
+docs/00_项目设计地图.md 是文档体系总入口。
+docs/ClinMindRuntime完整系统设计.md 是系统级权威总设计。
+Phase 1–5 冻结记录是已完成能力的边界依据。
+专项规划文档不是直接编码依据，必须经过 Phase 实现规格转化。
 ```
 
 ---
 
-# 三、当前允许实现的内容
+# 三、当前允许做的事情
 
-Phase 5-P2 已全部完成并冻结。当前无强制实现任务；若继续演进，只能从 Phase5冻结记录.md §六 或 Phase5_P2开发任务清单 §十 后置任务中立项。
-
-## 3.1 已交付：Phase 5-P1 Console API（冻结）
+当前允许：
 
 ```text
-ActorContext / RBAC-lite / AccessPolicy
-SafeConsoleDtoMapper
-GET /api/v1/debug/console/runtime-sessions
-GET /api/v1/debug/console/evaluation-runs
-GET /api/v1/debug/console/candidates / review-queue
-GET /api/v1/debug/console/audit-center/**
-Candidate review API + AccessPolicy
+1. 文档同步。
+2. README / docs/README / AI_IMPLEMENTATION_SKILL 状态更新。
+3. 将专项设计文档挂接到总设计和 docs/00_项目设计地图.md。
+4. 更新阶段路线图，使其与总设计 v2.2 对齐。
+5. 更新技术实现总方案，补充 Capability Orchestration、AgentExecutionLayer、Runtime Validation 的实现结构。
+6. 新增 Phase6_P0 受控 Agent 执行层实现规格。
+7. 新增 Phase6_P0 开发任务清单。
+8. 已冻结阶段的 bug fix、测试补强、文档修正。
 ```
 
-## 3.2 已交付：Phase 5-P2 前端 Console MVP（归档）
-
-```text
-console-web/ — Vite + React + TypeScript
-Runtime / Evaluation / Candidate / Review Queue / Audit Center 页面
-DebugContextPanel、consoleClient、SensitiveFieldRenderGuard
-Review 表单（APPROVE / REJECT / DEPRECATE）
-35 项 vitest；npm run build 通过
-```
-
-## 3.3 允许的维护类改动
-
-```text
-bug fix、测试补强、文档同步
-不破坏 Safe DTO、RBAC-lite、AuditLog 与前端敏感字段过滤
-保持 mvn test 与 console-web npm run test 回归
-```
+当前不应直接实现 Agent 代码，除非 Phase6_P0 实现规格与任务清单已经建立。
 
 ---
 
 # 四、当前禁止做的事情
 
 ```text
-1. 不新增真实 RAG / GraphRAG。
-2. 不接 Python AI Provider。
-3. 不接 MCP / LangGraph / Agent SDK 作为 Runtime 主控。
-4. 不训练基础大模型。
-5. 不实现 SFT / RLHF / DPO / RFT / 蒸馏训练链路。
-6. 不做完整产品化 Training Center / 正式 Runtime Console（最小 console-web/ MVP 已交付，不在此禁）。
-7. 不做正式登录系统 / JWT / OAuth / 多租户。
-8. 不做正式医生审核平台。
-9. 不自动上线 ApprovedExperience。
-10. 不发布 TrainingDatasetVersion。
-11. 不自动修改 AssetPackage / CapabilityProfile。
-12. 不改变患者端输出边界。
-13. 不绕过 SafetyGate 或 DecisionBoundary。
-14. 不删除 InMemory 实现或强制 postgres-only。
-15. 不直接返回 raw snapshot JSON 给 Console API。
+1. 不向 Phase 1–5 已冻结阶段继续堆新能力。
+2. 不在 Phase 6-P0 规格未建立前直接实现 Agent。
+3. 不实现自由自治式 Agent。
+4. 不实现多 Agent 协作。
+5. 不接 LangGraph / Agent SDK 作为 Runtime 主控。
+6. 不新增真实 RAG / GraphRAG。
+7. 不接 Python AI Provider。
+8. 不接 MCP / Tool / Skills 正式能力。
+9. 不训练基础大模型。
+10. 不实现 SFT / RLHF / DPO / RFT / 蒸馏训练链路。
+11. 不做完整产品化 Training Center / 正式 Runtime Console。
+12. 不做正式登录系统 / JWT / OAuth / 多租户。
+13. 不做正式医生审核平台。
+14. 不自动上线 ApprovedExperience。
+15. 不发布 TrainingDatasetVersion。
+16. 不自动修改 AssetPackage / CapabilityProfile。
+17. 不改变患者端输出边界。
+18. 不绕过 SafetyGate、Runtime Validation 或 DecisionBoundary。
+19. 不删除 InMemory 实现或强制 postgres-only。
+20. 不直接返回 raw snapshot JSON 给 Console API。
 ```
 
 如果任务中出现上述需求，AI 必须回复：
 
 ```text
-该能力属于后续 Phase，不属于当前 Phase 5-P2 归档范围。本次只保留为 backlog 或文档规划，不实现真实能力。
+该能力属于后续 Phase，不属于当前已冻结阶段或 Phase6-P0 前置设计范围。本次只保留为 backlog 或文档规划，不实现真实能力。
 ```
 
 ---
 
-# 五、Phase 5 架构约束（P1 Console API + P2 前端 MVP）
+# 五、Phase 5 冻结边界
+
+Phase 5 已全部冻结。
+
+已交付能力：
+
+```text
+Phase 5-P0：PostgreSQL、Repository 双实现、AuditLog、Persistence health / Audit API
+Phase 5-P1：ActorContext、RBAC-lite、AccessPolicy、Safe DTO、Console API、Audit Center
+Phase 5-P2：console-web/ 最小前端 Console MVP
+```
+
+维护约束：
 
 ```text
 1. RuntimeService 仍然是 Runtime 主控入口。
@@ -161,25 +173,102 @@ bug fix、测试补强、文档同步
 
 ---
 
-# 六、任务清单同步规则
+# 六、Phase 6-P0 前置设计约束
 
-若新开 Phase 或做后置任务立项，必须同步更新对应任务清单与 `docs/README.md`。
-
-对 Phase 5-P2 归档后的维护改动：
+Phase 6-P0 的目标不是“做一个自由 Agent”，而是：
 
 ```text
-1. 不擅自新增未立项的 Phase 子任务。
-2. 若修复 bug 或补测试，在 commit / PR 说明中注明影响范围。
-3. 若改动 Console API 或 console-web/，同步检查 Safe DTO 与 SensitiveField 测试。
+引入受控 Agent 执行层，证明 Agent 可以在 Runtime 授权下生成可校验、可拒绝、可追踪的 Proposal，并进入 RuntimeTrace / Evaluation / Audit 闭环。
+```
+
+Phase 6-P0 推荐首个 Agent：
+
+```text
+InquiryPlanningAgent
+```
+
+Phase 6-P0 允许设计的对象：
+
+```text
+AgentRegistry
+AgentRuntime
+AgentPolicy
+AgentContext
+AgentExecutionRequest
+AgentExecutionResult
+AgentProposal
+AgentProposalValidator
+AgentTrace
+AgentEvaluationHook
+Capability Orchestration
+Runtime Validation
+InquiryPlanningAgent
+```
+
+Phase 6-P0 必须坚持：
+
+```text
+Agent 只能生成 Proposal / Draft / Candidate / Finding / ScoreDraft。
+Agent 不能直接修改 RuntimeState。
+Agent 不能决定 SafetyGate。
+Agent 不能决定 DecisionBoundary。
+Agent 不能直接输出 PatientOutput。
+Agent 执行过程必须进入 RuntimeTrace / AuditLog。
+Agent 输出必须经过 Runtime Validation。
 ```
 
 ---
 
-# 七、测试约束
+# 七、专项文档使用规则
+
+专项设计文档必须通过 Phase 实现规格进入代码。
+
+正确链路：
+
+```text
+总设计
+↓
+项目设计地图
+↓
+专项设计
+↓
+Phase 实现规格
+↓
+Phase 开发任务清单
+↓
+代码实现
+↓
+测试与人工验证
+↓
+冻结记录
+```
+
+禁止：
+
+```text
+直接拿专项规划文档写代码。
+把长期规划当作当前任务。
+把 AI 技术雷达中的技术直接接入 Runtime Core。
+```
+
+后续每个专项文档应在开头加入“文档定位块”：
+
+```text
+上位总设计：docs/ClinMindRuntime完整系统设计.md
+对应能力域：xxx
+当前状态：长期规划 / 子系统设计 / 当前 Phase 实现依据 / 已实现冻结
+当前实现：已实现 xxx，未实现 xxx
+对应 Phase：Phase x
+实现入口：进入对应 Phase 后，以 Phase*_实现规格.md 和 Phase*_开发任务清单.md 为直接开发依据。
+```
+
+---
+
+# 八、测试约束
 
 Phase 5 必须同时保护后端 in-memory / postgres 回归与 console-web 前端测试。
 
-后端至少包含（P1 已交付，P2 不得破坏）：
+后端至少保护：
 
 ```text
 ActorContextResolverTest / AccessPolicyTest
@@ -190,14 +279,14 @@ ConsoleSensitiveFieldRedactionIntegrationTest
 Phase5P1ConsolePostgresEndToEndIntegrationTest
 ```
 
-前端至少包含（P2 已交付）：
+前端至少保护：
 
 ```text
 ConsoleAppSmoke.test.tsx
 SensitiveFieldRedactionRender.test.tsx
 RuntimePage / EvaluationPage / CandidatePage / ReviewQueueFlow
 AuditCenterPage / AuditCenterFlow / PermissionErrorFlow
-npm run build && npm run test（35 项）
+npm run build && npm run test
 ```
 
 每次改动后，必须尽量保持：
@@ -216,40 +305,28 @@ in-memory 与 postgres 专项测试可复现。
 
 ---
 
-# 八、当前最优下一步
+# 九、当前最优下一步
 
-当前最优实现任务是：
-
-```text
-无强制 Phase 5 子阶段 — Phase 5（P0/P1/P2）已全部冻结。
-```
-
-若需继续演进，只应评估后置任务（见 `docs/Phase5冻结记录.md` §六）：
+当前最优下一步是文档同步与 Phase 6-P0 设计准备：
 
 ```text
-1. 正式登录 / JWT / OAuth
-2. Docker Compose 一键编排
-3. 正式医生审核平台
-4. RAG / GraphRAG / 模型训练
+1. 更新 ClinMindRuntime阶段拆分路线图.md。
+2. 更新 ClinMindRuntime技术实现总方案.md。
+3. 为专项文档增加“文档定位块”。
+4. 新增 Phase6_P0受控Agent执行层_实现规格.md。
+5. 新增 Phase6_P0开发任务清单.md。
 ```
 
-不应在未立项的新 Phase 中：
-
-```text
-正式登录系统
-Docker Compose
-RAG / 模型训练
-后端 Console API 大改
-ApprovedExperience 自动生效
-```
+当前不应直接进入 Agent 代码实现。
 
 ---
 
-# 九、最终约束
+# 十、最终约束
 
 ```text
-当前不是在实现完整产品化平台。
-当前不是在实现模型训练平台。
-Phase 5-P1 最小 Console 与访问治理已完成并冻结。
-Phase 5-P1 的目标是让已有治理对象可以被安全查询、权限控制和审计复盘，但不改变 AI 决策边界。
+ClinMindRuntime 的核心不是让 AI 自由发挥，
+而是让 AI 能力在 Runtime 主控、Capability Orchestration、Runtime Validation、DecisionBoundary、Evaluation、Audit、Governance 之内运行。
+
+任何新能力都必须先进入总设计和 Phase 实现规格，
+再进入代码。
 ```
