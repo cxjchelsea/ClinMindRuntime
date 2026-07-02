@@ -1,22 +1,49 @@
 # ClinMindRuntime
 
-受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理、持久化治理底座与最小 Console 治理，**不是**普通 RAG 聊天应用。
+受控医疗 AI Agent Runtime 与能力治理平台：以 Runtime 为主控，将 Agent / RAG / Model / Tool 作为受控能力单元接入统一主链路，并通过 Evaluation / Candidate / Audit / Governance 形成可追踪、可评估、可回滚的医疗 AI 能力闭环。
 
-当前版本：**Phase 5 已全部冻结**（P0 持久化 / P1 Console API / P2 前端 MVP；Phase 1–4 已落地/冻结）
+当前版本：**Phase 5 已全部冻结**（P0 持久化 / P1 Console API / P2 前端 MVP；Phase 1–4 已落地/冻结）。
+
+当前总设计：[`docs/ClinMindRuntime完整系统设计.md`](docs/ClinMindRuntime完整系统设计.md) 已升级为 **v2.2**，项目定位从 Runtime-first 治理主干升级为：
+
+```text
+受控医疗 AI Agent Runtime 与能力治理平台
+```
+
+文档体系入口：[`docs/00_项目设计地图.md`](docs/00_项目设计地图.md)
+
+---
 
 ## 项目定位
 
-ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时**，核心思路：
+ClinMindRuntime 不是普通 RAG 医疗问答，也不是自由自治式医疗 Agent。
 
-- **Runtime 主控**：问诊流程、安全门、患者/医生双端输出边界由代码控制
-- **Asset Provider**：症状群知识、红旗规则、CapabilityProfile 等以 YAML 资产包注入
-- **Evaluation 闭环**：标准病例集 → Runtime 执行 → Scorer 评分 → 聚合报告 → CapabilityProfile 更新建议
-- **Candidate 沉淀**：从 Evaluation 暴露的问题中生成可追踪、可审核、不可自动生效的经验候选与训练数据候选
-- **Candidate 治理**：通过脱敏、来源校验和 review 记录，让候选更安全、更可治理，但仍不自动生效
-- **Persistence 治理底座**：通过 PostgreSQL、Repository 双实现和 AuditLog，让核心治理对象可持久化、可审计、可恢复
-- **Console 治理边界**：通过 ActorContext、RBAC-lite、Safe DTO 和 Audit Center，让治理对象可安全查询和复盘
+它的核心思路是：
 
-与「检索 + 大模型直接回答」的区别：Runtime **不绕过**结构化模块做最终临床判断；Evaluation **不绕过** Runtime 直接评输出文本；Candidate **不自动** 上线经验或进入训练集；Persistence **不改变** AI 决策边界；Console **不暴露**敏感原文和未脱敏候选输入。
+- **Runtime 主控**：问诊流程、安全门、患者/医生双端输出边界由代码控制。
+- **统一 Runtime 主链路**：所有能力都插入同一条 Runtime 主链路，而不是各自独立运行。
+- **Capability Orchestration**：Runtime 根据当前病例状态决定是否调用 Agent / RAG / Model / Tool。
+- **Agent 受控执行**：Agent 只能生成 Proposal / Draft / Candidate / Finding，不能直接修改 RuntimeState 或输出最终诊断。
+- **RAG 证据化**：RAG / GraphRAG 只能返回 EvidenceCandidate，进入 EvidenceGraph 后再由 Runtime 判断作用。
+- **Model Provider 化**：模型能力只能作为可评估、可替换、可回滚的 Provider 接入。
+- **Tool / MCP / Skills 最小权限**：外部工具调用必须经过 ToolAccessPolicy 和 Runtime Validation。
+- **Evaluation 闭环**：标准病例集 → Runtime 执行 → Scorer 评分 → 聚合报告 → CapabilityProfile 更新建议。
+- **Candidate 治理**：从 Evaluation 暴露的问题中生成可追踪、可审核、不可自动生效的经验候选与训练数据候选。
+- **Persistence / Audit / Console 治理底座**：通过 PostgreSQL、Repository 双实现、AuditLog、Safe DTO 和最小 Console，让治理对象可持久化、可审计、可复盘。
+
+与“检索 + 大模型直接回答”的区别：
+
+```text
+Runtime 不绕过结构化模块做最终临床判断。
+Agent 不绕过 Runtime 修改状态或输出诊断。
+RAG 不绕过 EvidenceGraph 和 DecisionBoundary 直接回答患者。
+Model 不绕过 Evaluation / CapabilityProfile 直接上线。
+Tool / MCP 不绕过 Runtime Validation 写入系统状态。
+Candidate 不自动上线经验或进入训练集。
+Console 不暴露敏感原文和未脱敏候选输入。
+```
+
+---
 
 ## 当前已实现 / 已设计
 
@@ -32,6 +59,22 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | 已冻结 |
 
 Phase 5 总冻结记录见 [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md)。P0/P1/P2 分别见 [`Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md)、[`Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)、[`Phase5_P2冻结记录.md`](docs/Phase5_P2冻结记录.md)。
+
+当前尚未完整实现：
+
+```text
+Agent Execution Layer
+真实 RAG EvidenceProvider
+KG-lite / GraphRAG Provider
+Python AI Provider
+ModelProvider / ModelRegistry / TrainingDatasetVersion
+ToolAccessPolicy / MCP Adapter / Skills
+Multi-Agent / Handoffs
+生产级登录 / 多租户 / RBAC
+正式医生审核平台
+```
+
+---
 
 ## 快速启动
 
@@ -55,7 +98,15 @@ npm run dev
 
 开发服务器默认 `http://localhost:5173`，侧边栏 **Debug Context** 可配置 Token / Actor / Roles 并测试连接；`/api` 代理至后端 `8080`。
 
-前端测试：`cd console-web && npm run test`（35 项）；构建：`npm run build`。
+前端测试：
+
+```powershell
+cd console-web
+npm run test
+npm run build
+```
+
+---
 
 ## 运行一次 Runtime（患者端）
 
@@ -72,6 +123,8 @@ Content-Type: application/json
 ```
 
 高风险输入应返回 `runtime_status: safety_gate_triggered`，患者端输出含风险提示且 **不泄露** DDx 板。
+
+---
 
 ## 运行一次 Evaluation
 
@@ -95,45 +148,61 @@ Content-Type: application/json
 - `GET /api/v1/debug/evaluations/runs/{run_id}/items/{case_id}`
 - `POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal?symptom_group=chest_pain`
 
-## 当前不做什么
-
-- 不训练基础大模型 / 不做 RLHF
-- 不自动修改生产资产包或 CapabilityProfile
-- 不自动上线 ExperienceCandidate
-- 不自动把 TrainingExampleCandidate 进入训练集
-- 不把 Candidate review 当作正式临床审核
-- 不做正式登录、OAuth、多租户
-- 不做 MCP / LangGraph / 完整 RAG 平台
+---
 
 ## 文档入口
 
 | 文档 | 说明 |
 |------|------|
-| [`docs/README.md`](docs/README.md) | 文档导航 |
-| [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试/展示用精简导读 |
+| [`docs/00_项目设计地图.md`](docs/00_项目设计地图.md) | 文档体系总入口，说明总设计、专项设计、Phase 文档和实现约束之间的关系 |
+| [`docs/README.md`](docs/README.md) | docs 目录导航 |
+| [`docs/ClinMindRuntime完整系统设计.md`](docs/ClinMindRuntime完整系统设计.md) | v2.2 权威总设计：八个能力域、五层架构、统一 Runtime 主链路 |
+| [`docs/AI_IMPLEMENTATION_SKILL.md`](docs/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor / Agent / Claude Code / Codex） |
+| [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试 / 展示用精简导读 |
 | [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md) | Phase 5 全阶段冻结依据 |
 | [`docs/Phase5_P2冻结记录.md`](docs/Phase5_P2冻结记录.md) | Phase 5-P2 冻结依据 |
-| [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md) | Phase 5-P2 总体规格 |
 | [`docs/Phase5_P2人工测试结果.md`](docs/Phase5_P2人工测试结果.md) | Phase 5-P2 前端验收记录 |
-| [`docs/Phase5_P1最小Console与访问治理_实现规格.md`](docs/Phase5_P1最小Console与访问治理_实现规格.md) | Phase 5-P1 总体规格 |
-| [`docs/Phase5_P1_RBAC与AuditCenter设计.md`](docs/Phase5_P1_RBAC与AuditCenter设计.md) | RBAC-lite 与 Audit Center 设计 |
-| [`docs/Phase5_P1Console_API与测试设计.md`](docs/Phase5_P1Console_API与测试设计.md) | Console API 与测试设计 |
-| [`docs/Phase5_P1开发任务清单.md`](docs/Phase5_P1开发任务清单.md) | Phase 5-P1 实现顺序 |
-| [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md) | Phase 5-P1 冻结依据 |
-| [`docs/Phase5_P1人工测试API结果.md`](docs/Phase5_P1人工测试API结果.md) | Phase 5-P1 人工 / E2E 验收记录 |
-| [`docs/Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md) | Phase 5-P0 冻结依据 |
-| [`docs/AI_IMPLEMENTATION_SKILL.md`](docs/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor/Agent） |
+| [`docs/ClinMindRuntime阶段拆分路线图.md`](docs/ClinMindRuntime阶段拆分路线图.md) | 阶段路线图，下一步需同步 v2.2 总设计 |
+| [`docs/ClinMindRuntime技术实现总方案.md`](docs/ClinMindRuntime技术实现总方案.md) | 技术实现总方案，下一步需补 Capability Orchestration / AgentExecutionLayer |
+
+---
+
+## 当前不做什么
+
+- 不向 Phase 1–5 已冻结阶段继续堆新能力。
+- 不在 Phase 6-P0 规格未建立前直接实现 Agent。
+- 不训练基础大模型 / 不做 RLHF。
+- 不自动修改生产资产包或 CapabilityProfile。
+- 不自动上线 ExperienceCandidate。
+- 不自动把 TrainingExampleCandidate 进入训练集。
+- 不把 Candidate review 当作正式临床审核。
+- 不做正式登录、OAuth、多租户。
+- 不提前做 MCP / LangGraph / 完整 RAG 平台。
+- 不让 Agent / RAG / Model / Tool 绕过 Runtime Validation 和 DecisionBoundary。
+
+---
 
 ## 下一阶段
 
-**Phase 5 已全部冻结。** 后续可选方向须单独立项（非当前强制主线）：
+**Phase 5 已全部冻结。** 当前建议下一阶段进入：
 
-- 正式登录 / JWT / OAuth
-- Docker Compose 一键编排
-- 正式医生审核平台
-- RAG / GraphRAG / 模型训练
+```text
+Phase 6-P0：受控 Agent 执行层 MVP
+```
 
-不应在未立项的新 Phase 中破坏 Phase 1–5 已冻结的 Runtime 主控、Safe DTO 与 Console 访问治理边界。Phase 5 归档依据见 [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md)。
+进入 Phase 6-P0 前，应先完成：
+
+```text
+1. 更新 ClinMindRuntime阶段拆分路线图.md。
+2. 更新 ClinMindRuntime技术实现总方案.md。
+3. 更新 AI_IMPLEMENTATION_SKILL.md。
+4. 新增 Phase6_P0受控Agent执行层_实现规格.md。
+5. 新增 Phase6_P0开发任务清单.md。
+```
+
+不应在未立项的新 Phase 中破坏 Phase 1–5 已冻结的 Runtime 主控、Safe DTO 与 Console 访问治理边界。
+
+---
 
 ## License
 
