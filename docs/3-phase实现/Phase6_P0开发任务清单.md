@@ -36,16 +36,16 @@ Agent 不能绕过 SafetyGate / DecisionBoundary / RuntimeTrace / Evaluation。
 
 | 编号 | 任务 | 状态 |
 |---|---|---|
-| P6-A | 建立 Agent domain 基础对象 | 待做 |
-| P6-B | 建立 AgentRegistry / AgentPolicy | 待做 |
-| P6-C | 建立 AgentRuntime 执行框架 | 待做 |
-| P6-D | 实现 InquiryPlanningAgent MVP | 待做 |
-| P6-E | 实现 AgentProposalValidator / RuntimeValidation 接入 | 待做 |
-| P6-F | Runtime 主链路接入 Capability Orchestration | 待做 |
-| P6-G | Agent Debug API | 待做 |
-| P6-H | Agent Trace / Audit 接入 | 待做 |
-| P6-I | Agent Evaluation Scorer | 待做 |
-| P6-J | 测试、人工验证与冻结记录 | 待做 |
+| P6-A | 建立 Agent domain 基础对象 | 已完成 |
+| P6-B | 建立 AgentRegistry / AgentPolicy | 已完成 |
+| P6-C | 建立 AgentRuntime 执行框架 | 已完成 |
+| P6-D | 实现 InquiryPlanningAgent MVP | 已完成 |
+| P6-E | 实现 AgentProposalValidator / RuntimeValidation 接入 | 已完成 |
+| P6-F | Runtime 主链路接入 Capability Orchestration | 已完成 |
+| P6-G | Agent Debug API | 已完成 |
+| P6-H | Agent Trace / Audit 接入 | 已完成 |
+| P6-I | Agent Evaluation Scorer | 已完成 |
+| P6-J | 测试、人工验证与冻结记录 | 已完成 |
 
 ---
 

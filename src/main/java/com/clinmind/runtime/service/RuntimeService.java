@@ -14,6 +14,9 @@ import com.clinmind.runtime.entry.EntryAssessmentService;
 import com.clinmind.runtime.experience.ExperienceContextService;
 import com.clinmind.runtime.knowledge.KnowledgeContextService;
 import com.clinmind.runtime.api.AssetContextRequest;
+import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
+import com.clinmind.runtime.agent.capability.CapabilityOrchestrationService;
+import com.clinmind.runtime.agent.inquiry.InquiryQuestionCandidate;
 import com.clinmind.runtime.asset.AssetLoadErrorCode;
 import com.clinmind.runtime.asset.AssetLoadException;
 import com.clinmind.runtime.asset.AssetPackageManifest;
@@ -64,6 +67,7 @@ public class RuntimeService {
     private final RuntimeTraceCollector traceCollector;
     private final AssetPackageRepository assetPackageRepository;
     private final AuditLogService auditLogService;
+    private final CapabilityOrchestrationService capabilityOrchestrationService;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -81,7 +85,8 @@ public class RuntimeService {
             FailurePolicyService failurePolicyService,
             RuntimeTraceCollector traceCollector,
             AssetPackageRepository assetPackageRepository,
-            AuditLogService auditLogService) {
+            AuditLogService auditLogService,
+            CapabilityOrchestrationService capabilityOrchestrationService) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -98,6 +103,7 @@ public class RuntimeService {
         this.traceCollector = traceCollector;
         this.assetPackageRepository = assetPackageRepository;
         this.auditLogService = auditLogService;
+        this.capabilityOrchestrationService = capabilityOrchestrationService;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -230,6 +236,9 @@ public class RuntimeService {
                         state);
                 return;
             }
+
+            AgentOrchestrationSnapshot orchestration = capabilityOrchestrationService.orchestrate(state);
+            state.setAgentOrchestration(orchestration);
 
             state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
             state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));
@@ -367,6 +376,15 @@ public class RuntimeService {
                 outputSummary.put("next_action_type", policy.nextAction().type().getValue());
                 outputSummary.put("next_action_content", policy.nextAction().content());
             }
+        }
+        if (trace.getModulesExecuted().contains("CapabilityOrchestration")
+                && state.getAgentOrchestration() != null) {
+            AgentOrchestrationSnapshot orchestration = state.getAgentOrchestration();
+            outputSummary.put("agent_execution_id", orchestration.executionId());
+            outputSummary.put("agent_status", orchestration.status() == null
+                    ? null
+                    : orchestration.status().name());
+            outputSummary.put("agent_accepted_question_count", orchestration.acceptedQuestions().size());
         }
         if (trace.getModulesExecuted().contains("DecisionBoundary") && state.getDecisionBoundary() != null) {
             DecisionBoundaryResult boundary = state.getDecisionBoundary();

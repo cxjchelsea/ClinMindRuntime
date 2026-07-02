@@ -34,4 +34,16 @@ public final class IdGenerator {
     public static String auditId() {
         return "audit_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String agentExecutionId() {
+        return "agent_exec_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String agentProposalId() {
+        return "proposal_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String agentTraceId() {
+        return "agent_trace_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

@@ -19,6 +19,7 @@ Phase 4-P1：候选治理与安全加固已完成并冻结。
 Phase 5-P0：持久化与治理底座已完成并冻结。
 Phase 5-P1：最小 Console 与访问治理已完成并冻结。
 Phase 5-P2：最小前端 Console MVP 已完成并冻结。
+Phase 6-P0：受控 Agent 执行层 MVP 已完成并冻结。
 ```
 
 当前总设计状态：
@@ -176,7 +177,7 @@ docs/
 | Phase 3 | 已冻结 | `docs/3-phase实现/Phase3_*`、`docs/3-phase实现/Phase3_P0冻结记录.md` |
 | Phase 4 | 已冻结 | `docs/3-phase实现/Phase4_*`、`docs/3-phase实现/Phase4_P0冻结记录.md`、`docs/3-phase实现/Phase4_P1冻结记录.md` |
 | Phase 5 | 已冻结 | `docs/3-phase实现/Phase5_*`、`docs/3-phase实现/Phase5冻结记录.md` |
-| Phase 6-P0 | 待设计 | `docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md`、`docs/3-phase实现/Phase6_P0Agent_API与测试设计.md`、`docs/3-phase实现/Phase6_P0开发任务清单.md` 待新增 |
+| Phase 6-P0 | 已冻结 | `docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md`、`docs/3-phase实现/Phase6_P0Agent_API与测试设计.md`、`docs/3-phase实现/Phase6_P0开发任务清单.md`、`docs/3-phase实现/Phase6_P0冻结记录.md` |
 
 ## 4.5 实现约束组
 
@@ -261,11 +262,9 @@ docs/3-phase实现/Phase7_P0冻结记录.md
 # 七、当前建议做什么
 
 ```text
-1. 保持 Phase 1–5 冻结边界。
-2. 新增 docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md。
-3. 新增 docs/3-phase实现/Phase6_P0Agent_API与测试设计.md。
-4. 新增 docs/3-phase实现/Phase6_P0开发任务清单.md。
-5. 建立 Phase 6-P0 文档后，再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
+1. 保持 Phase 1–6 P0 冻结边界。
+2. 进入 Phase 6-P1 或 Phase 7-P0 前，须先建立对应 Phase 实现规格与任务清单。
+3. 更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md 至新阶段。
 ```
 
 ---
@@ -282,8 +281,10 @@ docs/3-phase实现/Phase7_P0冻结记录.md
 → 实现约束
 ```
 
-下一步不是继续横向新增规划文档，而是进入：
+Phase 6-P0 已冻结。下一步按路线图进入：
 
 ```text
-Phase 6-P0：受控 Agent 执行层 MVP
+Phase 6-P1：Agent 能力扩展
+或
+Phase 7-P0：RAG EvidenceProvider
 ```

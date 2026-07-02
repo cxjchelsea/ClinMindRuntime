@@ -1,5 +1,7 @@
 package com.clinmind.runtime.api;
 
+import com.clinmind.runtime.agent.api.AgentAccessDeniedException;
+import com.clinmind.runtime.agent.api.AgentExecutionNotFoundException;
 import com.clinmind.runtime.candidate.generation.CandidateGenerationException;
 import com.clinmind.runtime.candidate.review.CandidateReviewException;
 import com.clinmind.runtime.candidate.sourceref.CandidateSourceRefValidationException;
@@ -92,6 +94,18 @@ public class ApiExceptionHandler {
             case TRAINING_EXAMPLE_CANDIDATE -> "TRAINING_EXAMPLE_CANDIDATE_NOT_FOUND";
             case EXPERIENCE_CANDIDATE -> "EXPERIENCE_CANDIDATE_NOT_FOUND";
         };
+    }
+
+    @ExceptionHandler(AgentExecutionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAgentExecutionNotFound(AgentExecutionNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.fail(new ApiError("AGENT_EXECUTION_NOT_FOUND", ex.getMessage())));
+    }
+
+    @ExceptionHandler(AgentAccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAgentAccessDenied(AgentAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.fail(new ApiError("ACCESS_DENIED", ex.getMessage())));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

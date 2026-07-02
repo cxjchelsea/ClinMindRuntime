@@ -1,6 +1,8 @@
 package com.clinmind.runtime.reasoning;
 
 import com.clinmind.runtime.state.CandidateStatus;
+import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
+import com.clinmind.runtime.agent.inquiry.InquiryQuestionCandidate;
 import com.clinmind.runtime.state.EvidenceGraph;
 import com.clinmind.runtime.state.EvidenceGraphItem;
 import com.clinmind.runtime.state.KnowledgeContext;
@@ -33,6 +35,19 @@ public class QuestionTestPolicyService {
                             null,
                             "high"),
                     "danger signal matched; urgent evaluation required");
+        }
+
+        AgentOrchestrationSnapshot orchestration = state.getAgentOrchestration();
+        if (orchestration != null && !orchestration.acceptedQuestions().isEmpty()) {
+            InquiryQuestionCandidate first = orchestration.acceptedQuestions().get(0);
+            return new QuestionTestPolicyResult(
+                    new NextAction(
+                            NextActionType.ASK_QUESTION,
+                            first.questionText(),
+                            "agent inquiry plan proposal",
+                            first.targetMissingFact(),
+                            first.priority().name().toLowerCase()),
+                    "agent inquiry planning accepted question");
         }
 
         EvidenceGraph evidenceGraph = state.getEvidenceGraph();
