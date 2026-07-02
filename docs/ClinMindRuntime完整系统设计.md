@@ -1,7 +1,7 @@
 # ClinMindRuntime 完整系统设计
 
 > 项目名称：ClinMindRuntime  
-> 当前总设计版本：v2.1  
+> 当前总设计版本：v2.2  
 > 中文定位：受控医疗 AI Agent Runtime 与能力治理平台  
 > 核心定义：ClinMindRuntime 不是普通医疗问答、普通 RAG 应用或自由自治式医疗 Agent，而是一个以 Runtime 为主控、以 Agent / RAG / Model / Tool 为受控能力单元、以 Evaluation / Audit / Governance 为闭环的医疗 AI 运行与治理平台。
 
@@ -877,19 +877,24 @@ Runtime 执行层
 ├── DifferentialDiagnosisBoard
 ├── EvidenceGraph
 ├── QuestionTestPolicy
-├── Agent Execution Layer
-│   ├── AgentRegistry
-│   ├── AgentRuntime
-│   ├── AgentPolicy
-│   ├── AgentContext
-│   ├── AgentProposalValidator
-│   ├── AgentTrace
-│   └── AgentEvaluationHook
-├── Tool / Provider Access Layer
-│   ├── ProviderInterface
-│   ├── ToolAccessPolicy
-│   ├── McpAdapter
-│   └── SkillExecutionPolicy
+├── Capability Orchestration
+│   ├── Agent Execution Layer
+│   │   ├── AgentRegistry
+│   │   ├── AgentRuntime
+│   │   ├── AgentPolicy
+│   │   ├── AgentContext
+│   │   ├── AgentProposalValidator
+│   │   ├── AgentTrace
+│   │   └── AgentEvaluationHook
+│   ├── Provider Access Layer
+│   │   ├── ModelProviderInterface
+│   │   ├── EvidenceProviderInterface
+│   │   └── PatientRewriteProviderInterface
+│   └── Tool / MCP / Skill Access Layer
+│       ├── ToolAccessPolicy
+│       ├── McpAdapter
+│       └── SkillExecutionPolicy
+├── Runtime Validation
 ├── DecisionBoundary
 ├── PatientOutputService
 ├── ClinicianReportService
@@ -899,120 +904,185 @@ Runtime 执行层
 
 ---
 
-# 六、核心运行链路
+# 六、统一 Runtime 主链路
 
-本节四条链路不是四套并列系统，而是以 Runtime 主链路为中心的能力接入视图。
+最终系统不是四条并行链路，而是一条统一的 Runtime 主链路。
 
-```text
-6.1 当前 Runtime 主链路
-= 当前已经实现的 Runtime-first 运行方式。
+Agent、RAG / GraphRAG、Model Provider、Tool / MCP / Skills 都不是独立主流程，而是这条主链路中的受控能力插入点。
 
-6.2 目标 Agent Runtime 链路
-= 下一阶段 Agent 如何作为受控执行单元接入 Runtime 主链路。
-
-6.3 目标 RAG / Evidence 链路
-= RAG、KG-lite、GraphRAG 如何作为 EvidenceProvider 接入知识与证据系统。
-
-6.4 目标 Model Provider 链路
-= 模型训练、后训练和模型服务如何通过 Provider 治理进入 Runtime。
-```
-
-四条链路的关系是：
+核心关系：
 
 ```text
-当前 Runtime 主链路是主干。
-Agent 链路是在主干中加入受控 Agent Proposal。
-RAG / Evidence 链路是为主干提供证据候选。
-Model Provider 链路是为主干提供可评估、可替换的模型能力。
+Runtime 是主线。
+Capability Orchestration 是能力编排节点。
+Agent / RAG / Model / Tool 是被 Runtime 授权调用的能力。
+Runtime Validation 负责校验外部能力结果。
+DecisionBoundary 负责最终输出边界。
+Evaluation / Governance 负责事后评估和能力回流。
 ```
 
-## 6.1 当前 Runtime 主链路
+## 6.1 一条主链路总览
 
-当前已落地的 Runtime-first 主链路是：
+完整目标链路如下：
 
 ```text
 用户 / 医生输入
 ↓
-Runtime API 创建或继续 Runtime
+Runtime API
 ↓
-EntryAssessment 判断工作态
+RuntimeService 创建或继续 Runtime
 ↓
-RuntimeState / CaseFrame 更新
+EntryAssessment 判断是否属于临床问诊 / 是否支持处理
 ↓
-Knowledge Context 查询医学知识资产
+RuntimeState / CaseFrame 更新病例状态
 ↓
-Experience Context 检索已验证经验
+KnowledgeContext / ExperienceContext 构建上下文
 ↓
-SafetyGate 危险信号识别
+SafetyGate 初筛高风险
 ↓
-Differential Diagnosis Board 构建候选诊断状态
+Capability Orchestration 能力编排
+  ├── Agent 生成问诊 / 证据 / 改写 / 复盘 Proposal
+  ├── RAG / KG-lite / GraphRAG 返回 EvidenceCandidate
+  ├── Model Provider 返回结构化 Draft / Candidate / ScoreDraft
+  └── Tool / MCP / Skills 返回 ToolResult / ExternalContext
 ↓
-EvidenceGraph 组织证据关系
-↓
-Question / Test Policy 决定下一步追问或检查建议
-↓
-DecisionBoundary 判断当前允许输出什么
-↓
-PatientOutput / ClinicianReport 生成分角色输出
-↓
-RuntimeTrace 记录知识、经验、模型候选、资产版本和输出边界
-↓
-Evaluation / Feedback / Outcome 进入复盘与训练数据候选
-```
-
-## 6.2 目标 Agent Runtime 链路
-
-下一阶段目标链路是：
-
-```text
-用户 / 医生输入
-↓
-Runtime API 创建或继续 Runtime
-↓
-EntryAssessment 判断工作态
-↓
-RuntimeState / CaseFrame 更新
-↓
-SafetyGate 初筛
-↓
-KnowledgeContext / ExperienceContext 构建
-↓
-AgentPolicy 判断本轮是否允许调用 Agent
-↓
-AgentRuntime 调用一个或多个受控 Agent
-↓
-Agent 输出结构化 Proposal
-↓
-AgentProposalValidator 校验 Proposal
+Runtime Validation 校验所有外部能力结果
 ↓
 Runtime 决定采纳 / 部分采纳 / 拒绝 / 降级
 ↓
-DDx Board / EvidenceGraph / QuestionPolicy 局部更新
+DDx Board / EvidenceGraph / QuestionPolicy 更新
 ↓
 DecisionBoundary 判断患者端和医生端可见内容
 ↓
-PatientOutput / ClinicianReport 生成分角色输出
+PatientOutput / ClinicianReport 分角色输出
 ↓
-RuntimeTrace 记录 Agent 输入、输出、采纳结果、拒绝原因
+RuntimeTrace / AuditLog 记录全过程
 ↓
-Evaluation / Feedback / Audit 进入治理闭环
+Evaluation 评估运行结果
+↓
+Candidate / TrainingExample / CapabilityProfile Proposal 沉淀
+↓
+Review / Governance 审核
+↓
+资产 / 经验 / 模型 / Skill / Capability 更新候选
+↓
+通过评估后进入下一轮 Runtime 可用能力
 ```
 
-核心原则：
+这条链路中，只有 Runtime 可以提交核心状态变化；其他能力只能返回可校验对象。
+
+## 6.2 Capability Orchestration 能力编排节点
+
+Capability Orchestration 是统一主链路中的能力调度节点。
+
+它负责根据当前 RuntimeState 判断本轮是否需要调用 Agent、RAG、Model Provider 或 Tool。
+
+输入：
 
 ```text
-Agent 不替代 Runtime。
-Agent 不直接修改 RuntimeState。
-Agent 不直接输出患者端最终内容。
-Agent 只生成可校验、可拒绝、可追踪的 Proposal。
+RuntimeState
+CaseFrame
+symptom_group
+known_facts
+missing_facts
+risk_signals
+current_ddx_board
+evidence_graph_summary
+capability_profile
+asset_context
+actor_context
 ```
 
-## 6.3 目标 RAG / Evidence 链路
+输出：
+
+```text
+CapabilityExecutionPlan
+- agent_calls
+- evidence_provider_calls
+- model_provider_calls
+- tool_calls
+- skip_reasons
+- fallback_policy
+```
+
+职责：
+
+```text
+1. 判断是否需要调用 Agent。
+2. 判断是否需要检索 RAG / GraphRAG 证据。
+3. 判断是否需要调用模型 Provider。
+4. 判断是否允许调用 Tool / MCP / Skills。
+5. 为每次外部能力调用绑定 policy、timeout、fallback、trace id。
+```
+
+边界：
+
+```text
+Capability Orchestration 只能编排调用计划，不能直接越过 Runtime Validation 修改 RuntimeState。
+```
+
+## 6.3 Agent 在主链路中的插入方式
+
+Agent 插入在 Capability Orchestration 节点中。
+
+典型路径：
+
+```text
+RuntimeState / CaseFrame
+↓
+Capability Orchestration 判断需要 Agent
+↓
+AgentPolicy 校验是否允许调用
+↓
+AgentRuntime 调用受控 Agent
+↓
+Agent 输出 AgentProposal
+↓
+AgentProposalValidator 校验
+↓
+Runtime 采纳 / 部分采纳 / 拒绝 / 降级
+↓
+QuestionPolicy / EvidenceGraph / ClinicianReport 等局部更新
+```
+
+Agent 示例：
+
+```text
+InquiryPlanningAgent：生成下一轮追问计划 Proposal。
+EvidenceOrganizationAgent：生成证据组织 Proposal。
+PatientRewriteAgent：生成患者安全表达 Draft。
+TraceReviewAgent：生成运行轨迹复盘 Finding。
+ExperienceCandidateMiningAgent：生成经验候选 Draft。
+```
+
+Agent 输出必须是：
+
+```text
+Proposal / Draft / Candidate / Finding / ScoreDraft
+```
+
+Agent 禁止输出：
+
+```text
+Final Diagnosis
+Final Patient Answer
+RuntimeState Decision
+SafetyGate Decision
+DecisionBoundary Decision
+```
+
+## 6.4 RAG / GraphRAG 在主链路中的插入方式
+
+RAG / GraphRAG 插入在 KnowledgeContext 和 Capability Orchestration 之后，作为 EvidenceProvider 能力被调用。
+
+典型路径：
 
 ```text
 RuntimeState / CaseFrame
 ↓
 KnowledgeContextService
+↓
+Capability Orchestration 判断需要外部证据
 ↓
 EvidenceAssetProvider
 ↓
@@ -1022,51 +1092,173 @@ EvidenceRetrievalResult
 ↓
 EvidenceCandidate
 ↓
+Runtime Validation
+↓
 EvidenceGraphItem
 ↓
 EvidenceGraph
 ↓
 QuestionTestPolicy / SafetyGate / DecisionBoundary
-↓
-PatientOutput / ClinicianReport
 ```
 
-核心原则：
+RAG / GraphRAG 的作用是：
 
 ```text
-RAG / GraphRAG 不直接回答患者。
-RAG / GraphRAG 不直接决定诊断。
-RAG / GraphRAG 只增强 EvidenceGraph。
+提供证据候选。
+增强 EvidenceGraph。
+帮助医生端理解证据来源。
+辅助 Evaluation 检查证据命中与适用性。
 ```
 
-## 6.4 目标 Model Provider 链路
+RAG / GraphRAG 不能：
 
 ```text
-TrainingDatasetVersion / EvaluationCaseSet / RuntimeTrace
+直接回答患者。
+直接决定诊断。
+直接替代 EvidenceGraph。
+直接绕过 DecisionBoundary。
+```
+
+## 6.5 Model Provider 在主链路中的插入方式
+
+Model Provider 插入在 Capability Orchestration 中，作为某个任务的可替换能力。
+
+典型路径：
+
+```text
+RuntimeState / CaseFrame / RuntimeTrace
 ↓
-Model Training / Post-training
+Capability Orchestration 判断需要模型能力
 ↓
-ModelProviderVersion
+ModelProviderPolicy 校验模型版本和能力边界
 ↓
-EvaluationResult
+Model Provider 调用
+↓
+Structured Draft / Candidate / EvidenceRef / ScoreDraft
+↓
+Runtime Validation
+↓
+Runtime 采纳 / 部分采纳 / 拒绝 / 降级
+```
+
+可用模型能力：
+
+```text
+IntentClassifierProvider
+CaseFrameExtractorProvider
+RiskSignalClassifierProvider
+EvidenceRetrieverProvider
+PatientSafeRewriteProvider
+ClinicianReportDraftProvider
+LlmJudgeScorer
+ExperienceCandidateMiner
+```
+
+模型上线链路：
+
+```text
+TrainingDatasetVersion
+→ Model Training / Post-training
+→ ModelProviderVersion
+→ EvaluationResult
+→ CapabilityProfileUpdateProposal
+→ Review / Governance
+→ Runtime 可用 Provider
+```
+
+模型不能：
+
+```text
+直接修改 RuntimeState。
+直接输出患者端诊断。
+绕过 SafetyGate / DecisionBoundary。
+未经 EvaluationResult 上线。
+```
+
+## 6.6 Tool / MCP / Skills 在主链路中的插入方式
+
+Tool / MCP / Skills 插入在 Capability Orchestration 中，作为外部能力或数据连接能力被调用。
+
+典型路径：
+
+```text
+RuntimeState / AgentRequest / ProviderRequest
+↓
+Capability Orchestration 判断是否允许外部工具
+↓
+ToolAccessPolicy / SkillExecutionPolicy 校验
+↓
+Tool Adapter / MCP Adapter / Skill Provider
+↓
+External Tool / MCP Server / External Data Source
+↓
+ToolResult / ExternalContext
+↓
+Runtime Validation
+↓
+Trace / Audit
+↓
+Runtime 采纳 / 拒绝 / 降级
+```
+
+适用场景：
+
+```text
+外部指南库查询。
+外部病例集读取。
+外部证据库连接。
+内部审核工具调用。
+检索服务、embedding 服务、reranker 服务调用。
+```
+
+禁止路径：
+
+```text
+Tool / MCP 直接修改 RuntimeState。
+ToolResult 直接进入 PatientOutput。
+MCP Server 成为 Runtime 主控。
+Skill 绕过 CapabilityProfile 扩大输出权限。
+```
+
+## 6.7 Evaluation / Governance 如何回流到主链路
+
+Evaluation / Governance 是主链路之后的能力回流机制。
+
+它不是一条独立问诊链路，而是让 Runtime 能力持续进化的闭环。
+
+回流路径：
+
+```text
+RuntimeTrace / AuditLog
+↓
+EvaluationRunner / Scorer
+↓
+EvaluationResult / SafetyViolation / RegressionFinding
 ↓
 CapabilityProfileUpdateProposal
+ExperienceCandidate
+TrainingExampleCandidate
+AssetImprovementCandidate
+ModelImprovementCandidate
+SkillImprovementCandidate
 ↓
 Review / Governance
 ↓
-Runtime 可用 Provider
+Asset / Experience / Model / Skill / Capability 更新候选
 ↓
-Provider 输出 Structured Draft / Candidate / EvidenceRef
+再次 Evaluation
 ↓
-Runtime Validation
+通过后进入 Runtime 可用能力
 ```
 
-核心原则：
+原则：
 
 ```text
-模型训练不是训练一个 AI 医生。
-模型能力只能作为 Provider 能力进入 Runtime。
-模型上线必须经过 Evaluation / Governance / CapabilityProfile 授权。
+评估结果不能自动扩大能力边界。
+候选经验不能自动上线。
+训练样本不能自动发布。
+模型不能未经评估进入 Runtime。
+CapabilityProfile 必须经过 Review / Governance。
 ```
 
 ---
@@ -1290,9 +1482,11 @@ docs/数据库持久化设计.md
   ↓
 Runtime 主控执行
   ↓
-Agent / RAG / Model / Tool 受控产生 Proposal / Candidate / EvidenceRef / Draft
+Capability Orchestration 受控调用 Agent / RAG / Model / Tool
   ↓
-Runtime 校验、采纳、拒绝或降级
+Agent / RAG / Model / Tool 产生 Proposal / Candidate / EvidenceRef / Draft / ToolResult
+  ↓
+Runtime Validation 校验、采纳、拒绝或降级
   ↓
 SafetyGate / EvidenceGraph / DecisionBoundary 控制输出
   ↓
