@@ -1,7 +1,7 @@
 # ClinMindRuntime 完整系统设计
 
 > 项目名称：ClinMindRuntime  
-> 当前总设计版本：v2.0  
+> 当前总设计版本：v2.1  
 > 中文定位：受控医疗 AI Agent Runtime 与能力治理平台  
 > 核心定义：ClinMindRuntime 不是普通医疗问答、普通 RAG 应用或自由自治式医疗 Agent，而是一个以 Runtime 为主控、以 Agent / RAG / Model / Tool 为受控能力单元、以 Evaluation / Audit / Governance 为闭环的医疗 AI 运行与治理平台。
 
@@ -611,28 +611,233 @@ EvidenceGraph 如何变化
 
 # 五、总体架构
 
-## 5.1 五层结构
+## 5.1 五层结构总览
 
 完整系统由五层组成：
 
 ```text
 1. 平台治理层
-   负责 Console、评估、审核、发布、回滚、权限、审计、模型注册和资产治理。
-
 2. 共享能力资产层
-   承载医学知识、规则、路径、经验、能力边界、评估病例、模型版本和 Skill 元数据。
-
 3. Runtime 执行层
-   负责一次问诊当下从输入、状态更新、Agent 调度、证据组织到安全输出的主流程。
-
 4. Provider / Agent / Tool 能力层
-   承载 Agent、Model Provider、RAG Provider、Tool Adapter、MCP Adapter、Skills 等可替换能力。
-
 5. Storage / Integration 层
-   承载 PostgreSQL、pgvector、Redis、外部 LLM API、Python AI Provider、MCP Server、外部知识库等。
 ```
 
-## 5.2 层间关系
+五层不是简单技术分层，而是权力边界分层：
+
+```text
+平台治理层负责治理权。
+共享能力资产层负责能力依据。
+Runtime 执行层负责运行主控权。
+Provider / Agent / Tool 能力层负责受控能力执行。
+Storage / Integration 层负责存储和外部连接。
+```
+
+## 5.2 平台治理层
+
+平台治理层负责管理、评估、审核、发布、回滚、权限和审计。
+
+核心组成：
+
+```text
+Runtime Console
+Evaluation Center
+Candidate / Review Queue
+Asset Console
+Experience Memory Center
+Model Registry / Training Center
+Audit Center
+Role / Permission / AccessPolicy
+Release / Rollback Governance
+```
+
+职责：
+
+```text
+1. 查看 Runtime、Evaluation、Candidate、Review、Audit 等治理对象。
+2. 管理资产、经验、模型、Skill、CapabilityProfile 的生命周期。
+3. 承载人工审核、复核、发布、下线、回滚流程。
+4. 控制不同角色可见字段和可执行动作。
+5. 记录所有治理动作的 AuditLog。
+```
+
+边界：
+
+```text
+平台治理层不能绕过 Runtime 直接改变医疗输出。
+Console review 不能自动让经验、模型、资产立即生效。
+治理动作必须通过 Evaluation / Review / Release 流程进入 Runtime 可用能力。
+```
+
+## 5.3 共享能力资产层
+
+共享能力资产层承载所有被 Runtime 使用、约束或引用的能力依据。
+
+核心组成：
+
+```text
+AssetPackage
+AssetMetadata
+Symptom Rotation Library
+Clinical Pathway
+Red Flag Rules
+Test Recommendation Rules
+RAG Evidence Library
+KG-lite / GraphRAG refs
+Clinical Experience Memory
+CapabilityProfile
+EvaluationCaseSet
+ModelProviderMetadata
+SkillMetadata
+TrainingDatasetVersion
+```
+
+职责：
+
+```text
+1. 提供医学知识、规则、路径、经验和能力边界。
+2. 记录每个资产的来源、版本、适用范围、风险等级和审核状态。
+3. 支持 RuntimeTrace 记录使用了哪些资产版本。
+4. 支持 Evaluation 回放某个资产版本下的表现。
+5. 为 RAG、GraphRAG、ModelProvider、SkillProvider 提供治理元数据。
+```
+
+边界：
+
+```text
+资产层只提供依据，不直接执行问诊。
+资产发布必须经过 Review / Governance。
+高风险资产加载失败必须 fail-closed。
+```
+
+## 5.4 Runtime 执行层
+
+Runtime 执行层是系统主控层，负责一次问诊当下的运行流程。
+
+核心组成：
+
+```text
+Runtime API
+RuntimeService
+RuntimeState / RuntimeStatus
+EntryAssessment
+CaseFrame
+KnowledgeContext
+ExperienceContext
+SafetyGate
+DifferentialDiagnosisBoard
+EvidenceGraph
+QuestionTestPolicy
+DecisionBoundary
+PatientOutputService
+ClinicianReportService
+FailurePolicy
+RuntimeTrace
+```
+
+职责：
+
+```text
+1. 接收输入并创建 / 继续 Runtime session。
+2. 维护病例状态和上下文。
+3. 调用知识、经验、Agent、Provider、Tool 等能力。
+4. 校验所有外部能力返回的 Proposal / Candidate / EvidenceRef / Draft。
+5. 控制患者端和医生端输出边界。
+6. 记录 RuntimeTrace，为 Evaluation、Candidate、Audit 提供依据。
+```
+
+边界：
+
+```text
+Runtime 执行层是唯一能提交 RuntimeState 变化的主控层。
+Agent、RAG、Model、Tool 均不能直接修改 RuntimeState。
+DecisionBoundary 之后不能再让模型自由扩写医疗内容。
+```
+
+## 5.5 Provider / Agent / Tool 能力层
+
+Provider / Agent / Tool 能力层承载所有可替换、可扩展、可降级的 AI 能力和外部能力。
+
+核心组成：
+
+```text
+AgentRuntime / AgentRegistry
+InquiryPlanningAgent
+EvidenceOrganizationAgent
+TraceReviewAgent
+Model Provider
+RAG Provider
+GraphRAG Provider
+Python AI Provider
+Tool Adapter
+MCP Adapter
+Skill Provider
+LLM-as-a-Judge Provider
+```
+
+职责：
+
+```text
+1. 生成结构化 Proposal / Draft / Candidate / EvidenceRef / ToolResult。
+2. 提供问诊规划、证据检索、文本改写、辅助评分、错误复盘等能力。
+3. 调用外部工具、模型、向量库、MCP Server 或知识库。
+4. 记录 provider version、agent version、tool version 和调用 trace。
+5. 在失败时返回可降级、可解释的错误状态。
+```
+
+边界：
+
+```text
+能力层不是主控层。
+能力层不能直接输出 PatientOutput。
+能力层不能决定 SafetyGate / DecisionBoundary。
+能力层返回内容必须被 Runtime 校验。
+```
+
+## 5.6 Storage / Integration 层
+
+Storage / Integration 层负责持久化、检索基础设施和外部系统连接。
+
+核心组成：
+
+```text
+PostgreSQL
+pgvector
+Redis
+Flyway Schema
+Repository / Store
+AuditLog Store
+Runtime Store
+Evaluation Store
+Candidate Store
+Model Registry Store
+Vector Index
+External LLM API
+Python AI Provider Service
+MCP Server
+External Knowledge Base
+```
+
+职责：
+
+```text
+1. 持久化 Runtime、Evaluation、Candidate、Review、Audit 等治理对象。
+2. 承载知识库、向量检索、相似病例检索和经验检索基础设施。
+3. 连接外部 LLM、模型服务、MCP Server、医院知识库或其他数据源。
+4. 支持可恢复、可审计、可回滚的治理底座。
+```
+
+边界：
+
+```text
+Storage 只保存事实和快照，不决定医疗逻辑。
+Integration 只连接外部服务，不直接调用 PatientOutput。
+外部服务返回结果必须进入 Runtime Validation。
+```
+
+## 5.7 层间依赖关系
+
+层间依赖方向必须保持单向：
 
 ```text
 平台治理层
@@ -647,7 +852,17 @@ Runtime 执行层继续校验、采纳、拒绝、降级和输出
 Storage / Integration 层提供持久化与外部服务连接
 ```
 
-## 5.3 Runtime 执行层内部结构
+禁止反向依赖：
+
+```text
+Provider 不能反向控制 RuntimeService。
+Agent 不能直接提交 RuntimeState。
+External Tool 不能直接写入核心医疗状态。
+Storage 不能承载医疗决策逻辑。
+Console 不能绕过 Runtime 修改能力边界。
+```
+
+## 5.8 Runtime 执行层内部结构
 
 ```text
 Runtime 执行层
@@ -685,6 +900,31 @@ Runtime 执行层
 ---
 
 # 六、核心运行链路
+
+本节四条链路不是四套并列系统，而是以 Runtime 主链路为中心的能力接入视图。
+
+```text
+6.1 当前 Runtime 主链路
+= 当前已经实现的 Runtime-first 运行方式。
+
+6.2 目标 Agent Runtime 链路
+= 下一阶段 Agent 如何作为受控执行单元接入 Runtime 主链路。
+
+6.3 目标 RAG / Evidence 链路
+= RAG、KG-lite、GraphRAG 如何作为 EvidenceProvider 接入知识与证据系统。
+
+6.4 目标 Model Provider 链路
+= 模型训练、后训练和模型服务如何通过 Provider 治理进入 Runtime。
+```
+
+四条链路的关系是：
+
+```text
+当前 Runtime 主链路是主干。
+Agent 链路是在主干中加入受控 Agent Proposal。
+RAG / Evidence 链路是为主干提供证据候选。
+Model Provider 链路是为主干提供可评估、可替换的模型能力。
+```
 
 ## 6.1 当前 Runtime 主链路
 
@@ -791,6 +1031,14 @@ QuestionTestPolicy / SafetyGate / DecisionBoundary
 PatientOutput / ClinicianReport
 ```
 
+核心原则：
+
+```text
+RAG / GraphRAG 不直接回答患者。
+RAG / GraphRAG 不直接决定诊断。
+RAG / GraphRAG 只增强 EvidenceGraph。
+```
+
 ## 6.4 目标 Model Provider 链路
 
 ```text
@@ -813,11 +1061,61 @@ Provider 输出 Structured Draft / Candidate / EvidenceRef
 Runtime Validation
 ```
 
+核心原则：
+
+```text
+模型训练不是训练一个 AI 医生。
+模型能力只能作为 Provider 能力进入 Runtime。
+模型上线必须经过 Evaluation / Governance / CapabilityProfile 授权。
+```
+
 ---
 
-# 七、实现状态总览
+# 七、AI 前沿技术覆盖矩阵
 
-## 7.1 已完成主干
+本节用于避免 AI 前沿技术只停留在专项规划中，确保每一类技术在总设计中都有正式归属。
+
+| 技术 / 能力 | 总设计归属 | 系统定位 | 推荐阶段 | 是否允许主控 |
+|---|---|---|---|---:|
+| Structured Output | Provider / Agent / Tool 能力层 | 所有外部能力返回结构化对象的基础要求 | Phase 2 起 | 否 |
+| Function Calling / Tool Calling | Tool / MCP / Skills 外部能力域 | Agent / Provider 内部工具调用机制 | Phase 9-P0 起 | 否 |
+| MCP | Tool / MCP / Skills 外部能力域 | 外部工具和数据源连接协议 | Phase 9-P0 起 | 否 |
+| Spring AI MCP | Tool / MCP / Skills 外部能力域 | Java 侧 MCP Client / Server 候选实现 | Phase 9-P0 或后置 | 否 |
+| OpenAI Agents SDK / Agents SDK 类技术 | Agent 受控执行域 | Agent 编排、handoff、guardrails、trace、eval 思想参考 | Phase 6 起可评估 | 否 |
+| LangGraph | Agent 受控执行域 / Provider 实验层 | 状态图、可恢复 Agent workflow 的参考或 Python Provider 内部实验 | Phase 6 / Phase 8 后置 | 否 |
+| LangChain / LlamaIndex | 医学知识与证据域 / Provider 能力层 | Python RAG、索引、检索、工具调用实验框架 | Phase 7 / Phase 8 | 否 |
+| GraphRAG | 医学知识与证据域 | EvidenceProvider / KG-lite 增强方向 | Phase 7-P1 | 否 |
+| LLM-as-a-Judge | 评估、审计与持续进化域 / 模型能力域 | EvaluationScorer 辅助评分器 | Phase 8-P0 或 Phase 3-P1 回补 | 否 |
+| Guardrails | 输出边界与安全治理域 / Provider 校验 | Provider 输出检查思想，不能替代 DecisionBoundary | Phase 6 起持续引入 | 否 |
+| Skills | Tool / MCP / Skills 外部能力域 / 共享能力资产层 | 可复用任务能力包、Provider Skill 或 Capability Asset | Phase 9-P0 | 否 |
+| Agent Memory | 临床经验与记忆域 / Agent 受控执行域 | 与 ExperienceContext、ExperienceCandidate 对照，不做自由记忆 | Phase 6-P1 / Phase 7 后置 | 否 |
+| Multi-Agent / Handoffs | Agent 受控执行域 / 平台治理层 | 后台审核、资产治理、评估复盘的协作模式 | Phase 6-P1 或后置 | 否 |
+| CrewAI / AutoGen | Agent 受控执行域实验参考 | 多 Agent 实验框架，不作为医疗 Runtime 主线 | 后置 | 否 |
+| Voice / Realtime Agent | Runtime 交互入口 / Agent 受控执行域 | 语音问诊交互层，不改变 Runtime 主控 | 后置 | 否 |
+| Computer Use / Browser Agent | Tool / MCP / Skills 外部能力域 | 当前医疗 Runtime 主线暂不需要 | 暂不接 | 否 |
+| Codex / Claude Code / OpenHands | 开发辅助工具 | 只作为开发工具，不属于产品 Runtime | 当前可用 | 否 |
+| Fine-tuning / SFT | 模型能力与 Provider 域 | 改善抽取、报告草稿、患者安全表达等 Provider 能力 | Phase 8-P1 | 否 |
+| DPO / RFT / Preference Optimization | 模型能力与 Provider 域 | 优化风格、边界安全、偏好排序等 Provider 能力 | Phase 8-P1 后置 | 否 |
+| Distillation | 模型能力与 Provider 域 | 降低成本、蒸馏轻量分类器或抽取模型 | Phase 8-P1 后置 | 否 |
+| Embedding / Reranker | 医学知识与证据域 / 模型能力域 | RAG、相似病例、经验检索、证据排序 | Phase 7 / Phase 8 | 否 |
+| pgvector | Storage / Integration 层 | 向量检索基础设施 | Phase 7-P0 或 Phase 8 | 否 |
+| Neo4j / Milvus / Qdrant | Storage / Integration 层 | 复杂图或向量检索增强，默认后置 | 后置 | 否 |
+
+矩阵原则：
+
+```text
+1. 技术名词不等于系统能力。
+2. 每个技术必须映射到一个能力域。
+3. 每个技术必须有主控边界。
+4. 每个技术必须经过 Phase 设计后才能实现。
+5. 没有进入 Phase 的技术只能作为规划或实验，不视为已实现。
+```
+
+---
+
+# 八、实现状态总览
+
+## 8.1 已完成主干
 
 当前已经完成并形成治理闭环的主干包括：
 
@@ -846,7 +1144,7 @@ Runtime 执行
 → Console
 ```
 
-## 7.2 已设计但尚未完整实现
+## 8.2 已设计但尚未完整实现
 
 ```text
 Agent Execution Layer
@@ -859,7 +1157,7 @@ Multi-Agent / Handoffs 后台协作
 正式登录 / 多租户 / 生产级 RBAC
 ```
 
-## 7.3 当前最大架构缺口
+## 8.3 当前最大架构缺口
 
 当前最大缺口不是 Runtime 治理，而是：
 
@@ -876,9 +1174,9 @@ Phase 6-P0：受控 Agent 执行层 MVP
 
 ---
 
-# 八、阶段路线总览
+# 九、阶段路线总览
 
-## 8.1 已完成阶段
+## 9.1 已完成阶段
 
 ```text
 Phase 1-P0：Runtime MVP
@@ -906,7 +1204,7 @@ Phase 5-P2：最小前端 Console MVP
   Runtime / Evaluation / Candidate / Review Queue / Audit Center 可视化入口。
 ```
 
-## 8.2 建议后续阶段
+## 9.2 建议后续阶段
 
 ```text
 Phase 6-P0：受控 Agent 执行层 MVP
@@ -937,7 +1235,7 @@ Phase 10-P0：生产级平台治理
 
 ---
 
-# 九、专项规划文档与总设计关系
+# 十、专项规划文档与总设计关系
 
 现有专项规划文档不应独立漂在总设计之外，而应作为本总设计的子系统展开。
 
@@ -962,7 +1260,7 @@ docs/数据库持久化设计.md
 
 ---
 
-# 十、当前不做什么
+# 十一、当前不做什么
 
 即使总设计已纳入 Agent / RAG / Model / Tool / MCP，也不代表当前阶段一次性实现这些能力。
 
@@ -983,7 +1281,7 @@ docs/数据库持久化设计.md
 
 ---
 
-# 十一、系统最终闭环
+# 十二、系统最终闭环
 
 完整目标闭环：
 
@@ -1019,7 +1317,7 @@ Asset / Experience / Model / Skill / Capability 更新候选
 
 ---
 
-# 十二、最终结论
+# 十三、最终结论
 
 ClinMindRuntime 的最终形态不是一个“会回答医学问题的模型”，也不是一个自由自治式医疗 Agent。
 
