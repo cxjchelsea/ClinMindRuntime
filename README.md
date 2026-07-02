@@ -2,7 +2,7 @@
 
 受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理、持久化治理底座与最小 Console 治理，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 5-P2 进行中（P2-E 已完成）**（Phase 1–5-P1 已落地/冻结；最小前端 Console MVP 实现中）
+当前版本：**Phase 5-P2 已完成**（Phase 1–5-P2 最小前端 Console MVP 已落地）
 
 ## 项目定位
 
@@ -29,9 +29,9 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
 | Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog、Persistence health / Audit API | 已冻结 |
 | Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
-| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | P2-E 已完成，P2-F 进行中 |
+| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | 已完成 |
 
-Phase 5-P1 冻结记录见 [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)。Phase 5-P2 规格见 [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md)。
+Phase 5-P1 冻结记录见 [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)。Phase 5-P2 规格见 [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md)；验收见 [`docs/Phase5_P2人工测试结果.md`](docs/Phase5_P2人工测试结果.md)。
 
 ## 快速启动
 
@@ -54,6 +54,8 @@ npm run dev
 ```
 
 开发服务器默认 `http://localhost:5173`，侧边栏 **Debug Context** 可配置 Token / Actor / Roles 并测试连接；`/api` 代理至后端 `8080`。
+
+前端测试：`cd console-web && npm run test`（35 项）；构建：`npm run build`。
 
 ## 运行一次 Runtime（患者端）
 
@@ -100,7 +102,7 @@ Content-Type: application/json
 - 不自动上线 ExperienceCandidate
 - 不自动把 TrainingExampleCandidate 进入训练集
 - 不把 Candidate review 当作正式临床审核
-- 不做完整前端 Console、正式登录、OAuth、多租户
+- 不做正式登录、OAuth、多租户
 - 不做 MCP / LangGraph / 完整 RAG 平台
 
 ## 文档入口
@@ -109,6 +111,9 @@ Content-Type: application/json
 |------|------|
 | [`docs/README.md`](docs/README.md) | 文档导航 |
 | [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试/展示用精简导读 |
+| [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md) | Phase 5-P2 总体规格 |
+| [`docs/Phase5_P2开发任务清单.md`](docs/Phase5_P2开发任务清单.md) | Phase 5-P2 实现顺序 |
+| [`docs/Phase5_P2人工测试结果.md`](docs/Phase5_P2人工测试结果.md) | Phase 5-P2 前端验收记录 |
 | [`docs/Phase5_P1最小Console与访问治理_实现规格.md`](docs/Phase5_P1最小Console与访问治理_实现规格.md) | Phase 5-P1 总体规格 |
 | [`docs/Phase5_P1_RBAC与AuditCenter设计.md`](docs/Phase5_P1_RBAC与AuditCenter设计.md) | RBAC-lite 与 Audit Center 设计 |
 | [`docs/Phase5_P1Console_API与测试设计.md`](docs/Phase5_P1Console_API与测试设计.md) | Console API 与测试设计 |
@@ -120,9 +125,14 @@ Content-Type: application/json
 
 ## 下一阶段
 
-**Phase 5-P2-F**：前端集成验收与归档（`console-web/`）。
+Phase 5-P2 最小前端 Console MVP 已完成。后续可选方向（非当前强制主线）：
 
-P2-E 已完成 Audit Center summary、log 列表、过滤与详情；不应跳过 P2-F 直接做正式登录或 Docker Compose，也不应实现 RAG 或模型训练。
+- 正式登录 / JWT / OAuth
+- Docker Compose 一键编排
+- 正式医生审核平台
+- RAG / GraphRAG / 模型训练
+
+不应在未立项的新 Phase 中破坏 Phase 1–5 已冻结的 Runtime 主控、Safe DTO 与 Console 访问治理边界。
 
 ## License
 

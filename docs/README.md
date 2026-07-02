@@ -17,15 +17,15 @@ Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
 Phase 4-P1：候选治理与安全加固已完成并冻结。
 Phase 5-P0：持久化与治理底座已完成并冻结。
 Phase 5-P1：最小 Console 与访问治理已完成并冻结。
-Phase 5-P2：最小前端 Console MVP — P2-E 已完成，当前进入 P2-F。
+Phase 5-P2：最小前端 Console MVP — 已完成。
 ```
 
 当前最优先任务：
 
 ```text
-1. 阅读 docs/Phase5_P2开发任务清单.md。
-2. 进入 Phase5-P2-F：前端集成验收与归档。
-3. 保持 Phase 1–5 后端 mvn test 回归通过。
+1. 阅读 docs/Phase5_P2人工测试结果.md 了解 P2 验收结论。
+2. 若继续演进，从 Phase5_P2开发任务清单 §十 后置任务中立项。
+3. 保持 Phase 1–5 后端 mvn test 回归与 console-web 前端测试通过。
 4. console-web 只调用 Safe Console API，不展示敏感字段。
 5. 继续禁止 RAG、Python Provider、模型训练、正式审核平台和 ApprovedExperience 自动生效。
 ```
@@ -166,8 +166,8 @@ Phase 5-P2：最小前端 Console MVP — P2-E 已完成，当前进入 P2-F。
 # 五、当前建议做什么
 
 ```text
-1. 阅读 docs/Phase5_P2开发任务清单.md。
-2. 进入 Phase5-P2-F：前端集成验收与归档。
+1. 阅读 docs/Phase5_P2人工测试结果.md 了解 P2 验收结论。
+2. 若继续演进，从 Phase5_P2开发任务清单 §十 后置任务中立项，而非破坏 P1/P2 边界。
 3. 保持 Phase1/2/3/4/5 后端回归与 console-web 前端测试通过。
 ```
 
@@ -187,4 +187,4 @@ Phase 5-P2：最小前端 Console MVP — P2-E 已完成，当前进入 P2-F。
 
 # 七、最终结论
 
-当前文档体系已支撑 Phase 1–5-P2 全链路。Phase5-P1 已冻结，Phase5-P2 P2-A 已完成，下一步进入 P2-B。
+当前文档体系已支撑 Phase 1–5-P2 全链路。Phase5-P1 已冻结，Phase5-P2 最小前端 Console MVP 已完成。

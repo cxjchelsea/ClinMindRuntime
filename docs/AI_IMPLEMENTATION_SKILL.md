@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P2 最小前端 Console MVP — P2-E 已完成
-下一步：Phase5-P2-F 前端集成验收与归档
+当前阶段：Phase 5-P2 最小前端 Console MVP — 已完成
+下一步：无强制主线（见后置任务：正式登录、Docker Compose、RAG 等）
 ```
 
 当前已经完成的主线：
@@ -23,7 +23,7 @@ Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
 Phase 5-P1：最小 Console 与访问治理，已冻结
-Phase 5-P2：最小前端 Console MVP — P2-E 已完成
+Phase 5-P2：最小前端 Console MVP — 已完成
 ```
 
 Phase 5-P2 目标：
@@ -263,18 +263,19 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P2-F：前端集成验收与归档
+无强制 P2 子阶段 — Phase 5-P2 已完成。
 ```
 
-只应实现：
+若需继续演进，只应评估后置任务（见 Phase5_P2开发任务清单 §十）：
 
 ```text
-1. ConsoleAppSmokeTest 与 SensitiveFieldRedactionRenderTest 补齐。
-2. docs/Phase5_P2人工测试结果.md 与 README / docs 导航同步。
-3. 确认 npm run test / npm run build 全绿。
+1. 正式登录 / JWT / OAuth
+2. Docker Compose 一键编排
+3. 正式医生审核平台
+4. RAG / GraphRAG / 模型训练
 ```
 
-不应在 P2-F 中实现：
+不应在未立项的新 Phase 中：
 
 ```text
 正式登录系统

@@ -206,17 +206,17 @@ P2 必须保证：
 
 # 八、Phase5-P2-F：前端集成验收与归档
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] ConsoleAppSmokeTest
-[ ] SensitiveFieldRedactionRenderTest
-[ ] npm run test
-[ ] npm run build
-[ ] docs/Phase5_P2人工测试结果.md
-[ ] README / docs 导航状态同步
+[x] ConsoleAppSmokeTest
+[x] SensitiveFieldRedactionRenderTest
+[x] npm run test
+[x] npm run build
+[x] docs/Phase5_P2人工测试结果.md
+[x] README / docs 导航状态同步
 ```
 
 验收标准：
@@ -271,14 +271,13 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P2-F：前端集成验收与归档
+Phase 5-P2 已完成 — 无强制主线；后置项见「十、后置任务」
 ```
 
-开始实现前必须：
+后续若继续演进，应优先阅读：
 
 ```text
-1. 将 Phase5-P2-F 状态从 [ ] 改为 [/]。
-2. 补齐 ConsoleAppSmokeTest、SensitiveFieldRedactionRenderTest 与人工验收文档。
-3. 确认 npm run test / npm run build 全绿。
-4. 不实现正式登录、Docker Compose、RAG、模型训练或后端 Console API 大改。
+1. docs/Phase5_P2人工测试结果.md — P2 验收依据。
+2. docs/Phase5_P2最小前端Console_MVP_实现规格.md — 边界与完成标准。
+3. 不直接实现正式登录、Docker Compose、RAG、模型训练或 ApprovedExperience 自动生效。
 ```
