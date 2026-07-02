@@ -10,7 +10,8 @@ public record EvidenceGraphItem(
         List<String> conflictingEvidence,
         CandidateStatus status,
         List<String> nextQuestions,
-        List<String> recommendedTests
+        List<String> recommendedTests,
+        List<EvidenceGraphRefEntry> evidenceRefs
 ) {
     public EvidenceGraphItem {
         supportingEvidence = supportingEvidence == null ? List.of() : List.copyOf(supportingEvidence);
@@ -20,10 +21,24 @@ public record EvidenceGraphItem(
         status = status == null ? CandidateStatus.INSUFFICIENT_EVIDENCE : status;
         nextQuestions = nextQuestions == null ? List.of() : List.copyOf(nextQuestions);
         recommendedTests = recommendedTests == null ? List.of() : List.copyOf(recommendedTests);
+        evidenceRefs = evidenceRefs == null ? List.of() : List.copyOf(evidenceRefs);
+    }
+
+    public EvidenceGraphItem(
+            String diagnosis,
+            List<String> supportingEvidence,
+            List<String> opposingEvidence,
+            List<String> missingEvidence,
+            List<String> conflictingEvidence,
+            CandidateStatus status,
+            List<String> nextQuestions,
+            List<String> recommendedTests) {
+        this(diagnosis, supportingEvidence, opposingEvidence, missingEvidence, conflictingEvidence,
+                status, nextQuestions, recommendedTests, List.of());
     }
 
     public EvidenceGraphItem(String diagnosis) {
         this(diagnosis, List.of(), List.of(), List.of(), List.of(),
-                CandidateStatus.INSUFFICIENT_EVIDENCE, List.of(), List.of());
+                CandidateStatus.INSUFFICIENT_EVIDENCE, List.of(), List.of(), List.of());
     }
 }

@@ -16,6 +16,8 @@ import com.clinmind.runtime.knowledge.KnowledgeContextService;
 import com.clinmind.runtime.api.AssetContextRequest;
 import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
 import com.clinmind.runtime.agent.capability.CapabilityOrchestrationService;
+import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
+import com.clinmind.runtime.evidence.capability.EvidenceCapabilityOrchestrator;
 import com.clinmind.runtime.agent.inquiry.InquiryQuestionCandidate;
 import com.clinmind.runtime.asset.AssetLoadErrorCode;
 import com.clinmind.runtime.asset.AssetLoadException;
@@ -68,6 +70,7 @@ public class RuntimeService {
     private final AssetPackageRepository assetPackageRepository;
     private final AuditLogService auditLogService;
     private final CapabilityOrchestrationService capabilityOrchestrationService;
+    private final EvidenceCapabilityOrchestrator evidenceCapabilityOrchestrator;
 
     public RuntimeService(
             RuntimeStore runtimeStore,
@@ -86,7 +89,8 @@ public class RuntimeService {
             RuntimeTraceCollector traceCollector,
             AssetPackageRepository assetPackageRepository,
             AuditLogService auditLogService,
-            CapabilityOrchestrationService capabilityOrchestrationService) {
+            CapabilityOrchestrationService capabilityOrchestrationService,
+            EvidenceCapabilityOrchestrator evidenceCapabilityOrchestrator) {
         this.runtimeStore = runtimeStore;
         this.entryAssessmentService = entryAssessmentService;
         this.caseFrameService = caseFrameService;
@@ -104,6 +108,7 @@ public class RuntimeService {
         this.assetPackageRepository = assetPackageRepository;
         this.auditLogService = auditLogService;
         this.capabilityOrchestrationService = capabilityOrchestrationService;
+        this.evidenceCapabilityOrchestrator = evidenceCapabilityOrchestrator;
     }
 
     public RuntimeExecutionResult startRuntime(StartRuntimeRequest request) {
@@ -239,6 +244,9 @@ public class RuntimeService {
 
             AgentOrchestrationSnapshot orchestration = capabilityOrchestrationService.orchestrate(state);
             state.setAgentOrchestration(orchestration);
+
+            EvidenceRetrievalSnapshot evidenceRetrieval = evidenceCapabilityOrchestrator.orchestrate(state);
+            state.setEvidenceRetrieval(evidenceRetrieval);
 
             state.setDifferentialBoard(differentialDiagnosisBoardService.buildDifferentialBoard(state));
             state.setEvidenceGraph(evidenceGraphService.buildEvidenceGraph(state));

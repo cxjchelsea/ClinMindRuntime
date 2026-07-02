@@ -1,0 +1,128 @@
+package_id: phase7-default
+version: phase7-default-0.1.0
+chunks:
+  - chunk_id: chunk_chest_pain_001
+    source_id: synthetic_safety_guide_chest_pain
+    source_type: synthetic_safety_knowledge
+    title: 胸痛风险信号识别
+    section_path: 胸痛 > 风险信号
+    symptom_group: chest_pain
+    diagnosis_tags: [acute_coronary_syndrome_rule_out]
+    keyword_tags: [胸闷, 活动后加重, 出汗, 放射痛]
+    content_summary: 活动后胸闷伴出汗需警惕急性冠脉综合征，应补充追问持续时间与放射痛。
+    evidence_strength: SAFETY_RULE
+    risk_level: HIGH
+    use_cases: [safety_warning, ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_chest_pain_002
+    source_id: synthetic_clinical_pathway_chest_pain
+    source_type: synthetic_clinical_pathway
+    title: 胸痛鉴别要点
+    section_path: 胸痛 > 鉴别诊断
+    symptom_group: chest_pain
+    diagnosis_tags: [non_cardiac_chest_pain]
+    keyword_tags: [胸痛, 非心源性, 肌肉骨骼]
+    content_summary: 非心源性胸痛常见为肌肉骨骼或胃食管来源，需结合活动、体位与伴随症状区分。
+    evidence_strength: GUIDELINE_SUMMARY
+    risk_level: MEDIUM
+    use_cases: [support, ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_chest_pain_003
+    source_id: synthetic_safety_guide_chest_pain
+    source_type: synthetic_safety_knowledge
+    title: 胸痛需补充信息
+    section_path: 胸痛 > 问诊要点
+    symptom_group: chest_pain
+    diagnosis_tags: [chest_pain_workup]
+    keyword_tags: [持续时间, 呼吸困难, 放射痛]
+    content_summary: 胸痛评估需明确持续时间、是否放射至左臂或下颌、是否伴呼吸困难。
+    evidence_strength: CLINICAL_CHECKLIST
+    risk_level: MEDIUM
+    use_cases: [ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_fever_001
+    source_id: synthetic_clinical_pathway_fever
+    source_type: synthetic_clinical_pathway
+    title: 发热常见病因
+    section_path: 发热 > 常见病因
+    symptom_group: fever
+    diagnosis_tags: [viral_infection, bacterial_infection]
+    keyword_tags: [发热, 头痛, 体温]
+    content_summary: 急性发热伴头痛常见于病毒感染，需关注热程、伴随皮疹与脱水表现。
+    evidence_strength: GUIDELINE_SUMMARY
+    risk_level: LOW
+    use_cases: [support, ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_fever_002
+    source_id: synthetic_safety_guide_fever
+    source_type: synthetic_safety_knowledge
+    title: 发热危险信号
+    section_path: 发热 > 风险信号
+    symptom_group: fever
+    diagnosis_tags: [sepsis_rule_out]
+    keyword_tags: [高热, 意识改变, 呼吸困难]
+    content_summary: 持续高热伴意识改变或呼吸困难需警惕严重感染或败血症风险。
+    evidence_strength: SAFETY_RULE
+    risk_level: HIGH
+    use_cases: [safety_warning, ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_fever_003
+    source_id: synthetic_clinical_pathway_fever
+    source_type: synthetic_clinical_pathway
+    title: 发热问诊要点
+    section_path: 发热 > 问诊要点
+    symptom_group: fever
+    diagnosis_tags: [fever_workup]
+    keyword_tags: [持续时间, 最高体温, 伴随症状]
+    content_summary: 发热评估需明确热程、最高体温及伴随咳嗽、皮疹、腹痛等症状。
+    evidence_strength: CLINICAL_CHECKLIST
+    risk_level: MEDIUM
+    use_cases: [ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_abdominal_pain_001
+    source_id: synthetic_safety_guide_abdominal_pain
+    source_type: synthetic_safety_knowledge
+    title: 腹痛危险信号
+    section_path: 腹痛 > 风险信号
+    symptom_group: abdominal_pain
+    diagnosis_tags: [acute_abdomen_rule_out]
+    keyword_tags: [剧烈腹痛, 反跳痛, 持续加重]
+    content_summary: 剧烈持续加重腹痛伴反跳痛需警惕急腹症，建议尽快线下评估。
+    evidence_strength: SAFETY_RULE
+    risk_level: HIGH
+    use_cases: [safety_warning, ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_abdominal_pain_002
+    source_id: synthetic_clinical_pathway_abdominal_pain
+    source_type: synthetic_clinical_pathway
+    title: 腹痛部位鉴别
+    section_path: 腹痛 > 鉴别诊断
+    symptom_group: abdominal_pain
+    diagnosis_tags: [gastroenteritis, appendicitis_rule_out]
+    keyword_tags: [腹痛, 右下腹, 恶心呕吐]
+    content_summary: 右下腹痛伴恶心呕吐需考虑阑尾炎等急腹症，应补充定位与伴随症状。
+    evidence_strength: GUIDELINE_SUMMARY
+    risk_level: MEDIUM
+    use_cases: [support, ask_more]
+    version: 0.1.0
+
+  - chunk_id: chunk_abdominal_pain_003
+    source_id: synthetic_clinical_pathway_abdominal_pain
+    source_type: synthetic_clinical_pathway
+    title: 腹痛问诊要点
+    section_path: 腹痛 > 问诊要点
+    symptom_group: abdominal_pain
+    diagnosis_tags: [abdominal_pain_workup]
+    keyword_tags: [起始部位, 放射, 排便]
+    content_summary: 腹痛评估需明确起始部位、是否放射、排便习惯改变及进食关系。
+    evidence_strength: CLINICAL_CHECKLIST
+    risk_level: MEDIUM
+    use_cases: [ask_more]
+    version: 0.1.0

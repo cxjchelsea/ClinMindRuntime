@@ -1,5 +1,8 @@
 package com.clinmind.runtime.reasoning;
 
+import com.clinmind.runtime.evidence.EvidenceCandidate;
+import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
+import com.clinmind.runtime.evidence.mapper.EvidenceCandidateToGraphMapper;
 import com.clinmind.runtime.asset.AssetRuntimeSupport;
 import com.clinmind.runtime.asset.TestRecommendationAsset;
 import com.clinmind.runtime.provider.TestRecommendationProvider;
@@ -8,6 +11,7 @@ import com.clinmind.runtime.state.CaseFrame;
 import com.clinmind.runtime.state.DDxCandidate;
 import com.clinmind.runtime.state.EvidenceGraph;
 import com.clinmind.runtime.state.EvidenceGraphItem;
+import com.clinmind.runtime.state.EvidenceGraphRefEntry;
 import com.clinmind.runtime.state.KnowledgeContext;
 import com.clinmind.runtime.state.RuntimeState;
 import com.clinmind.runtime.state.SymptomItem;
@@ -34,11 +38,15 @@ public class EvidenceGraphService {
         String combinedText = combinedText(state);
         KnowledgeContext knowledge = state.getKnowledgeContext();
         CaseFrame caseFrame = state.getCaseFrame();
+        List<EvidenceCandidate> ragCandidates = acceptedRagCandidates(state);
+        List<String> ragSummaries = EvidenceCandidateToGraphMapper.toSupportingSummaries(ragCandidates);
+        List<EvidenceGraphRefEntry> ragRefs = EvidenceCandidateToGraphMapper.toGraphRefs(ragCandidates);
 
         for (DDxCandidate candidate : state.getDifferentialBoard().candidates()) {
-            List<String> supporting = buildSupportingEvidence(caseFrame, candidate);
+            List<String> supporting = new ArrayList<>(buildSupportingEvidence(caseFrame, candidate));
+            supporting.addAll(ragSummaries);
             List<String> missing = buildMissingEvidence(caseFrame, knowledge, candidate, combinedText);
-            List<String> nextQuestions = buildNextQuestions(knowledge, combinedText);
+            List<String> nextQuestions = buildNextQuestions(knowledge, combinedText, ragCandidates);
             List<String> recommendedTests = buildRecommendedTests(state, knowledge, candidate);
 
             items.add(new EvidenceGraphItem(
@@ -49,9 +57,31 @@ public class EvidenceGraphService {
                     List.of(),
                     candidate.status(),
                     nextQuestions,
-                    recommendedTests));
+                    recommendedTests,
+                    ragRefs));
         }
         return new EvidenceGraph(items);
+    }
+
+    private List<EvidenceCandidate> acceptedRagCandidates(RuntimeState state) {
+        EvidenceRetrievalSnapshot snapshot = state.getEvidenceRetrieval();
+        if (snapshot == null || snapshot.acceptedCandidates().isEmpty()) {
+            return List.of();
+        }
+        return snapshot.acceptedCandidates();
+    }
+
+    private List<String> buildNextQuestions(
+            KnowledgeContext knowledge, String combinedText, List<EvidenceCandidate> ragCandidates) {
+        List<String> questions = buildNextQuestions(knowledge, combinedText);
+        for (EvidenceCandidate candidate : ragCandidates) {
+            if (candidate.useCase() != null
+                    && candidate.useCase().name().equals("ASK_MORE")
+                    && candidate.reasonSummary() != null) {
+                questions.add(candidate.reasonSummary());
+            }
+        }
+        return questions;
     }
 
     private List<String> buildSupportingEvidence(CaseFrame caseFrame, DDxCandidate candidate) {
