@@ -1,7 +1,13 @@
 # ClinMindRuntime 技术实现总方案
 
-> 本文档用于说明 ClinMindRuntime 的代码级落地方式：模块如何分层、包结构如何规划、Runtime 主链路如何实现、Provider 如何接入、Evaluation 如何执行、数据存储如何演进、Python AI Provider / RAG / 模型服务 / MCP 如何后置接入。  
-> 它连接完整系统设计、阶段拆分路线图、全局技术栈、AI 前沿技术规划、模型训练规划和各 Phase 详细设计，是后续代码实现的总蓝图。
+> 上位总设计：`docs/ClinMindRuntime完整系统设计.md`  
+> 文档地图：`docs/00_项目设计地图.md`  
+> 当前总设计版本：v2.2  
+> 当前项目定位：受控医疗 AI Agent Runtime 与能力治理平台  
+> 当前状态：Phase 1–5 已冻结；本文档已同步统一 Runtime 主链路、Capability Orchestration、AgentExecutionLayer 和 Runtime Validation。
+
+> 本文档用于说明 ClinMindRuntime 的代码级落地方式：模块如何分层、包结构如何规划、Runtime 主链路如何实现、Agent / Provider / RAG / Model / Tool 如何受控接入、Evaluation 如何执行、数据存储如何演进。  
+> 它连接完整系统设计、阶段拆分路线图、全局技术栈、AI 前沿技术规划、模型训练规划、RAG 规划和各 Phase 详细设计，是后续代码实现的总蓝图。
 
 ---
 
@@ -16,1051 +22,699 @@ docs/ClinMindRuntime完整系统设计.md
 docs/ClinMindRuntime阶段拆分路线图.md
 = 每个阶段什么时候做什么。
 
+docs/00_项目设计地图.md
+= 文档之间如何关联，专项设计如何进入 Phase 实现。
+
 docs/全局技术栈与架构选型.md
 = 用什么技术，以及什么时候接入。
 
 docs/AI前沿技术选型与接入规划.md
-= MCP、Agent SDK、LangGraph、GraphRAG、Skills 等怎么接，哪些不能提前接。
+= Agent、MCP、Tool、LangGraph、GraphRAG、Skills 等怎么接，哪些不能提前接。
+
+docs/医学知识库与RAG构建规划.md
+= RAG / KG-lite / GraphRAG 如何作为 EvidenceProvider 进入 Runtime。
 
 docs/模型训练与后训练规划.md
-= 模型训练、后训练、模型部署和 Model Provider 怎么演进。
+= 模型训练、后训练、模型部署和 ModelProvider 怎么演进。
 ```
 
 本文档回答：
 
 ```text
-这些设计最终如何落到代码、模块、依赖、API、Provider、存储、测试和部署中。
+这些设计最终如何落到代码、模块、依赖、API、Provider、Agent、Tool、存储、测试和部署中。
 ```
 
 ---
 
 # 二、当前实现状态
 
-当前仓库状态（2026-06-25 基线）：
+当前仓库状态：
 
 ```text
-Phase 1-P0：Runtime MVP — 已完成。
-Phase 2-P0：共享能力资产原型 — 已完成。
-Phase 3-P0：训练与评估闭环 MVP — 已冻结。
-Phase 4-P0：候选沉淀机制 + debug API — 已冻结。
-Phase 4-P1：候选治理与安全加固 — 已冻结。
-Phase 5-P0：持久化与治理底座（PostgreSQL 双模式、AuditLog）— 已冻结。
-Phase 5-P1：最小 Console API、RBAC-lite、Audit Center、Safe DTO — 已冻结。
-Phase 5-P2：最小前端 Console MVP（console-web/）— 已冻结。
-Phase 5 总归档：见 docs/Phase5冻结记录.md。
+Phase 1-P0：Runtime MVP，已完成。
+Phase 2-P0：共享能力资产原型，已完成。
+Phase 3-P0：Evaluation 闭环，已冻结。
+Phase 4-P0：Candidate 生成机制，已冻结。
+Phase 4-P1：Candidate 治理与安全加固，已冻结。
+Phase 5-P0：Persistence / Audit 治理底座，已冻结。
+Phase 5-P1：最小 Console API / Access Governance，已冻结。
+Phase 5-P2：最小前端 Console MVP，已冻结。
 ```
 
-当前无强制实现主线。后置可选方向：
+当前已实现主干：
 
 ```text
-正式登录 / JWT / OAuth
-Docker Compose 一键编排
-完整产品化前端 / Training Center
-Python AI Provider / RAG / GraphRAG
-模型训练 / 后训练
-MCP / LangGraph / Agent SDK
+Runtime 执行
+→ RuntimeTrace
+→ Asset Provider
+→ Evaluation
+→ Candidate
+→ Review
+→ Persistence
+→ Audit
+→ Console
 ```
 
-当前禁止提前实现（在未立项的新 Phase 中）：
+当前尚未实现：
 
 ```text
-真实 RAG / GraphRAG 作为 Runtime 主控
-模型训练 / 后训练自动生效
-MCP / LangGraph / Agent SDK 替代 SafetyGate
-正式医生审核平台语义
-ApprovedExperience / TrainingDatasetVersion 自动发布
-破坏 Safe DTO 或 Console RBAC-lite 边界
+AgentExecutionLayer
+Capability Orchestration 正式实现
+Runtime Validation 对外部能力统一校验
+真实 RAG EvidenceProvider
+KG-lite / GraphRAG Provider
+Python AI Provider
+ModelProvider / ModelRegistry / TrainingDatasetVersion
+ToolAccessPolicy / MCP Adapter / Skills
+Multi-Agent / Handoffs
+生产级登录 / 多租户 / 正式 RBAC
+正式医生审核平台
 ```
 
 ---
 
-# 三、总体技术实现架构
+# 三、总体技术架构
 
-完整技术实现架构分为六层：
+代码层面采用五层结构：
 
 ```text
-1. API Layer
-   对外暴露 Runtime API、debug/internal API、Phase 5-P1 Console API（/api/v1/debug/console/**）。
-
-2. Application / Orchestration Layer
-   负责编排 Runtime 主流程、Evaluation 执行流、Proposal 生成流。
-
-3. Domain Module Layer
-   负责 EntryAssessment、CaseFrame、SafetyGate、DDx、EvidenceGraph、DecisionBoundary 等领域逻辑。
-
-4. Provider / Asset Layer
-   负责读取可替换资产、知识、能力档案、经验、未来模型 Provider 和外部工具。
-
-5. Storage / Repository Layer
-   in-memory 与 PostgreSQL 双实现（Phase 5-P0）；YAML 资产包与 Evaluation 病例集；Redis / pgvector 仍后置。
-
-6. Integration Layer
-   后续连接 Python AI Provider、RAG、GraphRAG、MCP、外部 LLM、模型服务。
+1. API / Console Layer
+2. Application / Runtime Orchestration Layer
+3. Domain Capability Layer
+4. Provider / Agent / Tool Layer
+5. Storage / Integration Layer
 ```
 
-依赖方向必须单向：
+依赖方向：
 
 ```text
-API
-→ Application / Runtime Service
-→ Domain Module
-→ Provider Interface
-→ Provider Implementation / Repository / External Service
+API / Console
+→ Application / Runtime Orchestration
+→ Domain Capability
+→ Provider / Agent / Tool Interface
+→ Provider / Agent / Tool Implementation
+→ Storage / Integration
 ```
 
 禁止反向依赖：
 
 ```text
 Provider 不能反向控制 RuntimeService。
-External Agent 不能直接修改 RuntimeState。
-Model / LLM / MCP 不能绕过 SafetyGate / DecisionBoundary。
+Agent 不能直接修改 RuntimeState。
+Tool / MCP 不能直接写入 Domain State。
+Storage 不能承载医疗判断逻辑。
+Console 不能绕过 Safe DTO 和 AccessPolicy。
+Model / RAG / LLM 不能直接输出 PatientOutput。
 ```
 
 ---
 
-# 四、Java 后端分层设计
+# 四、统一 Runtime 主链路
 
-推荐代码分层：
+最终设计不是多条并行链路，而是一条统一 Runtime 主链路。
+
+目标链路：
+
+```text
+用户 / 医生输入
+↓
+Runtime API
+↓
+RuntimeService 创建或继续 Runtime
+↓
+EntryAssessment 判断是否属于临床问诊 / 是否支持处理
+↓
+RuntimeState / CaseFrame 更新病例状态
+↓
+KnowledgeContext / ExperienceContext 构建上下文
+↓
+SafetyGate 初筛高风险
+↓
+Capability Orchestration 能力编排
+  ├── Agent 生成问诊 / 证据 / 改写 / 复盘 Proposal
+  ├── RAG / KG-lite / GraphRAG 返回 EvidenceCandidate
+  ├── Model Provider 返回结构化 Draft / Candidate / ScoreDraft
+  └── Tool / MCP / Skills 返回 ToolResult / ExternalContext
+↓
+Runtime Validation 校验所有外部能力结果
+↓
+Runtime 决定采纳 / 部分采纳 / 拒绝 / 降级
+↓
+DDx Board / EvidenceGraph / QuestionPolicy 更新
+↓
+DecisionBoundary 判断患者端和医生端可见内容
+↓
+PatientOutput / ClinicianReport 分角色输出
+↓
+RuntimeTrace / AuditLog 记录全过程
+↓
+Evaluation 评估运行结果
+↓
+Candidate / TrainingExample / CapabilityProfile Proposal 沉淀
+↓
+Review / Governance 审核
+↓
+资产 / 经验 / 模型 / Skill / Capability 更新候选
+↓
+通过评估后进入下一轮 Runtime 可用能力
+```
+
+当前 Phase 1–5 已经实现这条链路的治理主干，Phase 6 之后开始在 Capability Orchestration 节点接入 Agent / RAG / Model / Tool。
+
+---
+
+# 五、Java 包结构规划
+
+推荐后续包结构：
 
 ```text
 com.clinmind.runtime
-  api/
-  runtime/
-  state/
-  trace/
-  entry/
-  caseframe/
-  knowledge/
-  experience/
-  safety/
-  reasoning/
-  boundary/
-  output/
-  asset/
-  provider/
-  evaluation/
-  training/        # 后置，不在 Phase 3-P0 实现真实训练
-  integration/     # 后置，不在 Phase 3-P0 接外部服务
-  common/
+  api
+  application
+  domain
+  trace
+  safety
+  boundary
+  capability
+  agent
+  provider
+  evidence
+  model
+  tool
+  asset
+  evaluation
+  candidate
+  governance
+  console
+  persistence
+  audit
+  config
 ```
 
-## 4.1 api
-
-职责：
+## 5.1 Runtime Core
 
 ```text
-Controller
-Request DTO
-Response DTO
-Response Mapper
-Error response
-```
+com.clinmind.runtime.application
+  RuntimeService
+  RuntimeCommandService
+  RuntimeQueryService
+  RuntimeContinuationService
 
-原则：
-
-```text
-1. Controller 只做请求接收和响应映射。
-2. Controller 不直接调用底层领域模块。
-3. Controller 必须通过 RuntimeService / EvaluationService 等应用服务。
-4. Patient-facing API 和 debug/internal API 必须路径隔离。
-```
-
-## 4.2 runtime / state / trace
-
-职责：
-
-```text
-RuntimeService
-RuntimeState
-RuntimeStatus
-RuntimeMode
-WorkMode
-RuntimeTrace
-RuntimeStore
-RuntimeTraceAspect
-TraceStep
-```
-
-原则：
-
-```text
-1. RuntimeService 是一次问诊主流程的唯一编排入口。
-2. RuntimeState 是诊断状态的唯一主承载。
-3. RuntimeTrace 是审计与评估的重要输入。
-4. Provider、Scorer、Model 不允许直接修改 RuntimeState。
-```
-
-## 4.3 domain modules
-
-领域模块包括：
-
-```text
-entry/
-caseframe/
-knowledge/
-experience/
-safety/
-reasoning/
-boundary/
-output/
+com.clinmind.runtime.domain
+  RuntimeState
+  RuntimeStatus
+  CaseFrame
+  DifferentialDiagnosisBoard
+  EvidenceGraph
+  QuestionPolicyState
 ```
 
 职责：
 
 ```text
-EntryAssessment：判断输入工作态、入口风险、是否支持。
-CaseFrame：结构化病例信息。
-KnowledgeContext：聚合医学知识资产。
-ExperienceContext：聚合已验证经验。
-SafetyGate：强安全门。
-DifferentialDiagnosisBoard：候选诊断状态。
-EvidenceGraph：证据关系。
-QuestionTestPolicy：下一步追问 / 检查建议。
-DecisionBoundary：输出边界。
-PatientOutput / ClinicianReport：分角色输出。
+RuntimeService 是主控入口。
+RuntimeState 是运行状态载体。
+Domain 对象不感知 Web、DB、LLM、RAG、MCP、前端。
 ```
 
-## 4.4 asset / provider
-
-职责：
+## 5.2 Safety / Boundary
 
 ```text
-AssetMetadata
-AssetPackage
-AssetPackageManifest
-AssetPackageRepository
-KnowledgeProvider
-ClinicalExperienceProvider
-CapabilityProfileProvider
-EvidenceAssetProvider
-```
+com.clinmind.runtime.safety
+  SafetyGateService
+  RedFlagRuleEvaluator
+  FailurePolicy
 
-原则：
-
-```text
-1. Runtime 不直接读取硬编码资产。
-2. Runtime 通过 Provider Interface 读取资产。
-3. Provider 返回结构化资产对象。
-4. RuntimeTrace 必须记录 asset_package_id、asset_package_version、asset_id、asset_version。
-```
-
-## 4.5 evaluation
-
-Phase 3 重点包。
-
-建议结构：
-
-```text
-evaluation/
-  model/
-  repository/
-  runner/
-  scorer/
-  result/
-  proposal/
-  api/
+com.clinmind.runtime.boundary
+  DecisionBoundaryService
+  PatientOutputMapper
+  ClinicianReportMapper
+  BoundaryViolation
 ```
 
 职责：
 
 ```text
-model：EvaluationCase、ExpectedOutcome、EvaluationRun、EvaluationResult 等数据结构。
-repository：YAML case set 读取。
-runner：通过 RuntimeService 执行病例。
-scorer：对 RuntimeCaseExecution 评分。
-result：聚合 EvaluationResult。
-proposal：生成 CapabilityProfileUpdateProposal。
-api：debug/internal evaluation API。
+SafetyGate 判断高风险和失败兜底。
+DecisionBoundary 决定患者端和医生端可见内容。
+任何 Agent / RAG / Model / Tool 都不能绕过这两个边界。
 ```
 
-核心约束：
+## 5.3 Capability Orchestration
 
 ```text
-EvaluationRunner 只能调用 RuntimeService。
-Scorer 只能评分，不能修改 RuntimeState。
-CapabilityProfileProposalService 只能生成 proposal，不能自动上线。
+com.clinmind.runtime.capability
+  CapabilityOrchestrationService
+  CapabilityInvocationPlan
+  CapabilityInvocationPolicy
+  CapabilityInvocationResult
+  CapabilityType
+  RuntimeValidationService
+  CapabilityResultValidator
+  CapabilityDegradationPolicy
 ```
 
-## 4.6 training
-
-后置包，Phase 3-P0 不实现真实训练。
-
-未来职责：
+职责：
 
 ```text
-TrainingExampleCandidate
-TrainingDatasetVersion
-ModelProviderMetadata
-ModelEvaluationRecord
-ModelRegistry
+判断当前 RuntimeState 下需要调用哪些外部能力。
+统一调度 Agent / RAG / Model / Tool。
+统一接收外部能力结果。
+统一进入 Runtime Validation。
+决定采纳、部分采纳、拒绝或降级。
 ```
 
-边界：
+Capability Orchestration 不是 Agent，也不是 LangGraph。它是 Java Runtime 内部的受控能力编排节点。
+
+## 5.4 AgentExecutionLayer
 
 ```text
-training 包负责训练数据与模型元数据治理，
-不负责直接执行医疗问诊，
-不负责直接输出患者端答案。
+com.clinmind.runtime.agent
+  AgentRegistry
+  AgentRuntime
+  AgentPolicy
+  AgentContext
+  AgentExecutionRequest
+  AgentExecutionResult
+  AgentProposal
+  AgentProposalValidator
+  AgentTrace
+  AgentEvaluationHook
+
+com.clinmind.runtime.agent.inquiry
+  InquiryPlanningAgent
+  InquiryPlanProposal
+  InquiryQuestionCandidate
+  InquiryPlanningPolicy
+  InquiryPlanProposalValidator
 ```
 
-## 4.7 integration
-
-后置包，Phase 3-P0 不接入。
-
-未来职责：
+职责：
 
 ```text
-PythonAiProviderClient
-RagProviderClient
-McpAdapter
-ExternalLlmClient
-EmbeddingClient
-GraphRagClient
+AgentRegistry 管理可用 Agent。
+AgentRuntime 执行受控 Agent。
+AgentPolicy 判断是否允许调用 Agent。
+AgentProposalValidator 校验 Agent 输出。
+AgentTrace 记录执行过程。
+AgentEvaluationHook 将 Agent 结果接入 Evaluation。
 ```
 
-边界：
+Phase 6-P0 首个 Agent：
 
 ```text
-Integration 只连接外部服务，返回结构化结果。
-Integration 不直接修改 RuntimeState。
-Integration 不直接调用 PatientOutput。
-```
-
----
-
-# 五、核心包结构规划
-
-当前已实现结构（节选）：
-
-```text
-src/main/java/com/clinmind/runtime/
-  api/                             # Runtime / debug REST 入口
-  runtime/                         # RuntimeService、RuntimeStore
-  state/                           # RuntimeState、RuntimeTrace
-  trace/
-  entry/ caseframe/ knowledge/ experience/
-  safety/ reasoning/ boundary/ output/
-  asset/
-  provider/                        # YAML Asset Provider
-  evaluation/                      # runner、scorer、result、proposal
-  candidate/                       # 候选生成、脱敏、review、store
-  audit/                           # AuditLog（Phase 5-P0）
-  persistence/                     # snapshot mapper、jdbc store
-  storage/                         # in-memory store
-  console/                         # Phase 5-P1：access、api、dto、audit query
-  config/
-  service/
-
-console-web/                       # Phase 5-P2：Vite + React 最小 Console MVP
-  src/pages/                       # Runtime / Evaluation / Candidate / Review / Audit
-  src/api/consoleClient.ts
-  src/auth/DebugContextProvider.tsx
-  src/components/SensitiveFieldRenderGuard.ts
-```
-
-测试结构：
-
-```text
-src/test/java/com/clinmind/runtime/
-  phase1–5 回归与集成测试
-  console/                         # Console API、RBAC、Safe DTO、Audit
-  persistence/                     # jdbc、postgres E2E
-
-console-web/src/tests/
-  35 项 vitest（smoke、页面流、敏感字段渲染）
-```
-
-资源结构：
-
-```text
-src/main/resources/
-  assets/packages/phase2-default/
-  evaluation/case-sets/phase3-default/
-  db/migration/                    # Flyway（postgres 模式）
-  application.yml
-```
-
----
-
-# 六、Runtime 主流程实现链路
-
-Runtime 主流程必须固定为：
-
-```text
-Controller
-→ RuntimeService.startRuntime / continueRuntime
-→ EntryAssessmentService
-→ CaseFrameService
-→ KnowledgeContextService
-→ ExperienceContextService
-→ SafetyGateService
-→ DifferentialDiagnosisBoardService
-→ EvidenceGraphService
-→ QuestionTestPolicyService
-→ DecisionBoundaryService
-→ PatientOutputService / ClinicianReportService
-→ RuntimeTrace
-→ RuntimeStore
-```
-
-每个模块的输入输出原则：
-
-```text
-1. 输入：RuntimeState + 当前模块所需资产 / Provider 结果。
-2. 输出：结构化 Result 或 RuntimeState 局部更新。
-3. Trace：每个关键模块必须记录执行结果。
-4. Error：安全相关失败必须 fail-safe。
+InquiryPlanningAgent
 ```
 
 禁止：
 
 ```text
-1. Controller 直接调用 SafetyGate / EvidenceGraph 等底层模块。
-2. Provider 直接生成患者端最终答案。
-3. LLM / RAG / Model 直接覆盖 RuntimeState。
-4. DecisionBoundary 之后再让模型自由改写医疗内容。
+Agent 直接修改 RuntimeState。
+Agent 直接决定 SafetyGate。
+Agent 直接决定 DecisionBoundary。
+Agent 直接输出 PatientOutput。
+Agent 直接生成最终诊断。
+```
+
+## 5.5 Evidence / RAG Provider
+
+```text
+com.clinmind.runtime.evidence
+  EvidenceProvider
+  EvidenceRetrievalRequest
+  EvidenceRetrievalResult
+  EvidenceCandidate
+  EvidenceRef
+  EvidenceProviderPolicy
+  EvidenceValidationService
+  EvidenceScorer
+
+com.clinmind.runtime.evidence.rag
+  RagEvidenceProvider
+  RagQueryBuilder
+  RagRetrievalTrace
+
+com.clinmind.runtime.evidence.graph
+  KgLiteProvider
+  GraphRagProvider
+  KnowledgeNode
+  KnowledgeEdge
+```
+
+职责：
+
+```text
+RAG / KG-lite / GraphRAG 只能返回 EvidenceCandidate / EvidenceRef。
+EvidenceCandidate 必须经过 Runtime Validation 后才能进入 EvidenceGraph。
+```
+
+## 5.6 ModelProvider
+
+```text
+com.clinmind.runtime.model
+  ModelProvider
+  ModelProviderMetadata
+  ModelProviderVersion
+  ModelProviderRequest
+  ModelProviderResult
+  ModelRegistry
+  ModelEvaluationPolicy
+
+com.clinmind.runtime.training
+  TrainingExampleCandidate
+  TrainingDatasetVersion
+  TrainingDatasetReviewPolicy
+  PreferencePair
+```
+
+职责：
+
+```text
+模型能力作为 Provider 接入。
+模型输出结构化 Draft / Candidate / EvidenceRef / ScoreDraft。
+模型不能直接扩大 CapabilityProfile。
+模型训练和后训练必须经过 Evaluation / Governance。
+```
+
+## 5.7 Tool / MCP / Skills
+
+```text
+com.clinmind.runtime.tool
+  ToolAccessPolicy
+  ToolExecutionRequest
+  ToolExecutionResult
+  ToolExecutionTrace
+  ToolAdapter
+
+com.clinmind.runtime.mcp
+  McpAdapter
+  McpServerMetadata
+  McpResourceRef
+  McpToolResult
+
+com.clinmind.runtime.skill
+  SkillMetadata
+  SkillExecutionPolicy
+  SkillProvider
+  SkillExecutionTrace
+```
+
+职责：
+
+```text
+外部工具只能通过 ToolAccessPolicy 调用。
+MCP Server 不能直接写入 RuntimeState。
+Skill 是可复用能力描述，不是自动授权。
+```
+
+## 5.8 Evaluation
+
+```text
+com.clinmind.runtime.evaluation
+  EvaluationCaseSet
+  EvaluationCase
+  RuntimeEvaluationRunner
+  EvaluationScorer
+  EvaluationResult
+  EvaluationItemResult
+  MetricResult
+  SafetyViolation
+  RegressionFinding
+  CapabilityProfileUpdateProposal
+```
+
+Phase 6 后新增：
+
+```text
+AgentProposalScorer
+InquiryPlanCoverageScorer
+AgentTraceCompletenessScorer
+CapabilityInvocationScorer
+EvidenceRetrievalScorer
+ModelProviderScorer
+ToolExecutionScorer
+```
+
+## 5.9 Candidate / Governance / Audit / Console
+
+```text
+com.clinmind.runtime.candidate
+  CandidateGenerationService
+  ExperienceCandidate
+  TrainingExampleCandidate
+  CandidateSanitizer
+  CandidateReviewService
+  CandidateReviewRecord
+
+com.clinmind.runtime.audit
+  AuditLog
+  AuditLogService
+  AuditLogStore
+
+com.clinmind.runtime.console
+  ConsoleQueryService
+  SafeConsoleDtoMapper
+  AccessPolicy
+  ActorContext
+  DebugTokenFilter
+```
+
+职责：
+
+```text
+Candidate 不自动上线。
+Console 不暴露 raw snapshot。
+Audit 记录所有治理动作。
 ```
 
 ---
 
-# 七、Provider / Asset / Model / MCP 接入边界
+# 六、Runtime Validation 设计
 
-## 7.1 Provider 总规则
+Runtime Validation 是 Phase 6 之后必须补上的统一校验边界。
+
+输入来源：
 
 ```text
-Runtime Core
-→ Provider Interface
-→ Provider Implementation
-→ Asset / External Service / Model / MCP Server
+AgentProposal
+EvidenceCandidate
+ModelProviderResult
+ToolExecutionResult
+SkillExecutionResult
+McpToolResult
 ```
 
-Provider 只能返回：
+输出：
 
 ```text
-结构化资产
-结构化候选
-证据引用
-模型草稿
-评分草稿
+ValidationAccepted
+ValidationPartiallyAccepted
+ValidationRejected
+ValidationDegraded
 ```
 
-Provider 不允许：
+校验维度：
 
 ```text
-直接修改 RuntimeState
-直接决定 SafetyGate
-直接决定 DecisionBoundary
-直接输出 PatientOutput
-直接上线 CapabilityProfile
+1. 是否越权修改 RuntimeState。
+2. 是否包含患者端禁止内容。
+3. 是否绕过 SafetyGate / DecisionBoundary。
+4. 是否缺少 source_ref / evidence_ref / provider_version。
+5. 是否违反 CapabilityProfile。
+6. 是否违反当前角色可见性。
+7. 是否高风险但无 fail-safe。
+8. 是否可进入 RuntimeTrace / AuditLog。
 ```
 
-## 7.2 YAML Provider
+核心接口建议：
 
-阶段：Phase 2-P0 已实现。
-
-用途：
-
-```text
-RedFlagRules
-TestRecommendationRules
-CapabilityProfile
-ClinicalPathway refs
-RAG evidence refs
-KG-lite refs
-Experience units
-```
-
-## 7.3 Python AI Provider
-
-阶段：Phase 4/5 后置。
-
-接入方式：
-
-```text
-Java Runtime
-→ Provider Interface
-→ PythonAiProviderClient
-→ FastAPI service
-```
-
-候选接口：
-
-```text
-POST /models/intent-classify
-POST /models/extract-case-frame
-POST /models/normalize-symptom
-POST /models/retrieve-evidence
-POST /models/rewrite-patient-safe
-POST /models/judge-output-safety
-POST /models/mine-experience-candidates
-```
-
-## 7.4 RAG / GraphRAG Provider
-
-阶段：Phase 4-P1 / Phase 5。
-
-接入方式：
-
-```text
-KnowledgeContextService
-→ EvidenceAssetProvider
-→ RagProvider / GraphRagProvider
-→ EvidenceRef
-→ EvidenceGraphService
-→ DecisionBoundary
-```
-
-## 7.5 MCP Adapter
-
-阶段：Phase 5 或后置实验。
-
-接入方式：
-
-```text
-Provider Interface
-→ McpAdapter / McpClient
-→ MCP Server
-→ External Tool / Data Source
-```
-
-MCP 不能成为 Runtime 主控。
-
-## 7.6 Model Provider
-
-阶段：Phase 4/5。
-
-接入方式：
-
-```text
-ModelProviderMetadata
-→ ModelProviderVersion
-→ EvaluationResult
-→ CapabilityProfileUpdateProposal
-→ Review / Governance
-→ Runtime 可用 Provider
-```
-
-模型上线必须有评估依据和可回滚机制。
-
----
-
-# 八、Evaluation 技术实现架构
-
-Phase 3 的技术实现链路：
-
-```text
-EvaluationController
-→ EvaluationRunService
-→ EvaluationCaseRepository
-→ RuntimeEvaluationRunner
-→ RuntimeService.startRuntime / continueRuntime
-→ RuntimeCaseExecution
-→ EvaluationScorer(s)
-→ EvaluationResultAggregator
-→ EvaluationResult
-→ CapabilityProfileProposalService
-```
-
-## 8.1 Evaluation 数据结构
-
-Phase3-P0-A：
-
-```text
-EvaluationCase
-EvaluationCaseSet
-EvaluationInputTurn
-ExpectedOutcome
-EvaluationRunConfig
-EvaluationRun
-EvaluationRunStatus
-RuntimeCaseExecution
-EvaluationItemResult
-EvaluationResult
-ScoreBreakdown
-MetricResult
-SafetyViolation
-RegressionFinding
-```
-
-## 8.2 Case Repository
-
-Phase3-P0-B：
-
-```text
-src/main/resources/evaluation/case-sets/phase3-default/
-```
-
-## 8.3 Runner
-
-Phase3-P0-C：
-
-```text
-RuntimeEvaluationRunner 必须通过 RuntimeService 执行病例。
-```
-
-## 8.4 Scorer
-
-Phase3-P0-D：
-
-```text
-SafetyGateScorer
-PatientBoundaryScorer
-DdxCoverageScorer
-NextActionScorer
-TraceCompletenessScorer
-AssetVersionTraceScorer
-```
-
-## 8.5 Result / Proposal
-
-Phase3-P0-E / F：
-
-```text
-EvaluationResultAggregator
-CapabilityEvaluationPolicy
-CapabilityProfileUpdateProposal
-CapabilityProfileProposalService
-```
-
-## 8.6 API
-
-Phase3-P0-G：
-
-```text
-POST /api/v1/debug/evaluations/runs
-GET /api/v1/debug/evaluations/runs/{run_id}
-GET /api/v1/debug/evaluations/runs/{run_id}/result
-GET /api/v1/debug/evaluations/runs/{run_id}/items/{case_id}
-POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal
+```java
+public interface CapabilityResultValidator<T> {
+    ValidationResult validate(RuntimeState state, T result, ValidationContext context);
+}
 ```
 
 ---
 
-# 九、数据存储演进方案
+# 七、API 规划
 
-## 9.1 Phase 1–3
+## 7.1 已有 API 类型
 
 ```text
-RuntimeStore：In-memory
-AssetPackageRepository：YAML resources
-EvaluationCaseRepository：YAML resources
-EvaluationRunStore：In-memory
+/api/v1/runtime/**
+/api/v1/debug/assets/**
+/api/v1/debug/evaluations/**
+/api/v1/debug/candidates/**
+/api/v1/debug/persistence/**
+/api/v1/console/**
 ```
 
-原因：
+## 7.2 Phase 6-P0 可新增 Debug API
 
 ```text
-先证明 Runtime、Asset、Evaluation 主线，不让数据库复杂度干扰 P0。
+POST /api/v1/debug/agents/inquiry-planning/run
+GET  /api/v1/debug/agents/executions/{execution_id}
+GET  /api/v1/debug/agents/executions/{execution_id}/trace
+POST /api/v1/debug/agents/proposals/{proposal_id}/validate
 ```
 
-## 9.2 Phase 4
-
-可开始引入 PostgreSQL 原型承载：
+限制：
 
 ```text
-RuntimeTrace
-EvaluationResult
-RegressionFinding
-ExperienceCandidate
-TrainingExampleCandidate
+只用于 debug / internal。
+必须经过 DebugTokenFilter / AccessPolicy。
+不得面向 patient-facing client。
+不得直接提交 RuntimeState 修改。
 ```
 
-## 9.3 Phase 5（分 P0 / P1 / P2 已交付 vs 仍后置）
-
-**Phase 5-P0 已落地（PostgreSQL 治理底座）：**
+## 7.3 后续 API
 
 ```text
-Runtime / Evaluation / Candidate / Review snapshot
-Jdbc*Store + InMemory*Store 双实现
-AuditLog
+/api/v1/debug/evidence/**
+/api/v1/debug/models/**
+/api/v1/debug/tools/**
+/api/v1/debug/skills/**
+```
+
+这些均后置到对应 Phase。
+
+---
+
+# 八、存储与迁移
+
+已实现：
+
+```text
+InMemory Store
+PostgreSQL Store / Repository
 Flyway migration
-Persistence health / Audit debug API
+AuditLog persistence
+Console safe query
 ```
 
-**Phase 5-P1 已落地（最小 Console API）：**
+Phase 6-P0 可新增存储对象：
 
 ```text
-ActorContext / RBAC-lite / AccessPolicy
-SafeConsoleDtoMapper
-/api/v1/debug/console/**（Runtime、Evaluation、Candidate、Review Queue、Audit Center）
-Console 查询与 review 写 AuditLog
+agent_executions
+agent_traces
+agent_proposals
+agent_validation_results
 ```
 
-**Phase 5-P2 已落地（最小前端 Console MVP）：**
+但 P0 可以先使用 in-memory + trace object 验证，再决定是否入库。
+
+后续存储扩展：
 
 ```text
-console-web/ — Runtime / Evaluation / Candidate / Review Queue / Audit Center 页面
-DebugContextPanel、consoleClient、SensitiveFieldRenderGuard
-```
-
-**仍后置（完整 Phase 5 平台化愿景）：**
-
-```text
-Redis（session cache、lock、rate limit）
-pgvector（evidence / case / experience embeddings）
-Python AI Provider service
-Docker Compose 一键编排
-完整 Training Center / Model Registry UI
-正式 User / Role / OAuth
+Phase 7：evidence_chunks、evidence_refs、knowledge_nodes、knowledge_edges、pgvector embeddings。
+Phase 8：model_provider_metadata、model_provider_versions、training_dataset_versions。
+Phase 9：tool_execution_traces、mcp_server_metadata、skill_metadata。
+Phase 10：users、roles、permissions、tenants、review_workflows。
 ```
 
 ---
 
-# 十、API 分层与接口边界
+# 九、测试策略
 
-## 10.1 Patient-facing API
-
-原则：
+每个 Phase 必须保持：
 
 ```text
-只返回患者安全字段。
-不得泄露 DDx Board、EvidenceGraph、must_not_miss、clinician report、asset internals。
+1. 后端单元测试。
+2. 后端集成测试。
+3. in-memory 与 postgres 回归。
+4. Console API 安全字段回归。
+5. console-web npm run test / npm run build。
 ```
 
-## 10.2 Clinician-facing API
-
-原则：
+Phase 6-P0 新增测试：
 
 ```text
-可返回候选诊断、证据图、检查建议和医生摘要。
-必须标注能力边界和证据状态。
+AgentRegistryTest
+AgentPolicyTest
+AgentRuntimeTest
+InquiryPlanningAgentTest
+AgentProposalValidatorTest
+AgentTraceIntegrationTest
+AgentCannotModifyRuntimeStateTest
+AgentCannotBypassDecisionBoundaryTest
+InquiryPlanCoverageScorerTest
 ```
 
-## 10.3 Debug / Internal API
-
-原则：
+必须证明：
 
 ```text
-路径必须包含 /api/v1/debug 或 /internal。
-可返回 trace、asset used、evaluation result。
-不得作为 patient-facing client 使用。
-```
-
-## 10.4 Console API 与前端 MVP（Phase 5-P1 / P2 已实现）
-
-**后端 Console API（P1，/api/v1/debug/console/**）：**
-
-```text
-Runtime / Evaluation 列表与 Safe DTO 详情
-Candidate / Review Queue 查询
-Candidate review（复用 debug review API + AccessPolicy）
-Audit Center summary / audit-logs / filters
-RBAC-lite：X-Debug-Actor / X-Debug-Roles + AccessPolicy
-```
-
-**前端最小 MVP（P2，console-web/）：**
-
-```text
-AppShell + Sidebar + DebugContextPanel
-五页治理界面与 review 表单
-只消费 Safe Console API；SensitiveFieldRenderGuard 二次过滤
-```
-
-**仍后置的完整平台 Console：**
-
-```text
-Training Center
-Asset Console（完整资产管理 UI）
-Model Registry
-正式登录 / 多租户
-Docker Compose 部署编排
+Agent 不能越权。
+Agent 输出必须经过 Runtime Validation。
+Runtime 能拒绝危险 Proposal。
+AgentTrace 可复盘。
+Evaluation 能评估 Agent 质量。
 ```
 
 ---
 
-# 十一、Python AI Provider 接入方案
+# 十、当前禁止实现清单
 
-Python Provider 后置，不属于 Phase 3-P0。
-
-未来服务结构：
+在 Phase 6-P0 规格未建立前，不应直接实现：
 
 ```text
-clinmind-ai-provider/
-  app/
-    routers/
-      intent.py
-      caseframe.py
-      embedding.py
-      rag.py
-      safety_expression.py
-      judge.py
-      experience_mining.py
-    services/
-      model_registry.py
-      llm_client.py
-      embedding_service.py
-      retrieval_service.py
-      inference_service.py
-```
-
-Java 侧调用规则：
-
-```text
-1. 通过 Provider Interface 调用。
-2. 设置 timeout / retry / fallback。
-3. Provider 失败不得导致患者端危险输出。
-4. Provider 返回结果必须经过 Runtime 校验。
-5. 所有调用必须记录 trace 和 provider version。
+1. 自由自治式 Agent。
+2. 多 Agent 协作。
+3. LangGraph / Agent SDK 作为 Runtime 主控。
+4. 真实 RAG / GraphRAG。
+5. Python AI Provider。
+6. MCP / Tool / Skills。
+7. 模型训练 / 后训练。
+8. 正式登录 / OAuth / 多租户。
+9. 正式医生审核平台。
+10. ApprovedExperience 自动上线。
+11. TrainingDatasetVersion 发布。
+12. CapabilityProfile 自动扩大权限。
 ```
 
 ---
 
-# 十二、RAG / GraphRAG / 向量库接入方案
+# 十一、从本文档进入实现的规则
 
-接入顺序：
+本文档是技术总蓝图，不是直接任务清单。
+
+正确实现链路：
 
 ```text
-Phase 2：只保留 evidence ref / kg_lite_ref。
-Phase 3：评估必须检查 evidence / asset version trace。
-Phase 4-P1：RAG EvidenceProvider 原型。
-Phase 5：pgvector-backed retrieval。
-后置：Milvus / Qdrant / Neo4j。
+ClinMindRuntime完整系统设计.md
+→ ClinMindRuntime阶段拆分路线图.md
+→ ClinMindRuntime技术实现总方案.md
+→ 对应专项设计文档
+→ 当前 Phase 实现规格
+→ 当前 Phase API 与测试设计
+→ 当前 Phase 开发任务清单
+→ 代码
+→ 测试
+→ 冻结记录
 ```
 
-技术路线：
+Phase 6-P0 下一步必须新增：
 
 ```text
-PostgreSQL + pgvector 优先。
-KG-lite 优先 PostgreSQL node / edge tables。
-Neo4j 只有复杂图遍历成为核心需求后再接。
-```
-
----
-
-# 十三、模型训练与模型服务接入方案
-
-接入原则：
-
-```text
-模型训练提升 Provider 能力。
-Runtime 控制最终责任。
-```
-
-候选模型能力：
-
-```text
-IntentClassifierProvider
-SymptomGroupClassifierProvider
-RiskSignalClassifierProvider
-CaseFrameExtractorProvider
-EmbeddingModelProvider
-EvidenceRerankerProvider
-PatientSafeRewriteProvider
-LlmJudgeScorer
-ExperienceCandidateMiner
-```
-
-上线链路：
-
-```text
-TrainingDatasetVersion
-→ Model Training / Post-training
-→ ModelProviderVersion
-→ EvaluationResult
-→ CapabilityProfileUpdateProposal
-→ Review / Governance
-→ Runtime 可用 Provider
-```
-
-禁止：
-
-```text
-模型直接面向患者输出诊断。
-模型直接修改 RuntimeState。
-模型绕过 SafetyGate / DecisionBoundary。
-模型未经 EvaluationResult 上线。
+docs/Phase6_P0受控Agent执行层_实现规格.md
+docs/Phase6_P0Agent_API与测试设计.md
+docs/Phase6_P0开发任务清单.md
 ```
 
 ---
 
-# 十四、测试体系总方案
+# 十二、最终结论
 
-测试分层：
+ClinMindRuntime 的技术实现路线已经从单纯 Runtime 治理主干，升级为统一 Runtime 主链路下的能力治理平台。
 
-```text
-Unit Test：单模块逻辑。
-Integration Test：Runtime pipeline。
-Regression Test：Phase 1 / Phase 2 不被破坏。
-Asset Test：资产版本、替代资产包、坏资产包 fail-safe。
-Boundary Test：患者端输出隔离。
-Evaluation Test：病例集考试和评分器。
-API Test：debug/internal API 路径和响应。
-Future Provider Test：Python / RAG / Model Provider 接入后回归。
-```
-
-Phase 3 每次改动必须保证：
+核心实现原则：
 
 ```text
-Phase 1 回归测试通过。
-Phase 2 Provider / Asset 回归测试通过。
-PatientOutputAssetIsolationTest 通过。
-RuntimeAssetVersionMismatchTest 通过。
-broken-package fail-safe 测试通过。
-新增 Evaluation 模块必须有对应 JUnit 测试。
+RuntimeService 仍是主控。
+Capability Orchestration 负责受控调度能力。
+Agent / RAG / Model / Tool 只能返回结构化候选。
+Runtime Validation 决定采纳、拒绝或降级。
+SafetyGate 和 DecisionBoundary 永远不能被绕过。
+RuntimeTrace / AuditLog / Evaluation / Governance 记录和约束每一次能力扩展。
 ```
 
----
-
-# 十五、部署演进方案
-
-## 15.1 当前阶段（Phase 5-P2 已完成）
-
-```text
-后端：Maven package → java -jar（in-memory 默认；--spring.profiles.active=postgres 可选）
-前端：cd console-web && npm install && npm run dev（http://localhost:5173，/api 代理 8080）
-验收：mvn test + console-web npm run test（35 项）+ npm run build
-人工记录：docs/Phase5_P2人工测试结果.md
-```
-
-## 15.2 Phase 5
-
-```text
-Docker Compose
-Java Runtime service
-PostgreSQL
-Redis
-Python AI Provider service
-Frontend service
-```
-
-## 15.3 后置
-
-```text
-Kubernetes
-OpenTelemetry
-Prometheus / Grafana
-CI/CD release pipeline
-model serving infra
-```
-
----
-
-# 十六、各 Phase 的技术实现重点
-
-## Phase 1
-
-```text
-Runtime 主链路、RuntimeState、Trace、安全门、输出边界。
-```
-
-## Phase 2
-
-```text
-Provider 抽象、YAML Asset Package、资产版本、RuntimeTrace asset records。
-```
-
-## Phase 3
-
-```text
-Evaluation model、case repository、runner、scorer、result、proposal、debug API。
-```
-
-## Phase 3-P1
-
-```text
-LlmJudgeScorer 辅助、TrainingExampleCandidate、Python offline analysis。
-```
-
-## Phase 4
-
-```text
-ExperienceCandidate、TrainingExampleCandidate、feedback/outcome、trace analysis。
-```
-
-## Phase 4-P1
-
-```text
-Python AI Provider prototype、embedding、RAG、GraphRAG、similar case retrieval。
-```
-
-## Phase 5-P0
-
-```text
-PostgreSQL 持久化、Repository 双实现、AuditLog、Flyway、Persistence health API。
-```
-
-## Phase 5-P1
-
-```text
-Console API、RBAC-lite、SafeConsoleDtoMapper、Audit Center 查询增强。
-```
-
-## Phase 5-P2
-
-```text
-console-web/ 最小前端 Console MVP；Debug Context；五页治理界面；前端安全边界与 vitest。
-```
-
-## Phase 5 后置（未实现）
-
-```text
-pgvector、Redis、Python Provider service、Docker Compose、完整 Training Center、正式 OAuth。
-```
-
----
-
-# 十七、禁止提前实现内容（P2 完成后仍有效）
-
-```text
-1. 不接 Python AI Provider 作为 Runtime 主控。
-2. 不接 RAG / GraphRAG 绕过 SafetyGate / DecisionBoundary。
-3. 不接 MCP / LangGraph / Agent SDK 替代 Runtime 主控。
-4. 不在未立项 Phase 中训练基础大模型或自动发布训练集。
-5. 不破坏 in-memory / postgres 双模式与 InMemory 实现。
-6. 不做完整产品化 Training Center / 正式登录 / 多租户（最小 console-web/ 已交付）。
-7. 不让 Provider / Model / LLM / MCP 替代 Runtime 主控。
-8. 不让任何模块绕过 SafetyGate / DecisionBoundary。
-9. 不自动上线 CapabilityProfile 或 ApprovedExperience。
-10. 不自动把 RuntimeTrace 变成经验或训练数据。
-11. 不通过 Console 或前端扩大 Safe DTO 暴露面（患者原文、clinician_report、raw training input）。
-12. 不把 Candidate review 当作正式临床审核或自动生效机制。
-```
-
----
-
-# 十八、当前最优下一步
-
-Phase 5-P2 已完成，无强制实现任务。
-
-若继续演进，应从后置任务立项（见 `docs/Phase5_P2开发任务清单.md` §十）：
-
-```text
-1. 正式登录 / JWT / OAuth
-2. Docker Compose 本地编排
-3. 完整产品化前端 / Training Center
-4. Python AI Provider / RAG / GraphRAG
-5. 模型训练 / 后训练
-```
-
-维护与回归优先：
-
-```text
-1. 保持 mvn test 与 console-web npm run test / build 全绿。
-2. 文档变更同步 docs/README.md 与 AI_IMPLEMENTATION_SKILL.md。
-3. 不破坏 Phase 1–5 已冻结边界。
-```
-
-不应在未立项时直接实现：
-
-```text
-后端 Console API 大改
-ApprovedExperience 自动生效
-正式医生审核平台
-```
-
----
-
-# 十九、最终结论
-
-ClinMindRuntime 的技术实现路线是：
-
-```text
-先实现稳定 Runtime Core，
-再实现可替换 Asset Provider，
-再实现 Evaluation 闭环，
-再沉淀经验和训练数据，
-再接入 AI Provider / RAG / GraphRAG / 模型服务，
-最后进入平台化、模型治理和企业级部署。
-```
-
-任何新技术、新模型、新 Agent 框架、新数据库、新前端，都必须服务这条主线，而不能取代 Runtime 主控。
+后续代码实现应先从 Phase 6-P0：受控 Agent 执行层 MVP 开始。
