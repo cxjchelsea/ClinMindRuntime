@@ -1,5 +1,13 @@
 # 测试与 CI 总方案
 
+> 上位总设计：`docs/ClinMindRuntime完整系统设计.md`  
+> 文档地图：`docs/00_项目设计地图.md`  
+> 对应能力域 / 架构层：评估、审计与持续进化域；工程质量治理；Provider / Agent / Tool 能力接入回归保障  
+> 当前状态：专项设计 / 持续生效的测试与 CI 约束  
+> 当前实现：已覆盖 Phase 1–5 后端回归、PostgreSQL 集成测试、Console 前端测试基础；尚未覆盖 Phase 6+ Agent / RAG / Model / MCP 的正式 contract test  
+> 对应 Phase：所有 Phase 持续适用；Phase 6 起需补 Agent contract / proposal validation / trace evaluation 测试  
+> 实现入口：每个 Phase 的实现规格和开发任务清单必须明确对应测试项，并在冻结记录中写明测试结果。
+
 > 本文档定义 ClinMindRuntime 的测试分层、回归基线、验收方式和 CI 演进路线。  
 > 本项目的测试目标不是只证明接口能跑通，而是证明 Runtime 主控、安全边界、资产版本、Evaluation 评分和未来 Provider 接入都不会破坏核心能力。
 
