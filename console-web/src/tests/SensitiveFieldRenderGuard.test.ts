@@ -41,4 +41,13 @@ describe('SensitiveFieldRenderGuard', () => {
     expect(containsSensitiveMarker('{"patient_output":"x"}')).toBe(true);
     expect(containsSensitiveMarker('runtime_status=COMPLETED')).toBe(false);
   });
+
+  it('filters candidate policy metadata input fields', () => {
+    const safe = toSafeDisplayRecord({
+      candidate_id: 'c1',
+      policy_metadata: { input: { text: 'secret' }, sanitizer: 'v1' },
+    });
+    expect(JSON.stringify(safe)).not.toContain('"input"');
+    expect(JSON.stringify(safe)).toContain('sanitizer');
+  });
 });

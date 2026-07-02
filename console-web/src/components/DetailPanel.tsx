@@ -8,6 +8,9 @@ function formatValue(value: unknown): string {
   if (typeof value === 'boolean') {
     return value ? '是' : '否';
   }
+  if (Array.isArray(value)) {
+    return value.map(String).join(', ');
+  }
   if (typeof value === 'object') {
     return JSON.stringify(value);
   }
@@ -38,6 +41,19 @@ const FIELD_LABELS: Record<string, string> = {
   pass_rate: 'Pass Rate',
   started_at: 'Started At',
   completed_at: 'Completed At',
+  policy_metadata: 'Policy Metadata',
+  title: 'Title',
+  summary: 'Summary',
+  label: 'Label',
+  tags: 'Tags',
+  candidate_id: 'Candidate ID',
+  candidate_kind: 'Kind',
+  candidate_type: 'Type',
+  task_type: 'Task Type',
+  review_status: 'Review Status',
+  risk_level: 'Risk Level',
+  sanitization_status: 'Sanitization Status',
+  source_ref: 'Source Ref',
 };
 
 export function DetailPanel({

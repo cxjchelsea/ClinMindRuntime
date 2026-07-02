@@ -19,7 +19,6 @@ import type {
   EvaluationConsoleDetail,
   EvaluationConsoleSummary,
   EvaluationListParams,
-  ReviewConsoleSummary,
   ReviewQueueListParams,
   RuntimeConsoleDetail,
   RuntimeConsoleSummary,
@@ -152,7 +151,7 @@ export function createConsoleClient(getContext: ContextGetter) {
     },
 
     listReviewQueue(params: ReviewQueueListParams = {}) {
-      return request<ReviewConsoleSummary[]>(
+      return request<CandidateConsoleSummary[]>(
         `/api/v1/debug/console/review-queue${buildQuery(params)}`,
       );
     },

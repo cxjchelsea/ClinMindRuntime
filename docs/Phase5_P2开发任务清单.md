@@ -134,27 +134,27 @@ P2 必须保证：
 
 # 六、Phase5-P2-D：Candidate / Review Queue 页面
 
-状态：`[ ]`
+状态：`[x]`
 
 任务：
 
 ```text
-[ ] CandidatePage
-[ ] Candidate list / detail
-[ ] ReviewQueuePage
-[ ] review form
-[ ] approve / reject / deprecate 操作
-[ ] 操作后刷新 queue 和 candidate detail
-[ ] 安全提示文案
+[x] CandidatePage
+[x] Candidate list / detail
+[x] ReviewQueuePage
+[x] review form
+[x] approve / reject / deprecate 操作
+[x] 操作后刷新 queue 和 candidate detail
+[x] 安全提示文案
 ```
 
 测试：
 
 ```text
-[ ] CandidatePageTest
-[ ] ReviewQueueFlowTest
-[ ] review endpoint selection test
-[ ] SensitiveFieldRenderGuard for candidate
+[x] CandidatePageTest
+[x] ReviewQueueFlowTest
+[x] review endpoint selection test
+[x] SensitiveFieldRenderGuard for candidate
 ```
 
 验收标准：
@@ -271,14 +271,14 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase5-P2-D：Candidate / Review Queue 页面
+Phase5-P2-E：Audit Center 页面
 ```
 
 开始实现前必须：
 
 ```text
-1. 将 Phase5-P2-D 状态从 [ ] 改为 [/]。
-2. 只实现 CandidatePage、ReviewQueuePage 与 review 表单。
-3. 不直接实现 Audit Center 全部页面。
-4. 不实现正式登录、Docker Compose、RAG、模型训练或正式审核平台。
+1. 将 Phase5-P2-E 状态从 [ ] 改为 [/]。
+2. 只实现 AuditCenterPage 与 audit summary / log list / filters / detail。
+3. 不直接实现 P2-F 归档或正式登录、Docker Compose、RAG、模型训练。
+4. 不实现后端 Console API 大改。
 ```

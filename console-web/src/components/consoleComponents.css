@@ -208,3 +208,82 @@
     grid-template-columns: 1fr;
   }
 }
+
+.governance-notice {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.review-form {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  background: #fff;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.review-form--disabled {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.review-form__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #0f2744;
+}
+
+.review-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: #475569;
+}
+
+.review-form__field select,
+.review-form__field input,
+.review-form__field textarea {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-family: inherit;
+}
+
+.review-form__success {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: 4px;
+  background: #ecfdf5;
+  color: #166534;
+  font-size: 0.8125rem;
+}
+
+.review-form button[type='submit'] {
+  justify-self: start;
+  padding: 0.4375rem 0.875rem;
+  border: none;
+  border-radius: 4px;
+  background: #1e4976;
+  color: #fff;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.review-form button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

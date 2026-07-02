@@ -9,8 +9,8 @@
 # 一、当前项目阶段
 
 ```text
-当前阶段：Phase 5-P2 最小前端 Console MVP — P2-C 已完成
-下一步：Phase5-P2-D Candidate / Review Queue 页面
+当前阶段：Phase 5-P2 最小前端 Console MVP — P2-D 已完成
+下一步：Phase5-P2-E Audit Center 页面
 ```
 
 当前已经完成的主线：
@@ -23,7 +23,7 @@ Phase 4-P0：候选沉淀机制 + debug API，已冻结
 Phase 4-P1：候选治理与安全加固，已冻结
 Phase 5-P0：持久化与治理底座，已冻结
 Phase 5-P1：最小 Console 与访问治理，已冻结
-Phase 5-P2：最小前端 Console MVP — P2-C 已完成
+Phase 5-P2：最小前端 Console MVP — P2-D 已完成
 ```
 
 Phase 5-P2 目标：
@@ -263,21 +263,21 @@ postgres 模式专项测试通过。
 当前最优实现任务是：
 
 ```text
-Phase5-P2-D：Candidate / Review Queue 页面
+Phase5-P2-E：Audit Center 页面
 ```
 
 只应实现：
 
 ```text
-1. CandidatePage / ReviewQueuePage 列表与详情。
-2. review 表单与 approve/reject/deprecate 操作。
+1. AuditCenterPage 与 audit summary / log list / filters / detail。
+2. 权限不足 / token 错误 UI 反馈。
 3. 同步更新 docs/Phase5_P2开发任务清单.md。
 ```
 
-不应在 P2-D 中实现：
+不应在 P2-E 中实现：
 
 ```text
-Audit Center 全部页面
+P2-F 归档与人工验收
 正式登录系统
 Docker Compose
 RAG / 模型训练

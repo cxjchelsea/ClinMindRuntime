@@ -2,7 +2,7 @@
 
 受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理、持久化治理底座与最小 Console 治理，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 5-P2 进行中（P2-C 已完成）**（Phase 1–5-P1 已落地/冻结；最小前端 Console MVP 实现中）
+当前版本：**Phase 5-P2 进行中（P2-D 已完成）**（Phase 1–5-P1 已落地/冻结；最小前端 Console MVP 实现中）
 
 ## 项目定位
 
@@ -29,7 +29,7 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
 | Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog、Persistence health / Audit API | 已冻结 |
 | Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
-| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | P2-C 已完成，P2-D 进行中 |
+| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | P2-D 已完成，P2-E 进行中 |
 
 Phase 5-P1 冻结记录见 [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)。Phase 5-P2 规格见 [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md)。
 
@@ -120,9 +120,9 @@ Content-Type: application/json
 
 ## 下一阶段
 
-**Phase 5-P2-D**：Candidate / Review Queue 页面（`console-web/`）。
+**Phase 5-P2-E**：Audit Center 页面（`console-web/`）。
 
-P2-C 已完成 Runtime / Evaluation 列表与 Safe DTO 详情；不应跳过 P2-D 直接实现 Audit Center，也不应实现正式登录、Docker Compose、RAG 或模型训练。
+P2-D 已完成 Candidate / Review Queue 列表、详情与 review 表单；不应跳过 P2-E 直接做 P2-F 归档，也不应实现正式登录、Docker Compose、RAG 或模型训练。
 
 ## License
 
