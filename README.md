@@ -4,13 +4,13 @@
 
 当前版本：**Phase 5 已全部冻结**（P0 持久化 / P1 Console API / P2 前端 MVP；Phase 1–4 已落地/冻结）。
 
-当前总设计：[`docs/ClinMindRuntime完整系统设计.md`](docs/ClinMindRuntime完整系统设计.md) 已升级为 **v2.2**，项目定位从 Runtime-first 治理主干升级为：
+当前总设计：[`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) 已升级为 **v2.2**，项目定位为：
 
 ```text
 受控医疗 AI Agent Runtime 与能力治理平台
 ```
 
-文档体系入口：[`docs/00_项目设计地图.md`](docs/00_项目设计地图.md)
+文档体系入口：[`docs/0-项目入口/00_项目设计地图.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/00_%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1%E5%9C%B0%E5%9B%BE.md)
 
 ---
 
@@ -58,7 +58,7 @@ Console 不暴露敏感原文和未脱敏候选输入。
 | Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
 | Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | 已冻结 |
 
-Phase 5 总冻结记录见 [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md)。P0/P1/P2 分别见 [`Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md)、[`Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)、[`Phase5_P2冻结记录.md`](docs/Phase5_P2冻结记录.md)。
+Phase 5 总冻结记录见 [`docs/3-phase实现/Phase5冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。P0/P1/P2 分别见 [`Phase5_P0冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5_P0%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)、[`Phase5_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)、[`Phase5_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。
 
 当前尚未完整实现：
 
@@ -154,16 +154,16 @@ Content-Type: application/json
 
 | 文档 | 说明 |
 |------|------|
-| [`docs/00_项目设计地图.md`](docs/00_项目设计地图.md) | 文档体系总入口，说明总设计、专项设计、Phase 文档和实现约束之间的关系 |
+| [`docs/0-项目入口/00_项目设计地图.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/00_%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1%E5%9C%B0%E5%9B%BE.md) | 文档体系总入口，说明总设计、专项设计、Phase 文档和实现约束之间的关系 |
 | [`docs/README.md`](docs/README.md) | docs 目录导航 |
-| [`docs/ClinMindRuntime完整系统设计.md`](docs/ClinMindRuntime完整系统设计.md) | v2.2 权威总设计：八个能力域、五层架构、统一 Runtime 主链路 |
-| [`docs/AI_IMPLEMENTATION_SKILL.md`](docs/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor / Agent / Claude Code / Codex） |
-| [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试 / 展示用精简导读 |
-| [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md) | Phase 5 全阶段冻结依据 |
-| [`docs/Phase5_P2冻结记录.md`](docs/Phase5_P2冻结记录.md) | Phase 5-P2 冻结依据 |
-| [`docs/Phase5_P2人工测试结果.md`](docs/Phase5_P2人工测试结果.md) | Phase 5-P2 前端验收记录 |
-| [`docs/ClinMindRuntime阶段拆分路线图.md`](docs/ClinMindRuntime阶段拆分路线图.md) | 阶段路线图，下一步需同步 v2.2 总设计 |
-| [`docs/ClinMindRuntime技术实现总方案.md`](docs/ClinMindRuntime技术实现总方案.md) | 技术实现总方案，下一步需补 Capability Orchestration / AgentExecutionLayer |
+| [`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) | v2.2 权威总设计：八个能力域、五层架构、统一 Runtime 主链路 |
+| [`docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md`](docs/4-%E5%AE%9E%E7%8E%B0%E7%BA%A6%E6%9D%9F/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor / Agent / Claude Code / Codex） |
+| [`docs/0-项目入口/项目展示导读.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/%E9%A1%B9%E7%9B%AE%E5%B1%95%E7%A4%BA%E5%AF%BC%E8%AF%BB.md) | 面试 / 展示用精简导读 |
+| [`docs/3-phase实现/Phase5冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 5 全阶段冻结依据 |
+| [`docs/3-phase实现/Phase5_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 5-P2 冻结依据 |
+| [`docs/3-phase实现/Phase5_P2人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5_P2%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 5-P2 前端验收记录 |
+| [`docs/1-总设计/ClinMindRuntime阶段拆分路线图.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E9%98%B6%E6%AE%B5%E6%8B%86%E5%88%86%E8%B7%AF%E7%BA%BF%E5%9B%BE.md) | 阶段路线图：Phase 6/7/8/9/10 长期演进顺序 |
+| [`docs/1-总设计/ClinMindRuntime技术实现总方案.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%80%BB%E6%96%B9%E6%A1%88.md) | 技术实现总方案：统一 Runtime 主链路、Capability Orchestration、AgentExecutionLayer、Runtime Validation |
 
 ---
 
@@ -193,11 +193,10 @@ Phase 6-P0：受控 Agent 执行层 MVP
 进入 Phase 6-P0 前，应先完成：
 
 ```text
-1. 更新 ClinMindRuntime阶段拆分路线图.md。
-2. 更新 ClinMindRuntime技术实现总方案.md。
-3. 更新 AI_IMPLEMENTATION_SKILL.md。
-4. 新增 Phase6_P0受控Agent执行层_实现规格.md。
-5. 新增 Phase6_P0开发任务清单.md。
+1. 新增 docs/3-phase实现/Phase6_P0受控Agent执行层_实现规格.md。
+2. 新增 docs/3-phase实现/Phase6_P0Agent_API与测试设计.md。
+3. 新增 docs/3-phase实现/Phase6_P0开发任务清单.md。
+4. 更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md，将 Phase 6-P0 从“设计准备”推进为“可实现但受限”。
 ```
 
 不应在未立项的新 Phase 中破坏 Phase 1–5 已冻结的 Runtime 主控、Safe DTO 与 Console 访问治理边界。
