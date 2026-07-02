@@ -4,7 +4,8 @@
 |------|------|
 | 验收日期 | 2026-06-25 |
 | 代码基线 | commit `270b015` |
-| 验收结论 | **通过** — 前端 35 项 vitest 全绿；`npm run build` 通过；后端 `mvn test` 回归通过（exit 0，Phase 1–5 未被破坏） |
+| 验收结论 | **通过并已冻结** — 前端 35 项 vitest 全绿；`npm run build` 通过；后端 `mvn test` 回归通过 |
+| 冻结记录 | [`Phase5_P2冻结记录.md`](Phase5_P2冻结记录.md)、[`Phase5冻结记录.md`](Phase5冻结记录.md) |
 | 后端启动 | `mvn -DskipTests package` → `java -jar target/clinmind-runtime-0.1.0-SNAPSHOT.jar` |
 | 前端启动 | `cd console-web && npm install && npm run dev` → `http://localhost:5173` |
 | Base URL | 后端 `http://localhost:8080`；前端 `/api` 代理至 8080 |

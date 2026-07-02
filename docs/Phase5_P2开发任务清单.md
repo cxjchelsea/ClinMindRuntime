@@ -1,5 +1,6 @@
 # Phase 5-P2 开发任务清单
 
+> **状态：已冻结**（2026-06-25，commit fe16d2b）。归档依据见 [`Phase5_P2冻结记录.md`](Phase5_P2冻结记录.md) 与 [`Phase5冻结记录.md`](Phase5冻结记录.md)。  
 > 本清单用于约束 Phase 5-P2 的实现顺序。  
 > Phase 5-P2 只做最小前端 Console MVP，不实现完整生产前端、正式登录、多租户、RAG、模型训练、正式医生审核平台、ApprovedExperience 自动生效或 TrainingDatasetVersion 发布。
 
@@ -271,7 +272,7 @@ Phase5-P2 完成需要满足：
 当前下一步：
 
 ```text
-Phase 5-P2 已完成 — 无强制主线；后置项见「十、后置任务」
+Phase 5 已全部冻结 — 见 docs/Phase5冻结记录.md
 ```
 
 后续若继续演进，应优先阅读：

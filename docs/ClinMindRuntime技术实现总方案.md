@@ -46,7 +46,8 @@ Phase 4-P0：候选沉淀机制 + debug API — 已冻结。
 Phase 4-P1：候选治理与安全加固 — 已冻结。
 Phase 5-P0：持久化与治理底座（PostgreSQL 双模式、AuditLog）— 已冻结。
 Phase 5-P1：最小 Console API、RBAC-lite、Audit Center、Safe DTO — 已冻结。
-Phase 5-P2：最小前端 Console MVP（console-web/）— 已完成。
+Phase 5-P2：最小前端 Console MVP（console-web/）— 已冻结。
+Phase 5 总归档：见 docs/Phase5冻结记录.md。
 ```
 
 当前无强制实现主线。后置可选方向：

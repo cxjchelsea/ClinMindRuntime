@@ -17,7 +17,8 @@ Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
 Phase 4-P1：候选治理与安全加固已完成并冻结。
 Phase 5-P0：持久化与治理底座已完成并冻结。
 Phase 5-P1：最小 Console 与访问治理已完成并冻结。
-Phase 5-P2：最小前端 Console MVP — 已完成。
+Phase 5-P2：最小前端 Console MVP — 已冻结。
+Phase 5 总归档：见 docs/Phase5冻结记录.md。
 ```
 
 当前最优先任务：
@@ -88,16 +89,18 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 | `docs/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
 | `docs/项目展示导读.md` | 活跃 | 面向面试官 / 自我复盘的项目导读 |
 
-## 3.2 已归档实现约束文档：Phase 5-P2
+## 3.2 已冻结 Phase 文档：Phase 5-P2
 
 | 文档 | 状态 | 用途 |
 |---|---|---|
-| `docs/Phase5_P2开发任务清单.md` | 已归档 | Phase5-P2-A 到 P2-F 实现顺序（已完成） |
+| `docs/Phase5冻结记录.md` | 已冻结 | Phase 5 全阶段（P0/P1/P2）归档依据 |
+| `docs/Phase5_P2冻结记录.md` | 已冻结 | Phase5-P2 冻结依据 |
 | `docs/Phase5_P2人工测试结果.md` | 验收归档 | Phase5-P2 前端 build / test / 联调验收 |
-| `docs/Phase5_P2最小前端Console_MVP_实现规格.md` | 归档基线 | Phase5-P2 总体实现规格 |
-| `docs/Phase5_P2前端信息架构与页面设计.md` | 归档基线 | 页面结构、导航与展示边界 |
-| `docs/Phase5_P2_API对接与前端状态管理设计.md` | 归档基线 | Console API Client、Debug Context |
-| `docs/Phase5_P2前端安全边界与测试设计.md` | 归档基线 | 前端安全边界与测试分层 |
+| `docs/Phase5_P2开发任务清单.md` | 归档 | Phase5-P2-A 到 P2-F 实现顺序（已完成） |
+| `docs/Phase5_P2最小前端Console_MVP_实现规格.md` | 冻结基线 | Phase5-P2 总体实现规格 |
+| `docs/Phase5_P2前端信息架构与页面设计.md` | 冻结基线 | 页面结构、导航与展示边界 |
+| `docs/Phase5_P2_API对接与前端状态管理设计.md` | 冻结基线 | Console API Client、Debug Context |
+| `docs/Phase5_P2前端安全边界与测试设计.md` | 冻结基线 | 前端安全边界与测试分层 |
 
 ## 3.3 已冻结 Phase 文档：Phase 5-P1
 
@@ -153,7 +156,7 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 
 ```text
 1. 不应向 Phase 4-P0 / Phase 4-P1 / Phase 5-P0 / Phase 5-P1 继续堆新能力（均已冻结）。
-2. 不应在 P2 归档范围内无立项地扩展 Console API 或 console-web/ 大能力。
+2. 不应在 Phase 5 冻结范围内无立项地扩展 Console API 或 console-web/ 大能力。
 3. 不应提前实现 RAG / GraphRAG / Python AI Provider。
 4. 不应提前做完整产品化前端 / Training Center（最小 console-web/ 已交付）。
 5. 不应提前实现模型训练 / 后训练。
@@ -168,8 +171,8 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 # 五、当前建议做什么
 
 ```text
-1. 阅读 docs/Phase5_P2人工测试结果.md 了解 P2 验收结论。
-2. 若继续演进，从 Phase5_P2开发任务清单 §十 后置任务中立项，而非破坏 P1/P2 边界。
+1. 阅读 docs/Phase5冻结记录.md 了解 Phase 5 全阶段归档结论。
+2. 若继续演进，从 Phase5冻结记录.md §六 后置任务中立项，而非破坏 P0/P1/P2 边界。
 3. 保持 Phase1/2/3/4/5 后端回归与 console-web 前端测试通过。
 ```
 
@@ -189,4 +192,4 @@ Phase 5-P2：最小前端 Console MVP — 已完成。
 
 # 七、最终结论
 
-当前文档体系已支撑 Phase 1–5-P2 全链路。Phase5-P1 已冻结，Phase5-P2 最小前端 Console MVP 已完成。
+当前文档体系已支撑 Phase 1–5 全链路。Phase 5（P0/P1/P2）已全部冻结。

@@ -2,7 +2,7 @@
 
 受控医疗 AI Runtime：结构化临床推理、资产治理、评估闭环、候选治理、持久化治理底座与最小 Console 治理，**不是**普通 RAG 聊天应用。
 
-当前版本：**Phase 5-P2 已完成**（Phase 1–5-P2 最小前端 Console MVP 已落地）
+当前版本：**Phase 5 已全部冻结**（P0 持久化 / P1 Console API / P2 前端 MVP；Phase 1–4 已落地/冻结）
 
 ## 项目定位
 
@@ -29,9 +29,9 @@ ClinMindRuntime 是一个面向临床 AI 系统的 **Java/Spring Boot 运行时*
 | Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
 | Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog、Persistence health / Audit API | 已冻结 |
 | Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
-| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | 已完成 |
+| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | 已冻结 |
 
-Phase 5-P1 冻结记录见 [`docs/Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)。Phase 5-P2 规格见 [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md)；验收见 [`docs/Phase5_P2人工测试结果.md`](docs/Phase5_P2人工测试结果.md)。
+Phase 5 总冻结记录见 [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md)。P0/P1/P2 分别见 [`Phase5_P0冻结记录.md`](docs/Phase5_P0冻结记录.md)、[`Phase5_P1冻结记录.md`](docs/Phase5_P1冻结记录.md)、[`Phase5_P2冻结记录.md`](docs/Phase5_P2冻结记录.md)。
 
 ## 快速启动
 
@@ -111,8 +111,9 @@ Content-Type: application/json
 |------|------|
 | [`docs/README.md`](docs/README.md) | 文档导航 |
 | [`docs/项目展示导读.md`](docs/项目展示导读.md) | 面试/展示用精简导读 |
+| [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md) | Phase 5 全阶段冻结依据 |
+| [`docs/Phase5_P2冻结记录.md`](docs/Phase5_P2冻结记录.md) | Phase 5-P2 冻结依据 |
 | [`docs/Phase5_P2最小前端Console_MVP_实现规格.md`](docs/Phase5_P2最小前端Console_MVP_实现规格.md) | Phase 5-P2 总体规格 |
-| [`docs/Phase5_P2开发任务清单.md`](docs/Phase5_P2开发任务清单.md) | Phase 5-P2 实现顺序 |
 | [`docs/Phase5_P2人工测试结果.md`](docs/Phase5_P2人工测试结果.md) | Phase 5-P2 前端验收记录 |
 | [`docs/Phase5_P1最小Console与访问治理_实现规格.md`](docs/Phase5_P1最小Console与访问治理_实现规格.md) | Phase 5-P1 总体规格 |
 | [`docs/Phase5_P1_RBAC与AuditCenter设计.md`](docs/Phase5_P1_RBAC与AuditCenter设计.md) | RBAC-lite 与 Audit Center 设计 |
@@ -125,14 +126,14 @@ Content-Type: application/json
 
 ## 下一阶段
 
-Phase 5-P2 最小前端 Console MVP 已完成。后续可选方向（非当前强制主线）：
+**Phase 5 已全部冻结。** 后续可选方向须单独立项（非当前强制主线）：
 
 - 正式登录 / JWT / OAuth
 - Docker Compose 一键编排
 - 正式医生审核平台
 - RAG / GraphRAG / 模型训练
 
-不应在未立项的新 Phase 中破坏 Phase 1–5 已冻结的 Runtime 主控、Safe DTO 与 Console 访问治理边界。
+不应在未立项的新 Phase 中破坏 Phase 1–5 已冻结的 Runtime 主控、Safe DTO 与 Console 访问治理边界。Phase 5 归档依据见 [`docs/Phase5冻结记录.md`](docs/Phase5冻结记录.md)。
 
 ## License
 

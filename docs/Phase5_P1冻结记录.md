@@ -10,7 +10,7 @@
 ```text
 冻结阶段：Phase 5-P1
 冻结状态：已冻结
-当前项目阶段：Phase 5-P1 已冻结 / Phase 5-P2 已完成
+当前项目阶段：Phase 5-P1 已冻结 / Phase 5-P2 已冻结 / Phase 5 总归档见 Phase5冻结记录.md
 冻结日期：2026-07-01
 代码基线：commit 84c2122
 ```
@@ -179,25 +179,9 @@ postgres CI / Docker 兼容性修复
 
 ---
 
-# 七、Phase 5-P2 完成情况
+# 七、Phase 5 整体归档
 
-Phase 5-P2 最小前端 Console MVP 已完成并归档：
-
-```text
-console-web/ — Runtime / Evaluation / Candidate / Review Queue / Audit Center
-DebugContextPanel、consoleClient、Review 表单、SensitiveFieldRenderGuard
-35 项 vitest；npm run build 通过
-验收：docs/Phase5_P2人工测试结果.md
-任务清单：docs/Phase5_P2开发任务清单.md（P2-A～P2-F 均 [x]）
-```
-
-仍后置（未在 P2 交付）：
-
-```text
-Docker Compose 一键编排
-正式 RBAC / 登录集成
-完整产品化 Training Center / Model Registry UI
-```
+Phase 5-P2 已冻结。Phase 5 全阶段归档见 [`Phase5冻结记录.md`](Phase5冻结记录.md)；P2 子阶段见 [`Phase5_P2冻结记录.md`](Phase5_P2冻结记录.md)。
 
 ---
 
