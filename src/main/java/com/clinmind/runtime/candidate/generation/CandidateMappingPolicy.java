@@ -13,8 +13,13 @@ import com.clinmind.runtime.evaluation.SafetyViolation;
 import com.clinmind.runtime.evaluation.SafetyViolationType;
 import com.clinmind.runtime.evaluation.scorer.AssetVersionTraceScorer;
 import com.clinmind.runtime.evaluation.scorer.DdxCoverageScorer;
+import com.clinmind.runtime.evaluation.scorer.JudgeBoundaryAgreementScorer;
+import com.clinmind.runtime.evaluation.scorer.JudgeTraceCompletenessScorer;
+import com.clinmind.runtime.evaluation.scorer.JudgeViolationDetectionScorer;
 import com.clinmind.runtime.evaluation.scorer.NextActionScorer;
 import com.clinmind.runtime.evaluation.scorer.PatientBoundaryScorer;
+import com.clinmind.runtime.evaluation.scorer.ProviderCapabilityProfileScorer;
+import com.clinmind.runtime.evaluation.scorer.RiskClassifierTraceScorer;
 import com.clinmind.runtime.evaluation.scorer.SafetyGateScorer;
 import com.clinmind.runtime.evaluation.scorer.TraceCompletenessScorer;
 import java.util.Locale;
@@ -51,9 +56,13 @@ public class CandidateMappingPolicy {
         return switch (metricId) {
             case SafetyGateScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.SAFETY_LESSON);
             case PatientBoundaryScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.PATIENT_BOUNDARY_LESSON);
+            case JudgeBoundaryAgreementScorer.METRIC_ID, JudgeViolationDetectionScorer.METRIC_ID ->
+                    Optional.of(ExperienceCandidateType.PATIENT_BOUNDARY_LESSON);
             case DdxCoverageScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.MISSING_DDX_LESSON);
             case NextActionScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.NEXT_ACTION_LESSON);
-            case TraceCompletenessScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.TRACE_QUALITY_LESSON);
+            case TraceCompletenessScorer.METRIC_ID, JudgeTraceCompletenessScorer.METRIC_ID,
+                    RiskClassifierTraceScorer.METRIC_ID, ProviderCapabilityProfileScorer.METRIC_ID ->
+                    Optional.of(ExperienceCandidateType.TRACE_QUALITY_LESSON);
             case AssetVersionTraceScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.ASSET_VERSION_LESSON);
             default -> Optional.empty();
         };
@@ -86,10 +95,13 @@ public class CandidateMappingPolicy {
         }
         return switch (metricId) {
             case SafetyGateScorer.METRIC_ID -> Optional.of(TrainingTaskType.RISK_SIGNAL_CLASSIFICATION);
-            case PatientBoundaryScorer.METRIC_ID -> Optional.of(TrainingTaskType.PATIENT_SAFE_REWRITE);
+            case RiskClassifierTraceScorer.METRIC_ID -> Optional.of(TrainingTaskType.RISK_SIGNAL_CLASSIFICATION);
+            case PatientBoundaryScorer.METRIC_ID, JudgeBoundaryAgreementScorer.METRIC_ID,
+                    JudgeViolationDetectionScorer.METRIC_ID -> Optional.of(TrainingTaskType.PATIENT_SAFE_REWRITE);
             case DdxCoverageScorer.METRIC_ID -> Optional.of(TrainingTaskType.DDX_EXPECTATION);
             case NextActionScorer.METRIC_ID -> Optional.of(TrainingTaskType.NEXT_ACTION_EXPECTATION);
-            case AssetVersionTraceScorer.METRIC_ID -> Optional.of(TrainingTaskType.ASSET_TRACE_EXPECTATION);
+            case AssetVersionTraceScorer.METRIC_ID, ProviderCapabilityProfileScorer.METRIC_ID,
+                    JudgeTraceCompletenessScorer.METRIC_ID -> Optional.of(TrainingTaskType.ASSET_TRACE_EXPECTATION);
             default -> Optional.empty();
         };
     }

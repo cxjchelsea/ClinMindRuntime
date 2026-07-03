@@ -36,18 +36,18 @@ Risk classifier 可以作为风险草稿信号；
 
 | 编号 | 任务 | 状态 |
 |---|---|---|
-| P8P1-A | 扩展 Python provider 配置与 capability profile | 待做 |
-| P8P1-B | 实现 Python /v1/capability-profiles | 待做 |
-| P8P1-C | 实现 Python JudgeProvider MVP | 待做 |
-| P8P1-D | 实现 Python RiskSignalClassifierProvider MVP | 待做 |
-| P8P1-E | 建立 Java capability profile domain | 待做 |
-| P8P1-F | 实现 ProviderCapabilityPolicy | 待做 |
-| P8P1-G | 扩展 Java PythonProviderClient | 待做 |
-| P8P1-H | 扩展 ProviderValidationService | 待做 |
-| P8P1-I | Provider Debug API 扩展 | 待做 |
-| P8P1-J | Evaluation Scorer 接入 Judge / Risk / Profile | 待做 |
-| P8P1-K | Trace / Audit / Candidate 治理接入 | 待做 |
-| P8P1-L | 测试、人工验证与冻结记录 | 待做 |
+| P8P1-A | 扩展 Python provider 配置与 capability profile | 已完成 |
+| P8P1-B | 实现 Python /v1/capability-profiles | 已完成 |
+| P8P1-C | 实现 Python JudgeProvider MVP | 已完成 |
+| P8P1-D | 实现 Python RiskSignalClassifierProvider MVP | 已完成 |
+| P8P1-E | 建立 Java capability profile domain | 已完成 |
+| P8P1-F | 实现 ProviderCapabilityPolicy | 已完成 |
+| P8P1-G | 扩展 Java PythonProviderClient | 已完成 |
+| P8P1-H | 扩展 ProviderValidationService | 已完成 |
+| P8P1-I | Provider Debug API 扩展 | 已完成 |
+| P8P1-J | Evaluation Scorer 接入 Judge / Risk / Profile | 已完成 |
+| P8P1-K | Trace / Audit / Candidate 治理接入 | 已完成 |
+| P8P1-L | 测试、人工验证与冻结记录 | 已完成 |
 
 ---
 
