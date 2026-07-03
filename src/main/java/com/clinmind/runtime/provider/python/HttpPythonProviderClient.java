@@ -10,24 +10,39 @@ import com.clinmind.runtime.provider.ProviderInvocationResult;
 import com.clinmind.runtime.provider.ProviderStatus;
 import com.clinmind.runtime.provider.ProviderValidationStatus;
 import com.clinmind.runtime.provider.ProviderTrace;
+import com.clinmind.runtime.provider.capability.ProviderCapabilityProfile;
+import com.clinmind.runtime.provider.capability.ProviderCapabilityProfileStatus;
 import com.clinmind.runtime.provider.embedding.EmbeddingItemResult;
 import com.clinmind.runtime.provider.embedding.EmbeddingRequest;
 import com.clinmind.runtime.provider.embedding.EmbeddingResult;
+import com.clinmind.runtime.provider.judge.JudgeInputSummary;
+import com.clinmind.runtime.provider.judge.JudgeRequest;
+import com.clinmind.runtime.provider.judge.JudgeScoreResult;
+import com.clinmind.runtime.provider.python.dto.PythonCapabilityProfilesResponseDto;
 import com.clinmind.runtime.provider.python.dto.PythonEmbeddingRequestDto;
 import com.clinmind.runtime.provider.python.dto.PythonEmbeddingResponseDto;
 import com.clinmind.runtime.provider.python.dto.PythonHealthResponse;
+import com.clinmind.runtime.provider.python.dto.PythonJudgeRequestDto;
+import com.clinmind.runtime.provider.python.dto.PythonJudgeResponseDto;
 import com.clinmind.runtime.provider.python.dto.PythonProvidersResponse;
+import com.clinmind.runtime.provider.python.dto.PythonRiskClassificationRequestDto;
+import com.clinmind.runtime.provider.python.dto.PythonRiskClassificationResponseDto;
 import com.clinmind.runtime.provider.python.dto.PythonRerankRequestDto;
 import com.clinmind.runtime.provider.python.dto.PythonRerankResponseDto;
 import com.clinmind.runtime.provider.rerank.RankedItem;
 import com.clinmind.runtime.provider.rerank.RerankRequest;
 import com.clinmind.runtime.provider.rerank.RerankResult;
+import com.clinmind.runtime.provider.risk.RiskCaseFrameSummary;
+import com.clinmind.runtime.provider.risk.RiskSignalClassificationRequest;
+import com.clinmind.runtime.provider.risk.RiskSignalDraft;
+import com.clinmind.runtime.provider.risk.RiskSignalLabel;
 import com.clinmind.runtime.provider.runtime.ProviderCallRecord;
 import com.clinmind.runtime.provider.runtime.ProviderCallStore;
 import com.clinmind.runtime.provider.validation.ProviderValidationService;
 import com.clinmind.runtime.state.IdGenerator;
 import java.net.SocketTimeoutException;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -291,6 +306,253 @@ public class HttpPythonProviderClient implements PythonProviderClient {
         }
     }
 
+    @Override
+    public ProviderInvocationResult<List<ProviderCapabilityProfile>> getCapabilityProfiles(String runtimeId) {
+        String providerCallId = IdGenerator.providerCallId();
+        String requestId = IdGenerator.providerRequestId();
+        if (!properties.isEnabled()) {
+            return disabledInvocation(providerCallId, requestId, runtimeId, ProviderCapabilityType.JUDGE);
+        }
+        long started = System.currentTimeMillis();
+        try {
+            PythonCapabilityProfilesResponseDto response = restClient
+                    .get()
+                    .uri("/v1/capability-profiles")
+                    .retrieve()
+                    .body(PythonCapabilityProfilesResponseDto.class);
+            long latencyMs = System.currentTimeMillis() - started;
+            if (response == null || response.profiles() == null) {
+                return failedGenericInvocation(
+                        providerCallId,
+                        requestId,
+                        runtimeId,
+                        ProviderCapabilityType.JUDGE,
+                        ProviderStatus.FAILED,
+                        "PYTHON_PROVIDER_INVALID_RESPONSE",
+                        "Capability profiles response missing",
+                        latencyMs,
+                        ProviderConstants.JUDGE_MODEL_ID,
+                        ProviderConstants.JUDGE_MODEL_VERSION);
+            }
+            List<ProviderCapabilityProfile> profiles = response.profiles().stream()
+                    .map(this::toCapabilityProfile)
+                    .toList();
+            List<String> reasons = profiles.stream()
+                    .flatMap(profile -> validationService.validateCapabilityProfile(profile).reasons().stream())
+                    .toList();
+            ProviderValidationStatus validationStatus =
+                    reasons.isEmpty() ? ProviderValidationStatus.ACCEPTED : ProviderValidationStatus.REJECTED;
+            ProviderStatus status = validationStatus == ProviderValidationStatus.ACCEPTED
+                    ? ProviderStatus.SUCCESS
+                    : ProviderStatus.VALIDATION_FAILED;
+            ProviderTrace trace = buildTrace(
+                    providerCallId,
+                    runtimeId,
+                    response.providerId(),
+                    response.providerVersion(),
+                    null,
+                    null,
+                    Map.of("profile_count", profiles.size()),
+                    Map.of("accepted_count", validationStatus == ProviderValidationStatus.ACCEPTED ? profiles.size() : 0),
+                    status,
+                    latencyMs,
+                    validationStatus != ProviderValidationStatus.ACCEPTED,
+                    validationStatus);
+            ProviderInvocationResult<List<ProviderCapabilityProfile>> invocation = new ProviderInvocationResult<>(
+                    providerCallId,
+                    requestId,
+                    runtimeId,
+                    status,
+                    validationStatus,
+                    validationStatus != ProviderValidationStatus.ACCEPTED,
+                    status == ProviderStatus.VALIDATION_FAILED ? "PROVIDER_SCHEMA_INVALID" : null,
+                    reasons.isEmpty() ? null : String.join("; ", reasons),
+                    List.of(),
+                    trace,
+                    validationStatus == ProviderValidationStatus.ACCEPTED ? profiles : null);
+            providerCallStore.save(toCallRecord(invocation, ProviderCapabilityType.JUDGE, reasons));
+            return invocation;
+        } catch (RuntimeException ex) {
+            long latencyMs = System.currentTimeMillis() - started;
+            ProviderHealthResult failure = ex instanceof RestClientException restClientException
+                    ? mapConnectionFailure(restClientException)
+                    : ProviderHealthResult.unavailable("PYTHON_PROVIDER_INVALID_RESPONSE", ex.getMessage());
+            ProviderInvocationResult<List<ProviderCapabilityProfile>> invocation = failedGenericInvocation(
+                    providerCallId,
+                    requestId,
+                    runtimeId,
+                    ProviderCapabilityType.JUDGE,
+                    failure.status(),
+                    failure.errorCode(),
+                    failure.message(),
+                    latencyMs,
+                    null,
+                    null);
+            providerCallStore.save(toCallRecord(invocation, ProviderCapabilityType.JUDGE, List.of(failure.message())));
+            return invocation;
+        }
+    }
+
+    @Override
+    public ProviderInvocationResult<JudgeScoreResult> judge(JudgeRequest request) {
+        String providerCallId = IdGenerator.providerCallId();
+        if (!properties.isEnabled()) {
+            return disabledInvocation(providerCallId, request.requestId(), request.runtimeId(), ProviderCapabilityType.JUDGE);
+        }
+        long started = System.currentTimeMillis();
+        try {
+            PythonJudgeResponseDto response = restClient
+                    .post()
+                    .uri("/v1/judge")
+                    .body(toJudgePayload(request))
+                    .retrieve()
+                    .body(PythonJudgeResponseDto.class);
+            long latencyMs = System.currentTimeMillis() - started;
+            if (response == null || !"SUCCESS".equalsIgnoreCase(response.status())) {
+                return failedGenericInvocation(
+                        providerCallId,
+                        request.requestId(),
+                        request.runtimeId(),
+                        ProviderCapabilityType.JUDGE,
+                        ProviderStatus.FAILED,
+                        response == null ? "PYTHON_PROVIDER_INVALID_RESPONSE" : response.errorCode(),
+                        "Judge call failed",
+                        latencyMs,
+                        ProviderConstants.JUDGE_MODEL_ID,
+                        ProviderConstants.JUDGE_MODEL_VERSION);
+            }
+            JudgeScoreResult result = toJudgeResult(response);
+            var validation = validationService.validateJudge(request, result);
+            ProviderValidationStatus validationStatus = validation.status();
+            ProviderStatus status = validationStatus == ProviderValidationStatus.REJECTED
+                    ? ProviderStatus.VALIDATION_FAILED
+                    : ProviderStatus.SUCCESS;
+            ProviderTrace trace = buildTrace(
+                    providerCallId,
+                    request.runtimeId(),
+                    result.providerId(),
+                    result.providerVersion(),
+                    result.modelId(),
+                    result.modelVersion(),
+                    Map.of("judge_target_type", request.judgeTargetType().name()),
+                    Map.of("violation_count", result.violations().size(), "overall_score", result.overallScore()),
+                    status,
+                    latencyMs,
+                    validationStatus != ProviderValidationStatus.ACCEPTED,
+                    validationStatus);
+            ProviderInvocationResult<JudgeScoreResult> invocation = new ProviderInvocationResult<>(
+                    providerCallId,
+                    request.requestId(),
+                    request.runtimeId(),
+                    status,
+                    validationStatus,
+                    validationStatus != ProviderValidationStatus.ACCEPTED,
+                    status == ProviderStatus.VALIDATION_FAILED ? "PROVIDER_SCHEMA_INVALID" : null,
+                    validation.reasons().isEmpty() ? null : String.join("; ", validation.reasons()),
+                    result.warnings(),
+                    trace,
+                    validationStatus == ProviderValidationStatus.ACCEPTED ? result : null);
+            providerCallStore.save(toCallRecord(invocation, ProviderCapabilityType.JUDGE, validation.reasons()));
+            return invocation;
+        } catch (RestClientException ex) {
+            long latencyMs = System.currentTimeMillis() - started;
+            ProviderHealthResult failure = mapConnectionFailure(ex);
+            ProviderInvocationResult<JudgeScoreResult> invocation = failedGenericInvocation(
+                    providerCallId,
+                    request.requestId(),
+                    request.runtimeId(),
+                    ProviderCapabilityType.JUDGE,
+                    failure.status(),
+                    failure.errorCode(),
+                    failure.message(),
+                    latencyMs,
+                    ProviderConstants.JUDGE_MODEL_ID,
+                    ProviderConstants.JUDGE_MODEL_VERSION);
+            providerCallStore.save(toCallRecord(invocation, ProviderCapabilityType.JUDGE, List.of(failure.message())));
+            return invocation;
+        }
+    }
+
+    @Override
+    public ProviderInvocationResult<RiskSignalDraft> classifyRisk(RiskSignalClassificationRequest request) {
+        String providerCallId = IdGenerator.providerCallId();
+        if (!properties.isEnabled()) {
+            return disabledInvocation(providerCallId, request.requestId(), request.runtimeId(), ProviderCapabilityType.RISK_CLASSIFICATION);
+        }
+        long started = System.currentTimeMillis();
+        try {
+            PythonRiskClassificationResponseDto response = restClient
+                    .post()
+                    .uri("/v1/classify-risk")
+                    .body(toRiskPayload(request))
+                    .retrieve()
+                    .body(PythonRiskClassificationResponseDto.class);
+            long latencyMs = System.currentTimeMillis() - started;
+            if (response == null || !"SUCCESS".equalsIgnoreCase(response.status())) {
+                return failedGenericInvocation(
+                        providerCallId,
+                        request.requestId(),
+                        request.runtimeId(),
+                        ProviderCapabilityType.RISK_CLASSIFICATION,
+                        ProviderStatus.FAILED,
+                        response == null ? "PYTHON_PROVIDER_INVALID_RESPONSE" : response.errorCode(),
+                        "Risk classification call failed",
+                        latencyMs,
+                        ProviderConstants.RISK_CLASSIFIER_MODEL_ID,
+                        ProviderConstants.RISK_CLASSIFIER_MODEL_VERSION);
+            }
+            RiskSignalDraft result = toRiskSignalDraft(response);
+            var validation = validationService.validateRiskSignalDraft(request, result);
+            ProviderValidationStatus validationStatus = validation.status();
+            ProviderStatus status = validationStatus == ProviderValidationStatus.REJECTED
+                    ? ProviderStatus.VALIDATION_FAILED
+                    : ProviderStatus.SUCCESS;
+            ProviderTrace trace = buildTrace(
+                    providerCallId,
+                    request.runtimeId(),
+                    result.providerId(),
+                    result.providerVersion(),
+                    result.modelId(),
+                    result.modelVersion(),
+                    Map.of("symptom_group", request.symptomGroup()),
+                    Map.of("risk_labels", result.riskLabels().stream().map(Enum::name).toList(), "risk_score", result.riskScore()),
+                    status,
+                    latencyMs,
+                    validationStatus != ProviderValidationStatus.ACCEPTED,
+                    validationStatus);
+            ProviderInvocationResult<RiskSignalDraft> invocation = new ProviderInvocationResult<>(
+                    providerCallId,
+                    request.requestId(),
+                    request.runtimeId(),
+                    status,
+                    validationStatus,
+                    validationStatus != ProviderValidationStatus.ACCEPTED,
+                    status == ProviderStatus.VALIDATION_FAILED ? "PROVIDER_SCHEMA_INVALID" : null,
+                    validation.reasons().isEmpty() ? null : String.join("; ", validation.reasons()),
+                    result.warnings(),
+                    trace,
+                    validationStatus == ProviderValidationStatus.ACCEPTED ? result : null);
+            providerCallStore.save(toCallRecord(invocation, ProviderCapabilityType.RISK_CLASSIFICATION, validation.reasons()));
+            return invocation;
+        } catch (RestClientException ex) {
+            long latencyMs = System.currentTimeMillis() - started;
+            ProviderHealthResult failure = mapConnectionFailure(ex);
+            ProviderInvocationResult<RiskSignalDraft> invocation = failedGenericInvocation(
+                    providerCallId,
+                    request.requestId(),
+                    request.runtimeId(),
+                    ProviderCapabilityType.RISK_CLASSIFICATION,
+                    failure.status(),
+                    failure.errorCode(),
+                    failure.message(),
+                    latencyMs,
+                    ProviderConstants.RISK_CLASSIFIER_MODEL_ID,
+                    ProviderConstants.RISK_CLASSIFIER_MODEL_VERSION);
+            providerCallStore.save(toCallRecord(invocation, ProviderCapabilityType.RISK_CLASSIFICATION, List.of(failure.message())));
+            return invocation;
+        }
+    }
+
     private ProviderHealthResult mapConnectionFailure(RestClientException ex) {
         if (ex instanceof ResourceAccessException resourceAccessException
                 && resourceAccessException.getCause() instanceof SocketTimeoutException) {
@@ -333,6 +595,44 @@ public class HttpPythonProviderClient implements PythonProviderClient {
                 null);
         providerCallStore.save(toCallRecord(invocation, capability, List.of("Python provider disabled")));
         return invocation;
+    }
+
+    private <T> ProviderInvocationResult<T> failedGenericInvocation(
+            String providerCallId,
+            String requestId,
+            String runtimeId,
+            ProviderCapabilityType capability,
+            ProviderStatus status,
+            String errorCode,
+            String message,
+            long latencyMs,
+            String modelId,
+            String modelVersion) {
+        ProviderTrace trace = buildTrace(
+                providerCallId,
+                runtimeId,
+                ProviderConstants.PYTHON_AI_PROVIDER_ID,
+                ProviderConstants.PYTHON_AI_PROVIDER_VERSION,
+                modelId,
+                modelVersion,
+                Map.of("capability", capability.name()),
+                Map.of(),
+                status,
+                latencyMs,
+                true,
+                ProviderValidationStatus.DEGRADED);
+        return new ProviderInvocationResult<>(
+                providerCallId,
+                requestId,
+                runtimeId,
+                status,
+                ProviderValidationStatus.DEGRADED,
+                true,
+                errorCode,
+                message,
+                List.of(),
+                trace,
+                null);
     }
 
     private ProviderInvocationResult<EmbeddingResult> failedInvocation(
@@ -519,5 +819,110 @@ public class HttpPythonProviderClient implements PythonProviderClient {
                 response.schemaVersion(),
                 response.result() == null ? null : response.result().queryId(),
                 rankedItems);
+    }
+
+    private PythonJudgeRequestDto toJudgePayload(JudgeRequest request) {
+        JudgeInputSummary summary = request.inputSummary();
+        return new PythonJudgeRequestDto(
+                request.requestId(),
+                request.runtimeId(),
+                request.providerId(),
+                request.judgeTargetType().name(),
+                request.judgeTargetId(),
+                request.rubricId(),
+                request.rubricVersion(),
+                new PythonJudgeRequestDto.PythonJudgeInputSummaryDto(
+                        summary == null ? "" : summary.text(),
+                        summary == null ? null : summary.symptomGroup()),
+                request.dimensions(),
+                request.forbiddenLabels(),
+                request.schemaVersion());
+    }
+
+    private PythonRiskClassificationRequestDto toRiskPayload(RiskSignalClassificationRequest request) {
+        RiskCaseFrameSummary summary = request.caseFrameSummary();
+        return new PythonRiskClassificationRequestDto(
+                request.requestId(),
+                request.runtimeId(),
+                request.providerId(),
+                request.symptomGroup(),
+                new PythonRiskClassificationRequestDto.PythonRiskCaseFrameSummaryDto(
+                        summary == null ? List.of() : summary.knownFacts(),
+                        summary == null ? List.of() : summary.missingFacts()),
+                request.redFlagCandidates(),
+                request.allowedLabels().stream().map(Enum::name).toList(),
+                request.schemaVersion());
+    }
+
+    private ProviderCapabilityProfile toCapabilityProfile(
+            PythonCapabilityProfilesResponseDto.PythonCapabilityProfileDto dto) {
+        return new ProviderCapabilityProfile(
+                dto.profileId(),
+                dto.providerId(),
+                dto.providerVersion(),
+                dto.modelId(),
+                dto.modelVersion(),
+                ProviderCapabilityType.valueOf(dto.capabilityType()),
+                dto.schemaVersion(),
+                dto.allowedUseCases(),
+                dto.forbiddenUseCases(),
+                dto.maxInputItems(),
+                dto.maxInputChars(),
+                dto.timeoutMs(),
+                dto.patientOutputAllowed(),
+                dto.clinicianOutputAllowed(),
+                dto.requiresValidation(),
+                dto.fallbackStrategy(),
+                dto.riskLevel(),
+                ProviderCapabilityProfileStatus.valueOf(dto.status()),
+                parseInstant(dto.createdAt()));
+    }
+
+    private JudgeScoreResult toJudgeResult(PythonJudgeResponseDto response) {
+        PythonJudgeResponseDto.PythonJudgeResultDto result = response.result();
+        return new JudgeScoreResult(
+                response.requestId(),
+                response.providerId(),
+                response.providerVersion(),
+                response.modelId(),
+                response.modelVersion(),
+                response.schemaVersion(),
+                result == null ? null : result.judgeTargetId(),
+                result == null ? 0.0 : result.overallScore(),
+                result == null ? Map.of() : result.dimensionScores(),
+                result == null ? List.of() : result.violations(),
+                result == null ? null : result.rationaleSummary(),
+                result == null ? 0.0 : result.confidence(),
+                response.warnings());
+    }
+
+    private RiskSignalDraft toRiskSignalDraft(PythonRiskClassificationResponseDto response) {
+        PythonRiskClassificationResponseDto.PythonRiskSignalDraftDto result = response.result();
+        List<RiskSignalLabel> labels = result == null || result.riskLabels() == null
+                ? List.of()
+                : result.riskLabels().stream().map(RiskSignalLabel::valueOf).toList();
+        return new RiskSignalDraft(
+                response.requestId(),
+                response.providerId(),
+                response.providerVersion(),
+                response.modelId(),
+                response.modelVersion(),
+                response.schemaVersion(),
+                labels,
+                result == null ? 0.0 : result.riskScore(),
+                result == null ? List.of() : result.matchedReasons(),
+                result == null ? 0.0 : result.uncertainty(),
+                response.warnings());
+    }
+
+    private Instant parseInstant(String value) {
+        if (value == null || value.isBlank()) {
+            return Instant.now();
+        }
+        try {
+            return Instant.parse(value);
+        } catch (DateTimeParseException ex) {
+            return Instant.now();
+        }
     }
 }

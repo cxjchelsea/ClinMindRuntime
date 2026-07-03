@@ -11,7 +11,7 @@ def test_health_up():
     body = response.json()
     assert body["status"] == "UP"
     assert body["provider_id"] == "python_ai_provider"
-    assert body["provider_version"] == "0.8.0-p0"
+    assert body["provider_version"] == "0.8.1-p1"
 
 
 def test_providers_capabilities():
@@ -21,5 +21,7 @@ def test_providers_capabilities():
     capabilities = {item["capability"]: item for item in body["capabilities"]}
     assert "EMBEDDING" in capabilities
     assert "RERANK" in capabilities
+    assert "JUDGE" in capabilities
+    assert "RISK_CLASSIFICATION" in capabilities
     assert capabilities["EMBEDDING"]["dimension"] == 16
     assert capabilities["EMBEDDING"]["model_version"] == "0.1.0"

@@ -5,9 +5,14 @@ import com.clinmind.runtime.console.access.ActorContext;
 import com.clinmind.runtime.console.access.ActorContextResolver;
 import com.clinmind.runtime.provider.api.dto.EmbeddingRunRequest;
 import com.clinmind.runtime.provider.api.dto.EmbeddingRunResponse;
+import com.clinmind.runtime.provider.api.dto.JudgeRunRequest;
+import com.clinmind.runtime.provider.api.dto.JudgeRunResponse;
 import com.clinmind.runtime.provider.api.dto.ProviderCallSafeDto;
 import com.clinmind.runtime.provider.api.dto.ProviderCapabilitiesResponse;
+import com.clinmind.runtime.provider.api.dto.ProviderCapabilityProfilesDebugResponse;
 import com.clinmind.runtime.provider.api.dto.ProviderHealthDto;
+import com.clinmind.runtime.provider.api.dto.RiskClassifierRunRequest;
+import com.clinmind.runtime.provider.api.dto.RiskClassifierRunResponse;
 import com.clinmind.runtime.provider.api.dto.RerankRunRequest;
 import com.clinmind.runtime.provider.api.dto.RerankRunResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +56,14 @@ public class ProviderDebugController {
         return ApiResponse.ok(providerDebugService.capabilities(), actor.requestId());
     }
 
+    @GetMapping("/capability-profiles")
+    public ApiResponse<ProviderCapabilityProfilesDebugResponse> capabilityProfiles(HttpServletRequest httpRequest) {
+        ActorContext actor = actorContextResolver.resolve(httpRequest);
+        actorContextResolver.bindToLegacyAuditContext(actor);
+        accessPolicy.requireReadAccess(actor);
+        return ApiResponse.ok(providerDebugService.capabilityProfiles(), actor.requestId());
+    }
+
     @PostMapping("/embeddings/run")
     public ApiResponse<EmbeddingRunResponse> runEmbeddings(
             @RequestBody EmbeddingRunRequest request, HttpServletRequest httpRequest) {
@@ -67,6 +80,24 @@ public class ProviderDebugController {
         actorContextResolver.bindToLegacyAuditContext(actor);
         accessPolicy.requireRunAccess(actor);
         return ApiResponse.ok(providerDebugService.runRerank(request), actor.requestId());
+    }
+
+    @PostMapping("/judge/run")
+    public ApiResponse<JudgeRunResponse> runJudge(
+            @RequestBody JudgeRunRequest request, HttpServletRequest httpRequest) {
+        ActorContext actor = actorContextResolver.resolve(httpRequest);
+        actorContextResolver.bindToLegacyAuditContext(actor);
+        accessPolicy.requireRunAccess(actor);
+        return ApiResponse.ok(providerDebugService.runJudge(request), actor.requestId());
+    }
+
+    @PostMapping("/risk-classifier/run")
+    public ApiResponse<RiskClassifierRunResponse> runRiskClassifier(
+            @RequestBody RiskClassifierRunRequest request, HttpServletRequest httpRequest) {
+        ActorContext actor = actorContextResolver.resolve(httpRequest);
+        actorContextResolver.bindToLegacyAuditContext(actor);
+        accessPolicy.requireRunAccess(actor);
+        return ApiResponse.ok(providerDebugService.runRiskClassifier(request), actor.requestId());
     }
 
     @GetMapping("/calls/{provider_call_id}")

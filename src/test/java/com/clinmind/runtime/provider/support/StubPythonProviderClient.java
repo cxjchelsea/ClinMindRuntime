@@ -7,12 +7,17 @@ import com.clinmind.runtime.provider.ProviderInvocationResult;
 import com.clinmind.runtime.provider.ProviderStatus;
 import com.clinmind.runtime.provider.ProviderTrace;
 import com.clinmind.runtime.provider.ProviderValidationStatus;
+import com.clinmind.runtime.provider.capability.ProviderCapabilityProfile;
 import com.clinmind.runtime.provider.embedding.EmbeddingRequest;
 import com.clinmind.runtime.provider.embedding.EmbeddingResult;
+import com.clinmind.runtime.provider.judge.JudgeRequest;
+import com.clinmind.runtime.provider.judge.JudgeScoreResult;
 import com.clinmind.runtime.provider.python.PythonProviderClient;
 import com.clinmind.runtime.provider.rerank.RankedItem;
 import com.clinmind.runtime.provider.rerank.RerankRequest;
 import com.clinmind.runtime.provider.rerank.RerankResult;
+import com.clinmind.runtime.provider.risk.RiskSignalClassificationRequest;
+import com.clinmind.runtime.provider.risk.RiskSignalDraft;
 import com.clinmind.runtime.state.IdGenerator;
 import java.time.Instant;
 import java.util.List;
@@ -111,6 +116,21 @@ public class StubPythonProviderClient implements PythonProviderClient {
                 List.of(),
                 trace,
                 result);
+    }
+
+    @Override
+    public ProviderInvocationResult<List<ProviderCapabilityProfile>> getCapabilityProfiles(String runtimeId) {
+        return disabledResult(IdGenerator.providerCallId(), IdGenerator.providerRequestId(), runtimeId);
+    }
+
+    @Override
+    public ProviderInvocationResult<JudgeScoreResult> judge(JudgeRequest request) {
+        return disabledResult(IdGenerator.providerCallId(), request.requestId(), request.runtimeId());
+    }
+
+    @Override
+    public ProviderInvocationResult<RiskSignalDraft> classifyRisk(RiskSignalClassificationRequest request) {
+        return disabledResult(IdGenerator.providerCallId(), request.requestId(), request.runtimeId());
     }
 
     private ProviderInvocationResult<EmbeddingResult> disabledResult(String requestId, String runtimeId) {
