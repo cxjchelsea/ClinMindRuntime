@@ -22,12 +22,14 @@ Phase 5-P2：最小前端 Console MVP 已完成并冻结。
 Phase 6-P0：受控 Agent 执行层 MVP 已完成并冻结。
 Phase 7-P0：RAG EvidenceProvider MVP 已完成并冻结。
 Phase 7-P1：KG-lite / Graph Evidence 原型已完成并冻结。
+Phase 8-P0：Python AI Provider / EmbeddingProvider MVP 已完成并冻结。
+Phase 8-P1：ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已完成并冻结。
 ```
 
 当前下一阶段建议：
 
 ```text
-Phase 8-P0：Python AI Provider / EmbeddingProvider MVP
+Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion（或进入 Phase 10 Provider Console）
 ```
 
 当前新增专项规划：
@@ -115,7 +117,7 @@ docs/
 
 阅读目标：先确认当前阶段、允许范围和禁止边界，再进入具体实现。
 
-## 3.3 Phase 8-P0 前置阅读
+## 3.3 Phase 8-P1 冻结归档阅读
 
 ```text
 1. docs/0-项目入口/00_项目设计地图.md
@@ -123,11 +125,12 @@ docs/
 3. docs/2-专项设计/Python_AIProvider接入规划.md
 4. docs/2-专项设计/模型训练与后训练规划.md
 5. docs/2-专项设计/医学知识库与RAG构建规划.md
-6. docs/3-phase实现/Phase7_P1冻结记录.md
-7. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
+6. docs/3-phase实现/Phase8_P1冻结记录.md
+7. docs/3-phase实现/Phase8_P1人工测试结果.md
+8. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
 ```
 
-阅读目标：确认 Python 只能作为 AI Provider 接入，不能成为 Runtime、Agent 主控或患者端回答生成器。
+阅读目标：确认 Python / Model / Judge / Risk classifier 都只能作为受控 Provider 接入，不能成为 Runtime 主控、SafetyGate 决策器或患者端回答生成器。
 
 ---
 
@@ -180,7 +183,8 @@ docs/
 | Phase 6-P0 | 已冻结 | `docs/3-phase实现/Phase6_P0*`、`docs/3-phase实现/Phase6_P0冻结记录.md` |
 | Phase 7-P0 | 已冻结 | `docs/3-phase实现/Phase7_P0*`、`docs/3-phase实现/Phase7_P0冻结记录.md` |
 | Phase 7-P1 | 已冻结 | `docs/3-phase实现/Phase7_P1*`、`docs/3-phase实现/Phase7_P1冻结记录.md` |
-| Phase 8-P0 | 待设计 | `Phase8_P0Python_AIProvider_实现规格.md`、`Phase8_P0Provider_API与测试设计.md`、`Phase8_P0开发任务清单.md` 待新增 |
+| Phase 8-P0 | 已冻结 | `docs/3-phase实现/Phase8_P0*`、`docs/3-phase实现/Phase8_P0冻结记录.md` |
+| Phase 8-P1 | 已冻结 | `docs/3-phase实现/Phase8_P1*`、`docs/3-phase实现/Phase8_P1冻结记录.md` |
 
 ## 4.5 实现约束组
 
@@ -233,15 +237,17 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 # 六、当前不应做什么
 
 ```text
-1. 不应向 Phase 1–7 P1 已冻结阶段继续堆新能力。
-2. 不应在 Phase 8-P0 规格未建立前直接实现 Python Provider。
-3. 不应让 Python 成为 Runtime 主控。
-4. 不应让 Python Agent 自主循环。
-5. 不应让 Python 直接输出 PatientOutput。
-6. 不应让 Python 直接判断最终诊断。
-7. 不应提前做模型训练 / 后训练。
-8. 不应提前实现完整 ModelRegistry / PromptRegistry / MLOps。
-9. 不应提前实现正式医生审核平台或 Knowledge Console。
+1. 不应向 Phase 1–8 P1 已冻结阶段继续堆新能力。
+2. 不应让 Python 成为 Runtime 主控。
+3. 不应让 Python Agent 自主循环。
+4. 不应让 Python 直接输出 PatientOutput。
+5. 不应让 Python 直接判断最终诊断。
+6. 不应让 JudgeProvider 直接决定最终诊断。
+7. 不应让 RiskSignalClassifierProvider 直接触发 SafetyGate。
+8. 不应绕过 ProviderCapabilityPolicy / ProviderValidation。
+9. 不应提前做模型训练 / 后训练。
+10. 不应提前实现完整 ModelRegistry / PromptRegistry / MLOps。
+11. 不应提前实现正式医生审核平台或 Knowledge Console。
 ```
 
 ---
@@ -249,12 +255,11 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 # 七、当前建议做什么
 
 ```text
-1. 保持 Phase 1–7 P1 冻结边界。
-2. 以 docs/2-专项设计/Python_AIProvider接入规划.md 为前置规划。
-3. 新增 docs/3-phase实现/Phase8_P0Python_AIProvider_实现规格.md。
-4. 新增 docs/3-phase实现/Phase8_P0Provider_API与测试设计.md。
-5. 新增 docs/3-phase实现/Phase8_P0开发任务清单.md。
-6. 建立 Phase 8-P0 文档后，再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
+1. 保持 Phase 1–8 P1 冻结边界。
+2. 以 Phase8_P1冻结记录.md 作为模型 Provider 治理基线。
+3. 后续新增能力进入 Phase 8-P2 或 Phase 10。
+4. 新阶段必须先建立实现规格、API 与测试设计、开发任务清单。
+5. 再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
 ```
 
 ---
@@ -268,11 +273,13 @@ Runtime 主控
 → 受控 Agent
 → RAG EvidenceProvider
 → KG-lite / Graph Evidence
-→ Python AI Provider 前置规划
+→ Python AI Provider / EmbeddingProvider
+→ ModelProvider / JudgeProvider / ProviderCapabilityProfile
 ```
 
-下一步不是直接写 Python 代码，而是进入：
+Phase 8-P1 已冻结归档。下一步不是继续向 P1 堆能力，而是进入：
 
 ```text
-Phase 8-P0：Python AI Provider / EmbeddingProvider MVP 的实现级设计
+Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion
+或 Phase 10：Provider Console / Model Console
 ```
