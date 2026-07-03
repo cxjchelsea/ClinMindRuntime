@@ -1,5 +1,6 @@
 package com.clinmind.runtime.evidence;
 
+import com.clinmind.runtime.provider.ProviderEnhancementSnapshot;
 import java.time.Instant;
 import java.util.List;
 
@@ -17,7 +18,8 @@ public record EvidenceRetrievalResult(
         List<String> warnings,
         String errorCode,
         Instant startedAt,
-        Instant finishedAt
+        Instant finishedAt,
+        ProviderEnhancementSnapshot providerEnhancement
 ) {
     public EvidenceRetrievalResult {
         evidenceCandidates = evidenceCandidates == null ? List.of() : List.copyOf(evidenceCandidates);

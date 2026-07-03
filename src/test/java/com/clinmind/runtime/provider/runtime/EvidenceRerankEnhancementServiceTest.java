@@ -122,6 +122,7 @@ class EvidenceRerankEnhancementServiceTest {
                 List.of(),
                 null,
                 null,
+                null,
                 null);
     }
 }

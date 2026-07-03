@@ -35,7 +35,6 @@ public class EvidenceRetrievalRuntime {
     private final EvidenceCorpusRepository corpusRepository;
     private final EvidenceRetrievalStore retrievalStore;
     private final EvidenceRerankEnhancementService rerankEnhancementService;
-    private ProviderEnhancementSnapshot lastProviderEnhancement;
 
     public EvidenceRetrievalRuntime(
             EvidenceProviderPolicy evidenceProviderPolicy,
@@ -50,12 +49,6 @@ public class EvidenceRetrievalRuntime {
         this.corpusRepository = corpusRepository;
         this.retrievalStore = retrievalStore;
         this.rerankEnhancementService = rerankEnhancementService;
-    }
-
-    public ProviderEnhancementSnapshot consumeLastProviderEnhancement() {
-        ProviderEnhancementSnapshot snapshot = lastProviderEnhancement;
-        lastProviderEnhancement = null;
-        return snapshot;
     }
 
     @TraceStep("EvidenceRetrievalRuntime")
@@ -97,7 +90,8 @@ public class EvidenceRetrievalRuntime {
                     policyDecision.reasons(),
                     "EVIDENCE_POLICY_REJECTED",
                     startedAt,
-                    Instant.now());
+                    Instant.now(),
+                    null);
             return saveAndReturn(result);
         }
 
@@ -105,7 +99,7 @@ public class EvidenceRetrievalRuntime {
             EvidenceRetrievalResult rawResult = ragEvidenceProvider.retrieve(request);
             EvidenceRerankEnhancementService.EnhancementOutcome enhancement =
                     rerankEnhancementService.apply(request, rawResult);
-            lastProviderEnhancement = enhancement.providerEnhancement();
+            ProviderEnhancementSnapshot providerEnhancement = enhancement.providerEnhancement();
 
             List<com.clinmind.runtime.evidence.EvidenceCandidate> candidates = enhancement.candidates();
             EvidenceRetrievalResult enhancedRawResult = new EvidenceRetrievalResult(
@@ -122,7 +116,8 @@ public class EvidenceRetrievalRuntime {
                     mergeWarnings(rawResult.warnings(), enhancement.warnings()),
                     rawResult.errorCode(),
                     rawResult.startedAt(),
-                    rawResult.finishedAt());
+                    rawResult.finishedAt(),
+                    null);
 
             EvidenceValidationResult validationResult = evidenceValidationService.validate(
                     enhancedRawResult.evidenceCandidates(), request);
@@ -159,7 +154,8 @@ public class EvidenceRetrievalRuntime {
                             ? "EVIDENCE_VALIDATION_REJECTED"
                             : null,
                     enhancedRawResult.startedAt(),
-                    Instant.now());
+                    Instant.now(),
+                    providerEnhancement);
             return saveAndReturn(result);
         } catch (RuntimeException ex) {
             EvidenceRetrievalTrace trace = buildTrace(
@@ -184,7 +180,8 @@ public class EvidenceRetrievalRuntime {
                     List.of(ex.getMessage()),
                     "EVIDENCE_RETRIEVAL_FAILED",
                     startedAt,
-                    Instant.now());
+                    Instant.now(),
+                    null);
             return saveAndReturn(result);
         }
     }

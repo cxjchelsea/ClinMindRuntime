@@ -103,7 +103,8 @@ public class RagEvidenceProvider implements EvidenceProvider {
                 List.of(),
                 null,
                 startedAt,
-                Instant.now());
+                Instant.now(),
+                null);
     }
 
     private EvidenceCandidate toCandidate(ScoredChunk scored, EvidenceRetrievalRequest request, EvidenceCorpus corpus) {

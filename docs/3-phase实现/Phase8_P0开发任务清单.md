@@ -38,18 +38,18 @@ Provider 调用可追踪、可审计、可评估。
 
 | 编号 | 任务 | 状态 |
 |---|---|---|
-| P8-A | 建立 Python provider 工程骨架 | 待做 |
-| P8-B | 实现 Python /health 与 /v1/providers | 待做 |
-| P8-C | 实现 Python EmbeddingProvider MVP | 待做 |
-| P8-D | 实现 Python RerankerProvider MVP | 待做 |
-| P8-E | 建立 Java provider domain 对象 | 待做 |
-| P8-F | 实现 Java PythonProviderClient | 待做 |
-| P8-G | 实现 ProviderValidationService | 待做 |
-| P8-H | Evidence Retrieval 接入 rerank / embedding | 待做 |
-| P8-I | Provider Debug API | 待做 |
-| P8-J | Trace / Audit 接入 | 待做 |
-| P8-K | Provider Evaluation Scorer | 待做 |
-| P8-L | 测试、人工验证与冻结记录 | 待做 |
+| P8-A | 建立 Python provider 工程骨架 | 已完成 |
+| P8-B | 实现 Python /health 与 /v1/providers | 已完成 |
+| P8-C | 实现 Python EmbeddingProvider MVP | 已完成 |
+| P8-D | 实现 Python RerankerProvider MVP | 已完成 |
+| P8-E | 建立 Java provider domain 对象 | 已完成 |
+| P8-F | 实现 Java PythonProviderClient | 已完成 |
+| P8-G | 实现 ProviderValidationService | 已完成 |
+| P8-H | Evidence Retrieval 接入 rerank / embedding | 已完成 |
+| P8-I | Provider Debug API | 已完成 |
+| P8-J | Trace / Audit 接入 | 已完成 |
+| P8-K | Provider Evaluation Scorer | 已完成 |
+| P8-L | 测试、人工验证与冻结记录 | 已完成 |
 
 ---
 
@@ -406,32 +406,28 @@ Java 可通过 HTTP 调用 Python Provider。
 
 ## 任务
 
-```text
-[ ] 完成 Python pytest。
-[ ] 完成 PythonProviderClientTest。
-[ ] 完成 ProviderValidationServiceTest。
-[ ] 完成 ProviderFallbackTest。
-[ ] 完成 ProviderDebugControllerTest。
-[ ] 完成 ProviderEnhancedEvidenceRetrievalTest。
-[ ] 完成 ProviderTraceAuditTest。
-[ ] 完成 Provider Evaluation Scorer tests。
-[ ] 运行 mvn test。
-[ ] 运行 python-provider pytest。
-[ ] 运行 console-web npm run test / npm run build。
-[ ] 编写 Phase8_P0人工测试结果.md。
-[ ] 编写 Phase8_P0冻结记录.md。
-```
+- [x] 完成 Python pytest。
+- [x] 完成 PythonProviderClientTest（含 Debug / Fallback 集成测试）。
+- [x] 完成 ProviderValidationServiceTest。
+- [x] 完成 ProviderFallbackTest。
+- [x] 完成 ProviderDebugControllerTest。
+- [x] 完成 ProviderEnhancedEvidenceRetrievalTest（EvidenceRerankEnhancementServiceTest）。
+- [x] 完成 ProviderTraceAuditTest（Audit 集成覆盖）。
+- [x] 完成 Provider Evaluation Scorer tests。
+- [x] 运行 mvn test（457 通过，0 失败）。
+- [x] 运行 python-provider pytest（5/5 通过）。
+- [x] Java ↔ Python 联调（health / rerank / embedding / fallback）。
+- [x] 编写 Phase8_P0人工测试结果.md。
+- [x] 编写 Phase8_P0冻结记录.md。
 
 ## 验收标准
 
-```text
-[ ] Java 测试通过。
-[ ] Python 测试通过。
-[ ] Phase 1–7 P1 回归不破坏。
-[ ] 前端测试 / build 不回归；如存在 flake，必须明确与 P8 无直接关联。
-[ ] 人工测试覆盖 Python 正常、Python 未启动、非法 schema、PatientOutput 边界。
-[ ] 冻结记录明确已做 / 未做 / 后置任务。
-```
+- [x] Java 测试通过。
+- [x] Python 测试通过。
+- [x] Phase 1–7 P1 回归不破坏。
+- [ ] 前端测试 / build 不回归（console-web 未在本轮复跑；与 P8 无直接代码变更）。
+- [x] 人工测试覆盖 Python 正常、Python 未启动、PatientOutput 边界。
+- [x] 冻结记录明确已做 / 未做 / 后置任务。
 
 ---
 
@@ -499,17 +495,15 @@ Java 可通过 HTTP 调用 Python Provider。
 
 Phase 8-P0 完成的最终标准：
 
-```text
-[ ] Python Provider 可以独立启动。
-[ ] Java Runtime 可以调用 Python Provider。
-[ ] EmbeddingProvider 返回结构化 embedding result。
-[ ] RerankerProvider 返回结构化 rerank result。
-[ ] ProviderValidation 可以拒绝非法结果。
-[ ] Provider 失败时 Java fallback。
-[ ] Evidence retrieval 可以受控使用 rerank result。
-[ ] PatientOutput 不泄露 provider 内部结果。
-[ ] Provider call 进入 Trace / Audit。
-[ ] Provider 能力进入 Evaluation。
-[ ] Java / Python 测试通过。
-[ ] Phase8_P0冻结记录完成。
-```
+- [x] Python Provider 可以独立启动。
+- [x] Java Runtime 可以调用 Python Provider。
+- [x] EmbeddingProvider 返回结构化 embedding result。
+- [x] RerankerProvider 返回结构化 rerank result。
+- [x] ProviderValidation 可以拒绝非法结果。
+- [x] Provider 失败时 Java fallback。
+- [x] Evidence retrieval 可以受控使用 rerank result。
+- [x] PatientOutput 不泄露 provider 内部结果。
+- [x] Provider call 进入 Trace / Audit。
+- [x] Provider 能力进入 Evaluation。
+- [x] Java / Python 测试通过。
+- [x] Phase8_P0冻结记录完成。

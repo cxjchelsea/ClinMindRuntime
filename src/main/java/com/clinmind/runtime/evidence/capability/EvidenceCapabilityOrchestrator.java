@@ -44,7 +44,7 @@ public class EvidenceCapabilityOrchestrator {
 
         EvidenceRetrievalRequest request = buildRequest(state, symptomGroup);
         EvidenceRetrievalResult result = evidenceRetrievalRuntime.retrieve(request);
-        state.setProviderEnhancement(evidenceRetrievalRuntime.consumeLastProviderEnhancement());
+        state.setProviderEnhancement(result.providerEnhancement());
         List<com.clinmind.runtime.evidence.EvidenceCandidate> accepted =
                 evidenceRetrievalRuntime.acceptedCandidates(result);
 

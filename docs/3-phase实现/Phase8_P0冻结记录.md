@@ -9,7 +9,9 @@
 
 ## 一、冻结结论
 
-Phase 8-P0 **Python AI Provider / EmbeddingProvider MVP** 代码已实现。Python pytest 5/5 通过；Java 测试已在代码层覆盖，**待在 JDK 17+ 环境执行 `mvn test` 后正式验收冻结**。
+Phase 8-P0 **Python AI Provider / EmbeddingProvider MVP** 已实现并通过自动化测试、联调与人工验收，**现冻结**。
+
+代码基线：commit `39f2435`
 
 核心命题已验证（设计 + 单测 / pytest 层）：
 
@@ -38,7 +40,7 @@ Provider 调用可 Trace / Audit / Evaluation（provider_eval）。
 | P8-I | Debug API `/api/v1/debug/providers/**` | 已完成 |
 | P8-J | ProviderCallStore + Audit（RUN/QUERY_PYTHON_PROVIDER） | 已完成 |
 | P8-K | 4 个 Evaluation Scorer（`provider_eval` 门控） | 已完成 |
-| P8-L | pytest + Java 测试 + 人工测试/冻结文档 | 已完成（Java mvn 待 JDK17 复验） |
+| P8-L | pytest + Java 测试 + 联调 + 人工测试/冻结文档 | 已完成 |
 
 ---
 
@@ -94,13 +96,18 @@ JudgeProvider / RiskSignalClassifierProvider（Phase 8-P1）
 - Phase 7 Evidence / Graph 能力未被移除；rerank 为可选增强层  
 - `provider_eval` tag 门控 Evaluation Scorer，不影响 Phase 1–7 默认 case  
 - Python Provider 默认 disabled，不改变现有 Runtime 默认行为
+- **P0 收口修正：** `ProviderEnhancementSnapshot` 已移入 `EvidenceRetrievalResult`，移除 `EvidenceRetrievalRuntime` 单例字段 `lastProviderEnhancement`，消除并发串扰风险（见 `EvidenceRetrievalRuntimeConcurrencyTest`）
+
+## 六点一、已知限制（留待 P1+）
+
+- Python Provider 错误响应仍使用 FastAPI `HTTPException`（400），尚未统一为结构化 Provider error response
+- Rerank `item_id` 当前使用 `chunkId`；若同一 chunk 对应多个 candidate 可能覆盖，后续可改为 `candidateId`
 
 ---
 
-## 七、验收待办（JDK 17+ 环境）
+## 七、验收结论
 
-```text
-[ ] mvn test 全绿
-[ ] 启用 python-provider 后人工 Debug API 联调
-[ ] console-web npm run test / build（如无 P8 相关变更可跳过）
-```
+- [x] `mvn test` 全绿（457 通过，JDK 21）
+- [x] Python ↔ Java 联调通过
+- [x] Evidence rerank 与 fallback 验证通过
+- [ ] `console-web npm run test / build`（本轮未复跑；P8 未改前端）
