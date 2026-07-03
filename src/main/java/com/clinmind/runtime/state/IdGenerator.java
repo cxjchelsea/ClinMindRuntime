@@ -74,4 +74,20 @@ public final class IdGenerator {
     public static String graphPathId() {
         return "graph_path_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String providerCallId() {
+        return "provider_call_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String providerTraceId() {
+        return "provider_trace_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String providerRequestId() {
+        return "provider_req_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String providerQueryId() {
+        return "provider_query_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

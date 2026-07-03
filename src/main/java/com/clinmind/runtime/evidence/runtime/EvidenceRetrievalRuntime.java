@@ -15,6 +15,8 @@ import com.clinmind.runtime.evidence.validation.EvidenceValidationService;
 import com.clinmind.runtime.agent.ProposalValidationStatus;
 import com.clinmind.runtime.evidence.corpus.EvidenceCorpusRepository;
 import com.clinmind.runtime.state.IdGenerator;
+import com.clinmind.runtime.provider.runtime.EvidenceRerankEnhancementService;
+import com.clinmind.runtime.provider.ProviderEnhancementSnapshot;
 import com.clinmind.runtime.trace.TraceStep;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,18 +34,28 @@ public class EvidenceRetrievalRuntime {
     private final EvidenceValidationService evidenceValidationService;
     private final EvidenceCorpusRepository corpusRepository;
     private final EvidenceRetrievalStore retrievalStore;
+    private final EvidenceRerankEnhancementService rerankEnhancementService;
+    private ProviderEnhancementSnapshot lastProviderEnhancement;
 
     public EvidenceRetrievalRuntime(
             EvidenceProviderPolicy evidenceProviderPolicy,
             RagEvidenceProvider ragEvidenceProvider,
             EvidenceValidationService evidenceValidationService,
             EvidenceCorpusRepository corpusRepository,
-            EvidenceRetrievalStore retrievalStore) {
+            EvidenceRetrievalStore retrievalStore,
+            EvidenceRerankEnhancementService rerankEnhancementService) {
         this.evidenceProviderPolicy = evidenceProviderPolicy;
         this.ragEvidenceProvider = ragEvidenceProvider;
         this.evidenceValidationService = evidenceValidationService;
         this.corpusRepository = corpusRepository;
         this.retrievalStore = retrievalStore;
+        this.rerankEnhancementService = rerankEnhancementService;
+    }
+
+    public ProviderEnhancementSnapshot consumeLastProviderEnhancement() {
+        ProviderEnhancementSnapshot snapshot = lastProviderEnhancement;
+        lastProviderEnhancement = null;
+        return snapshot;
     }
 
     @TraceStep("EvidenceRetrievalRuntime")
@@ -91,9 +103,30 @@ public class EvidenceRetrievalRuntime {
 
         try {
             EvidenceRetrievalResult rawResult = ragEvidenceProvider.retrieve(request);
+            EvidenceRerankEnhancementService.EnhancementOutcome enhancement =
+                    rerankEnhancementService.apply(request, rawResult);
+            lastProviderEnhancement = enhancement.providerEnhancement();
+
+            List<com.clinmind.runtime.evidence.EvidenceCandidate> candidates = enhancement.candidates();
+            EvidenceRetrievalResult enhancedRawResult = new EvidenceRetrievalResult(
+                    rawResult.retrievalId(),
+                    rawResult.requestId(),
+                    rawResult.runtimeId(),
+                    rawResult.providerId(),
+                    rawResult.providerVersion(),
+                    rawResult.evidenceCorpusVersion(),
+                    rawResult.status(),
+                    candidates,
+                    rawResult.validationResult(),
+                    rawResult.queryTrace(),
+                    mergeWarnings(rawResult.warnings(), enhancement.warnings()),
+                    rawResult.errorCode(),
+                    rawResult.startedAt(),
+                    rawResult.finishedAt());
+
             EvidenceValidationResult validationResult = evidenceValidationService.validate(
-                    rawResult.evidenceCandidates(), request);
-            EvidenceRetrievalStatus status = mapValidationStatus(rawResult.status(), validationResult.status());
+                    enhancedRawResult.evidenceCandidates(), request);
+            EvidenceRetrievalStatus status = mapValidationStatus(enhancedRawResult.status(), validationResult.status());
 
             List<String> acceptedIds = validationResult.acceptedCandidateIds();
             List<String> rejectedIds = validationResult.rejectedCandidateIds();
@@ -107,25 +140,25 @@ public class EvidenceRetrievalRuntime {
                     rejectedIds,
                     validationResult.reasons());
 
-            List<String> warnings = new ArrayList<>(rawResult.warnings());
+            List<String> warnings = new ArrayList<>(enhancedRawResult.warnings());
             warnings.addAll(evidenceProviderPolicy.highRiskWarnings(policyContext));
 
             EvidenceRetrievalResult result = new EvidenceRetrievalResult(
-                    rawResult.retrievalId(),
+                    enhancedRawResult.retrievalId(),
                     request.requestId(),
                     request.runtimeId(),
-                    rawResult.providerId(),
-                    rawResult.providerVersion(),
-                    rawResult.evidenceCorpusVersion(),
+                    enhancedRawResult.providerId(),
+                    enhancedRawResult.providerVersion(),
+                    enhancedRawResult.evidenceCorpusVersion(),
                     status,
-                    rawResult.evidenceCandidates(),
+                    enhancedRawResult.evidenceCandidates(),
                     validationResult,
                     trace,
                     warnings,
                     status == EvidenceRetrievalStatus.VALIDATION_REJECTED
                             ? "EVIDENCE_VALIDATION_REJECTED"
                             : null,
-                    rawResult.startedAt(),
+                    enhancedRawResult.startedAt(),
                     Instant.now());
             return saveAndReturn(result);
         } catch (RuntimeException ex) {
@@ -218,5 +251,11 @@ public class EvidenceRetrievalRuntime {
     private EvidenceRetrievalResult saveAndReturn(EvidenceRetrievalResult result) {
         retrievalStore.save(result);
         return result;
+    }
+
+    private List<String> mergeWarnings(List<String> baseWarnings, List<String> extraWarnings) {
+        List<String> merged = new ArrayList<>(baseWarnings);
+        merged.addAll(extraWarnings);
+        return merged;
     }
 }

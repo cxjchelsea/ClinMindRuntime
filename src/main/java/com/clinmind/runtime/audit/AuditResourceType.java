@@ -10,5 +10,6 @@ public enum AuditResourceType {
     AUDIT_LOG,
     AGENT_EXECUTION,
     EVIDENCE_RETRIEVAL,
-    GRAPH_EVIDENCE
+    GRAPH_EVIDENCE,
+    PYTHON_PROVIDER
 }

@@ -3,6 +3,7 @@ package com.clinmind.runtime.state;
 import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
 import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
 import com.clinmind.runtime.evidence.graph.GraphEvidenceSnapshot;
+import com.clinmind.runtime.provider.ProviderEnhancementSnapshot;
 import com.clinmind.runtime.asset.AssetUsedRecord;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class RuntimeState {
     private AgentOrchestrationSnapshot agentOrchestration;
     private EvidenceRetrievalSnapshot evidenceRetrieval;
     private GraphEvidenceSnapshot graphEvidence;
+    private ProviderEnhancementSnapshot providerEnhancement;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -279,6 +281,14 @@ public class RuntimeState {
 
     public void setGraphEvidence(GraphEvidenceSnapshot graphEvidence) {
         this.graphEvidence = graphEvidence;
+    }
+
+    public ProviderEnhancementSnapshot getProviderEnhancement() {
+        return providerEnhancement;
+    }
+
+    public void setProviderEnhancement(ProviderEnhancementSnapshot providerEnhancement) {
+        this.providerEnhancement = providerEnhancement;
     }
 
     public Instant getCreatedAt() {

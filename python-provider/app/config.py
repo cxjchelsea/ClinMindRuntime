@@ -1,0 +1,8 @@
+PROVIDER_ID = "python_ai_provider"
+PROVIDER_VERSION = "0.8.0-p0"
+SCHEMA_VERSION = "0.8.0"
+EMBEDDING_MODEL_ID = "mock_embedding_model"
+EMBEDDING_MODEL_VERSION = "0.1.0"
+EMBEDDING_DIMENSION = 16
+RERANK_MODEL_ID = "mock_reranker_model"
+RERANK_MODEL_VERSION = "0.1.0"
