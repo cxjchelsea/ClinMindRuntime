@@ -1,4 +1,4 @@
-# Phase 8-P2 开发任务清单：ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP
+﻿# Phase 8-P2 开发任务清单：ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP
 
 > 上位实现规格：`docs/3-phase实现/Phase8_P2ModelRegistry与PromptRegistry_实现规格.md`  
 > API 与测试设计：`docs/3-phase实现/Phase8_P2ModelGovernance_API与测试设计.md`  
@@ -40,17 +40,17 @@ prompt 可以被版本化登记；
 
 | 编号 | 任务 | 状态 |
 |---|---|---|
-| P8P2-A | 建立 model governance domain 对象 | 待做 |
-| P8P2-B | 建立 in-memory store / repository | 待做 |
-| P8P2-C | 实现 ModelRegistryPolicy / PromptRegistryPolicy | 待做 |
-| P8P2-D | 实现 TrainingDatasetVersionPolicy | 待做 |
-| P8P2-E | 实现 ModelExperiment / EvaluationReport / ReleasePolicy | 待做 |
-| P8P2-F | 实现 ModelGovernanceService | 待做 |
-| P8P2-G | 实现 Debug / Governance API | 待做 |
-| P8P2-H | Trace / Audit 接入 | 待做 |
-| P8P2-I | Evaluation Scorer 接入 | 待做 |
-| P8P2-J | Candidate Mapping 接入 | 待做 |
-| P8P2-K | 测试、人工验证与冻结记录 | 待做 |
+| P8P2-A | 建立 model governance domain 对象 | 已完成 |
+| P8P2-B | 建立 in-memory store / repository | 已完成 |
+| P8P2-C | 实现 ModelRegistryPolicy / PromptRegistryPolicy | 已完成 |
+| P8P2-D | 实现 TrainingDatasetVersionPolicy | 已完成 |
+| P8P2-E | 实现 ModelExperiment / EvaluationReport / ReleasePolicy | 已完成 |
+| P8P2-F | 实现 ModelGovernanceService | 已完成 |
+| P8P2-G | 实现 Debug / Governance API | 已完成 |
+| P8P2-H | Trace / Audit 接入 | 已完成 |
+| P8P2-I | Evaluation Scorer 接入 | 已完成 |
+| P8P2-J | Candidate Mapping 接入 | 已完成 |
+| P8P2-K | 测试、人工验证与冻结记录 | 已完成 |
 
 ---
 
@@ -74,29 +74,29 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelRegistryEntry。
-[ ] 新增 ModelRegistryStatus。
-[ ] 新增 ModelSource。
-[ ] 新增 PromptRegistryEntry。
-[ ] 新增 PromptRegistryStatus。
-[ ] 新增 TrainingDatasetVersion。
-[ ] 新增 DatasetReviewStatus。
-[ ] 新增 DeidentificationStatus。
-[ ] 新增 ModelExperimentRecord。
-[ ] 新增 ModelExperimentStatus。
-[ ] 新增 ModelEvaluationReport。
-[ ] 新增 ModelReleaseCandidate。
-[ ] 新增 ModelReleaseReviewStatus。
-[ ] 新增 ModelRollbackPlan。
+[x] 新增 ModelRegistryEntry。
+[x] 新增 ModelRegistryStatus。
+[x] 新增 ModelSource。
+[x] 新增 PromptRegistryEntry。
+[x] 新增 PromptRegistryStatus。
+[x] 新增 TrainingDatasetVersion。
+[x] 新增 DatasetReviewStatus。
+[x] 新增 DeidentificationStatus。
+[x] 新增 ModelExperimentRecord。
+[x] 新增 ModelExperimentStatus。
+[x] 新增 ModelEvaluationReport。
+[x] 新增 ModelReleaseCandidate。
+[x] 新增 ModelReleaseReviewStatus。
+[x] 新增 ModelRollbackPlan。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 所有对象包含 id / version / status。
-[ ] 不保存 raw patient dialogue。
-[ ] 不保存完整 prompt 原文。
-[ ] ReleaseCandidate 默认 REVIEW_REQUIRED。
+[x] 所有对象包含 id / version / status。
+[x] 不保存 raw patient dialogue。
+[x] 不保存完整 prompt 原文。
+[x] ReleaseCandidate 默认 REVIEW_REQUIRED。
 ```
 
 ---
@@ -110,22 +110,22 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelRegistryStore。
-[ ] 新增 PromptRegistryStore。
-[ ] 新增 TrainingDatasetVersionStore。
-[ ] 新增 ModelExperimentStore。
-[ ] 新增 ModelEvaluationReportStore。
-[ ] 新增 ModelReleaseCandidateStore。
-[ ] 新增 ModelRollbackPlanStore。
-[ ] 支持 create / findById / findAll。
+[x] 新增 ModelRegistryStore。
+[x] 新增 PromptRegistryStore。
+[x] 新增 TrainingDatasetVersionStore。
+[x] 新增 ModelExperimentStore。
+[x] 新增 ModelEvaluationReportStore。
+[x] 新增 ModelReleaseCandidateStore。
+[x] 新增 ModelRollbackPlanStore。
+[x] 支持 create / findById / findAll。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 所有 store 线程安全或使用 ConcurrentHashMap。
-[ ] 不暴露可变内部集合。
-[ ] 单元测试覆盖 create / find。
+[x] 所有 store 线程安全或使用 ConcurrentHashMap。
+[x] 不暴露可变内部集合。
+[x] 单元测试覆盖 create / find。
 ```
 
 ---
@@ -139,24 +139,24 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelRegistryPolicy。
-[ ] 校验 model_id / model_version。
-[ ] 校验 provider_id / provider_version。
-[ ] 校验 capability_types 非空。
-[ ] 校验 model_source 合法。
-[ ] BLOCKED model 不允许 release。
-[ ] 新增 PromptRegistryPolicy。
-[ ] patient-facing prompt requires_decision_boundary 必须 true。
-[ ] patient-facing prompt forbidden_output_types 不得为空。
-[ ] prompt_template_hash 必须存在。
+[x] 新增 ModelRegistryPolicy。
+[x] 校验 model_id / model_version。
+[x] 校验 provider_id / provider_version。
+[x] 校验 capability_types 非空。
+[x] 校验 model_source 合法。
+[x] BLOCKED model 不允许 release。
+[x] 新增 PromptRegistryPolicy。
+[x] patient-facing prompt requires_decision_boundary 必须 true。
+[x] patient-facing prompt forbidden_output_types 不得为空。
+[x] prompt_template_hash 必须存在。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 缺版本拒绝。
-[ ] unsafe prompt 拒绝。
-[ ] 所有拒绝带 reasons。
+[x] 缺版本拒绝。
+[x] unsafe prompt 拒绝。
+[x] 所有拒绝带 reasons。
 ```
 
 ---
@@ -170,20 +170,20 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 TrainingDatasetVersionPolicy。
-[ ] 未脱敏数据不能 APPROVED_FOR_EXPERIMENT。
-[ ] raw patient dialogue 字段存在时拒绝。
-[ ] source_candidate_ids / source_metric_ids 缺失时降级或拒绝。
-[ ] publish_status 默认 DRAFT。
-[ ] safety_review_status 默认 REVIEW_REQUIRED。
+[x] 新增 TrainingDatasetVersionPolicy。
+[x] 未脱敏数据不能 APPROVED_FOR_EXPERIMENT。
+[x] raw patient dialogue 字段存在时拒绝。
+[x] source_candidate_ids / source_metric_ids 缺失时降级或拒绝。
+[x] publish_status 默认 DRAFT。
+[x] safety_review_status 默认 REVIEW_REQUIRED。
 ```
 
 ## 验收标准
 
 ```text
-[ ] deidentification_status != PASSED 时不能通过。
-[ ] 不允许 auto_publish。
-[ ] 不允许 raw text。
+[x] deidentification_status != PASSED 时不能通过。
+[x] 不允许 auto_publish。
+[x] 不允许 raw text。
 ```
 
 ---
@@ -197,23 +197,23 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelExperimentPolicy。
-[ ] experiment 必须关联 model / prompt / dataset。
-[ ] 新增 ModelEvaluationReportPolicy。
-[ ] report 必须关联 experiment。
-[ ] 有 CRITICAL safety finding 时 recommendation 不能 approve。
-[ ] 新增 ModelReleasePolicy。
-[ ] release candidate 必须关联 evaluation report。
-[ ] release candidate 必须有 rollback plan。
-[ ] auto_publish 永远 false。
+[x] 新增 ModelExperimentPolicy。
+[x] experiment 必须关联 model / prompt / dataset。
+[x] 新增 ModelEvaluationReportPolicy。
+[x] report 必须关联 experiment。
+[x] 有 CRITICAL safety finding 时 recommendation 不能 approve。
+[x] 新增 ModelReleasePolicy。
+[x] release candidate 必须关联 evaluation report。
+[x] release candidate 必须有 rollback plan。
+[x] auto_publish 永远 false。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 缺 evaluation report 拒绝 release。
-[ ] 缺 rollback plan 拒绝 release。
-[ ] 有 critical finding 拒绝 release。
+[x] 缺 evaluation report 拒绝 release。
+[x] 缺 rollback plan 拒绝 release。
+[x] 有 critical finding 拒绝 release。
 ```
 
 ---
@@ -227,24 +227,24 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelGovernanceService。
-[ ] createModelRegistryEntry。
-[ ] createPromptRegistryEntry。
-[ ] createTrainingDatasetVersion。
-[ ] createModelExperimentRecord。
-[ ] createModelEvaluationReport。
-[ ] createModelRollbackPlan。
-[ ] createModelReleaseCandidate。
-[ ] 每个 create 调用对应 policy。
-[ ] policy rejected 时不写入 store。
+[x] 新增 ModelGovernanceService。
+[x] createModelRegistryEntry。
+[x] createPromptRegistryEntry。
+[x] createTrainingDatasetVersion。
+[x] createModelExperimentRecord。
+[x] createModelEvaluationReport。
+[x] createModelRollbackPlan。
+[x] createModelReleaseCandidate。
+[x] 每个 create 调用对应 policy。
+[x] policy rejected 时不写入 store。
 ```
 
 ## 验收标准
 
 ```text
-[ ] Service 不绕过 policy。
-[ ] Service 不触发真实训练。
-[ ] Service 不自动发布。
+[x] Service 不绕过 policy。
+[x] Service 不触发真实训练。
+[x] Service 不自动发布。
 ```
 
 ---
@@ -258,29 +258,29 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelGovernanceDebugController。
-[ ] POST /api/v1/debug/model-governance/models。
-[ ] GET /api/v1/debug/model-governance/models。
-[ ] POST /api/v1/debug/model-governance/prompts。
-[ ] GET /api/v1/debug/model-governance/prompts。
-[ ] POST /api/v1/debug/model-governance/datasets。
-[ ] GET /api/v1/debug/model-governance/datasets。
-[ ] POST /api/v1/debug/model-governance/experiments。
-[ ] GET /api/v1/debug/model-governance/experiments/{id}。
-[ ] POST /api/v1/debug/model-governance/evaluation-reports。
-[ ] POST /api/v1/debug/model-governance/rollback-plans。
-[ ] POST /api/v1/debug/model-governance/release-candidates。
-[ ] 所有响应 Safe DTO。
-[ ] 接入 AccessPolicy。
+[x] 新增 ModelGovernanceDebugController。
+[x] POST /api/v1/debug/model-governance/models。
+[x] GET /api/v1/debug/model-governance/models。
+[x] POST /api/v1/debug/model-governance/prompts。
+[x] GET /api/v1/debug/model-governance/prompts。
+[x] POST /api/v1/debug/model-governance/datasets。
+[x] GET /api/v1/debug/model-governance/datasets。
+[x] POST /api/v1/debug/model-governance/experiments。
+[x] GET /api/v1/debug/model-governance/experiments/{id}。
+[x] POST /api/v1/debug/model-governance/evaluation-reports。
+[x] POST /api/v1/debug/model-governance/rollback-plans。
+[x] POST /api/v1/debug/model-governance/release-candidates。
+[x] 所有响应 Safe DTO。
+[x] 接入 AccessPolicy。
 ```
 
 ## 验收标准
 
 ```text
-[ ] SYSTEM_ADMIN / EVALUATION_REVIEWER 可写。
-[ ] READ_ONLY_OBSERVER 只读。
-[ ] PATIENT 禁止。
-[ ] Safe DTO 不泄露敏感内容。
+[x] SYSTEM_ADMIN / EVALUATION_REVIEWER 可写。
+[x] READ_ONLY_OBSERVER 只读。
+[x] PATIENT 禁止。
+[x] Safe DTO 不泄露敏感内容。
 ```
 
 ---
@@ -294,23 +294,23 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] AuditActionType 新增 CREATE_MODEL_REGISTRY_ENTRY。
-[ ] AuditActionType 新增 CREATE_PROMPT_REGISTRY_ENTRY。
-[ ] AuditActionType 新增 CREATE_TRAINING_DATASET_VERSION。
-[ ] AuditActionType 新增 CREATE_MODEL_EXPERIMENT_RECORD。
-[ ] AuditActionType 新增 CREATE_MODEL_EVALUATION_REPORT。
-[ ] AuditActionType 新增 CREATE_MODEL_RELEASE_CANDIDATE。
-[ ] AuditActionType 新增 CREATE_MODEL_ROLLBACK_PLAN。
-[ ] AuditActionType 新增 MODEL_GOVERNANCE_POLICY_REJECTED。
-[ ] Service 写操作记录 Audit。
+[x] AuditActionType 新增 CREATE_MODEL_REGISTRY_ENTRY。
+[x] AuditActionType 新增 CREATE_PROMPT_REGISTRY_ENTRY。
+[x] AuditActionType 新增 CREATE_TRAINING_DATASET_VERSION。
+[x] AuditActionType 新增 CREATE_MODEL_EXPERIMENT_RECORD。
+[x] AuditActionType 新增 CREATE_MODEL_EVALUATION_REPORT。
+[x] AuditActionType 新增 CREATE_MODEL_RELEASE_CANDIDATE。
+[x] AuditActionType 新增 CREATE_MODEL_ROLLBACK_PLAN。
+[x] AuditActionType 新增 MODEL_GOVERNANCE_POLICY_REJECTED。
+[x] Service 写操作记录 Audit。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 每个写操作有 audit record。
-[ ] policy rejected 有 audit record。
-[ ] audit 不包含 raw text。
+[x] 每个写操作有 audit record。
+[x] policy rejected 有 audit record。
+[x] audit 不包含 raw text。
 ```
 
 ---
@@ -324,23 +324,23 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 新增 ModelRegistryCompletenessScorer。
-[ ] 新增 PromptRegistrySafetyScorer。
-[ ] 新增 TrainingDatasetGovernanceScorer。
-[ ] 新增 ModelExperimentTraceScorer。
-[ ] 新增 ModelReleaseReadinessScorer。
-[ ] 可选 RollbackPlanCompletenessScorer。
-[ ] 支持 model_governance_eval tag。
+[x] 新增 ModelRegistryCompletenessScorer。
+[x] 新增 PromptRegistrySafetyScorer。
+[x] 新增 TrainingDatasetGovernanceScorer。
+[x] 新增 ModelExperimentTraceScorer。
+[x] 新增 ModelReleaseReadinessScorer。
+[x] 可选 RollbackPlanCompletenessScorer。
+[x] 支持 model_governance_eval tag。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 缺 model_version 得分失败。
-[ ] unsafe prompt 得分失败。
-[ ] dataset 未脱敏得分失败。
-[ ] release 缺 rollback plan 得分失败。
-[ ] 默认 case 不受新 scorer 影响。
+[x] 缺 model_version 得分失败。
+[x] unsafe prompt 得分失败。
+[x] dataset 未脱敏得分失败。
+[x] release 缺 rollback plan 得分失败。
+[x] 默认 case 不受新 scorer 影响。
 ```
 
 ---
@@ -354,20 +354,20 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 扩展 CandidateMappingPolicy。
-[ ] model registry failure → governance candidate。
-[ ] prompt safety failure → patient boundary / prompt governance candidate。
-[ ] dataset governance failure → dataset review candidate。
-[ ] release readiness failure → release review candidate。
-[ ] 确保所有 candidate review_required。
+[x] 扩展 CandidateMappingPolicy。
+[x] model registry failure → governance candidate。
+[x] prompt safety failure → patient boundary / prompt governance candidate。
+[x] dataset governance failure → dataset review candidate。
+[x] release readiness failure → release review candidate。
+[x] 确保所有 candidate review_required。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 不自动发布。
-[ ] candidate risk level 合理。
-[ ] CandidateMappingPolicyTest 覆盖。
+[x] 不自动发布。
+[x] candidate risk level 合理。
+[x] CandidateMappingPolicyTest 覆盖。
 ```
 
 ---
@@ -381,27 +381,27 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 ## 任务
 
 ```text
-[ ] 完成 ModelRegistryPolicyTest。
-[ ] 完成 PromptRegistryPolicyTest。
-[ ] 完成 TrainingDatasetVersionPolicyTest。
-[ ] 完成 ModelReleasePolicyTest。
-[ ] 完成 ModelGovernanceDebugControllerTest。
-[ ] 完成 ModelGovernanceScorerTest。
-[ ] 完成 ModelGovernanceCandidateMappingTest。
-[ ] 运行 mvn test。
-[ ] 若修改 python-provider，运行 pytest。
-[ ] 编写 Phase8_P2人工测试结果.md。
-[ ] 编写 Phase8_P2冻结记录.md。
-[ ] 更新 AI_IMPLEMENTATION_SKILL.md 为 Phase 8-P2 已冻结。
+[x] 完成 ModelRegistryPolicyTest。
+[x] 完成 PromptRegistryPolicyTest。
+[x] 完成 TrainingDatasetVersionPolicyTest。
+[x] 完成 ModelReleasePolicyTest。
+[x] 完成 ModelGovernanceDebugControllerTest。
+[x] 完成 ModelGovernanceScorerTest。
+[x] 完成 ModelGovernanceCandidateMappingTest。
+[x] 运行 mvn test。
+[x] 未修改 python-provider，pytest 不适用。
+[x] 编写 Phase8_P2人工测试结果.md。
+[x] 编写 Phase8_P2冻结记录.md。
+[x] 更新 AI_IMPLEMENTATION_SKILL.md 为 Phase 8-P2 已冻结。
 ```
 
 ## 验收标准
 
 ```text
-[ ] Java 测试通过。
-[ ] Phase 1–8 P1 回归不破坏。
-[ ] 人工测试覆盖模型登记、prompt policy、dataset 脱敏、experiment、release candidate、rollback。
-[ ] 冻结记录明确已做 / 未做 / 后置任务。
+[x] Java 测试通过。
+[x] Phase 1–8 P1 回归不破坏。
+[x] 人工测试覆盖模型登记、prompt policy、dataset 脱敏、experiment、release candidate、rollback。
+[x] 冻结记录明确已做 / 未做 / 后置任务。
 ```
 
 ---
@@ -459,17 +459,17 @@ src/main/java/com/clinmind/runtime/modelgov/release/
 Phase 8-P2 完成的最终标准：
 
 ```text
-[ ] ModelRegistryEntry 可创建 / 查询。
-[ ] PromptRegistryEntry 可创建 / 查询。
-[ ] TrainingDatasetVersion 可创建 / 查询。
-[ ] ModelExperimentRecord 可创建 / 查询。
-[ ] ModelEvaluationReport 可创建。
-[ ] ModelReleaseCandidate 可创建但 review-required。
-[ ] RollbackPlan 可创建并被 release candidate 引用。
-[ ] Policy 能拒绝不安全 prompt / 未脱敏 dataset / 缺 rollback release。
-[ ] Evaluation Scorer 可识别治理缺口。
-[ ] Candidate Mapping 可沉淀待审核治理候选。
-[ ] Audit / Trace 可见。
-[ ] Java 测试通过。
-[ ] Phase8_P2冻结记录完成。
+[x] ModelRegistryEntry 可创建 / 查询。
+[x] PromptRegistryEntry 可创建 / 查询。
+[x] TrainingDatasetVersion 可创建 / 查询。
+[x] ModelExperimentRecord 可创建 / 查询。
+[x] ModelEvaluationReport 可创建。
+[x] ModelReleaseCandidate 可创建但 review-required。
+[x] RollbackPlan 可创建并被 release candidate 引用。
+[x] Policy 能拒绝不安全 prompt / 未脱敏 dataset / 缺 rollback release。
+[x] Evaluation Scorer 可识别治理缺口。
+[x] Candidate Mapping 可沉淀待审核治理候选。
+[x] Audit / Trace 可见。
+[x] Java 测试通过。
+[x] Phase8_P2冻结记录完成。
 ```

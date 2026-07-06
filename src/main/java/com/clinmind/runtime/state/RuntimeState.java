@@ -3,6 +3,7 @@ package com.clinmind.runtime.state;
 import com.clinmind.runtime.agent.AgentOrchestrationSnapshot;
 import com.clinmind.runtime.evidence.EvidenceRetrievalSnapshot;
 import com.clinmind.runtime.evidence.graph.GraphEvidenceSnapshot;
+import com.clinmind.runtime.modelgov.ModelGovernanceSnapshot;
 import com.clinmind.runtime.provider.ProviderEnhancementSnapshot;
 import com.clinmind.runtime.provider.ProviderGovernanceSnapshot;
 import com.clinmind.runtime.asset.AssetUsedRecord;
@@ -40,6 +41,7 @@ public class RuntimeState {
     private GraphEvidenceSnapshot graphEvidence;
     private ProviderEnhancementSnapshot providerEnhancement;
     private ProviderGovernanceSnapshot providerGovernance;
+    private ModelGovernanceSnapshot modelGovernance;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -299,6 +301,14 @@ public class RuntimeState {
 
     public void setProviderGovernance(ProviderGovernanceSnapshot providerGovernance) {
         this.providerGovernance = providerGovernance;
+    }
+
+    public ModelGovernanceSnapshot getModelGovernance() {
+        return modelGovernance;
+    }
+
+    public void setModelGovernance(ModelGovernanceSnapshot modelGovernance) {
+        this.modelGovernance = modelGovernance;
     }
 
     public Instant getCreatedAt() {

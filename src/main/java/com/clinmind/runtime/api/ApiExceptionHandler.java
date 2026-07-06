@@ -11,6 +11,7 @@ import com.clinmind.runtime.console.access.AccessDeniedException;
 import com.clinmind.runtime.console.access.ActorContextRequiredException;
 import com.clinmind.runtime.console.access.InvalidDebugRoleException;
 import com.clinmind.runtime.evaluation.EvaluationLoadException;
+import com.clinmind.runtime.modelgov.ModelGovernancePolicyException;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +69,12 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleApiException(ApiException ex) {
         return ResponseEntity.status(ex.getStatus())
                 .body(ApiResponse.fail(new ApiError(ex.getCode(), ex.getMessage())));
+    }
+
+    @ExceptionHandler(ModelGovernancePolicyException.class)
+    public ResponseEntity<ApiResponse<Void>> handleModelGovernancePolicy(ModelGovernancePolicyException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.fail(new ApiError("MODEL_GOVERNANCE_POLICY_REJECTED", ex.getMessage())));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

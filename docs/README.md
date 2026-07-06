@@ -24,12 +24,13 @@ Phase 7-P0：RAG EvidenceProvider MVP 已完成并冻结。
 Phase 7-P1：KG-lite / Graph Evidence 原型已完成并冻结。
 Phase 8-P0：Python AI Provider / EmbeddingProvider MVP 已完成并冻结。
 Phase 8-P1：ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已完成并冻结。
+Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已完成并冻结。
 ```
 
 当前下一阶段建议：
 
 ```text
-Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion（或进入 Phase 10 Provider Console）
+Phase 8-P3：模型治理增强 / Phase 9：Tool 与 MCP 受控接入 / Phase 10：Provider Console
 ```
 
 当前新增专项规划：
@@ -185,6 +186,7 @@ docs/
 | Phase 7-P1 | 已冻结 | `docs/3-phase实现/Phase7_P1*`、`docs/3-phase实现/Phase7_P1冻结记录.md` |
 | Phase 8-P0 | 已冻结 | `docs/3-phase实现/Phase8_P0*`、`docs/3-phase实现/Phase8_P0冻结记录.md` |
 | Phase 8-P1 | 已冻结 | `docs/3-phase实现/Phase8_P1*`、`docs/3-phase实现/Phase8_P1冻结记录.md` |
+| Phase 8-P2 | 已冻结 | `docs/3-phase实现/Phase8_P2*`、`docs/3-phase实现/Phase8_P2冻结记录.md` |
 
 ## 4.5 实现约束组
 
@@ -237,7 +239,7 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 # 六、当前不应做什么
 
 ```text
-1. 不应向 Phase 1–8 P1 已冻结阶段继续堆新能力。
+1. 不应向 Phase 1–8 P2 已冻结阶段继续堆新能力。
 2. 不应让 Python 成为 Runtime 主控。
 3. 不应让 Python Agent 自主循环。
 4. 不应让 Python 直接输出 PatientOutput。
@@ -257,7 +259,7 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 ```text
 1. 保持 Phase 1–8 P1 冻结边界。
 2. 以 Phase8_P1冻结记录.md 作为模型 Provider 治理基线。
-3. 后续新增能力进入 Phase 8-P2 或 Phase 10。
+3. 后续新增能力进入 Phase 8-P3 / Phase 9 / Phase 10。
 4. 新阶段必须先建立实现规格、API 与测试设计、开发任务清单。
 5. 再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
 ```
@@ -275,11 +277,13 @@ Runtime 主控
 → KG-lite / Graph Evidence
 → Python AI Provider / EmbeddingProvider
 → ModelProvider / JudgeProvider / ProviderCapabilityProfile
+→ ModelRegistry / PromptRegistry / TrainingDatasetVersion
 ```
 
-Phase 8-P1 已冻结归档。下一步不是继续向 P1 堆能力，而是进入：
+Phase 8-P2 已冻结归档。下一步不是继续向 P2 堆能力，而是进入：
 
 ```text
-Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion
+Phase 8-P3：模型治理增强
+或 Phase 9：Tool / MCP / Skills 受控接入
 或 Phase 10：Provider Console / Model Console
 ```

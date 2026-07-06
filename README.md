@@ -2,7 +2,7 @@
 
 受控医疗 AI Agent Runtime 与能力治理平台：以 Runtime 为主控，将 Agent / RAG / Model / Tool 作为受控能力单元接入统一主链路，并通过 Evaluation / Candidate / Audit / Governance 形成可追踪、可评估、可回滚的医疗 AI 能力闭环。
 
-当前版本：**Phase 8-P1 已冻结**（Python AI Provider / EmbeddingProvider、ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已完成并归档；Phase 1–7 已落地/冻结）。
+当前版本：**Phase 8-P2 已冻结**（ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已完成并归档；Phase 1–8 P1 已落地/冻结）。
 
 当前总设计：[`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) 已升级为 **v2.2**，项目定位为：
 
@@ -62,8 +62,9 @@ Console 不暴露敏感原文和未脱敏候选输入。
 | Phase 7-P1 | KG-lite / Graph Evidence 原型 | 已冻结 |
 | Phase 8-P0 | Python AI Provider / EmbeddingProvider MVP | 已冻结 |
 | Phase 8-P1 | ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP | 已冻结 |
+| Phase 8-P2 | ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP | 已冻结 |
 
-Phase 8-P1 冻结记录见 [`docs/3-phase实现/Phase8_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。Phase 8-P0 冻结记录见 [`docs/3-phase实现/Phase8_P0冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P0%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。
+Phase 8-P2 冻结记录见 [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。Phase 8-P1 冻结记录见 [`docs/3-phase实现/Phase8_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。
 
 当前尚未完整实现：
 
@@ -72,7 +73,6 @@ Agent Execution Layer
 真实 RAG EvidenceProvider
 KG-lite / GraphRAG Provider
 Python AI Provider
-ModelRegistry / PromptRegistry / TrainingDatasetVersion
 ToolAccessPolicy / MCP Adapter / Skills
 Multi-Agent / Handoffs
 生产级登录 / 多租户 / RBAC
@@ -167,6 +167,8 @@ Content-Type: application/json
 | [`docs/3-phase实现/Phase5冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 5 全阶段冻结依据 |
 | [`docs/3-phase实现/Phase8_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 8-P1 冻结依据 |
 | [`docs/3-phase实现/Phase8_P1人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 8-P1 验收记录 |
+| [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 8-P2 冻结依据 |
+| [`docs/3-phase实现/Phase8_P2人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 8-P2 验收记录 |
 | [`docs/1-总设计/ClinMindRuntime阶段拆分路线图.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E9%98%B6%E6%AE%B5%E6%8B%86%E5%88%86%E8%B7%AF%E7%BA%BF%E5%9B%BE.md) | 阶段路线图：Phase 6/7/8/9/10 长期演进顺序 |
 | [`docs/1-总设计/ClinMindRuntime技术实现总方案.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%80%BB%E6%96%B9%E6%A1%88.md) | 技术实现总方案：统一 Runtime 主链路、Capability Orchestration、AgentExecutionLayer、Runtime Validation |
 
@@ -174,7 +176,7 @@ Content-Type: application/json
 
 ## 当前不做什么
 
-- 不向 Phase 1–8 P1 已冻结阶段继续堆新能力。
+- 不向 Phase 1–8 P2 已冻结阶段继续堆新能力。
 - 不让模型能力接管 Runtime、SafetyGate 或 PatientOutput。
 - 不训练基础大模型 / 不做 RLHF。
 - 不自动修改生产资产包或 CapabilityProfile。
@@ -189,10 +191,11 @@ Content-Type: application/json
 
 ## 下一阶段
 
-**Phase 8-P1 已冻结。** 当前建议下一阶段进入：
+**Phase 8-P2 已冻结。** 当前建议下一阶段进入：
 
 ```text
-Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion
+Phase 8-P3：模型治理增强
+或 Phase 9：Tool / MCP / Skills 受控接入
 或 Phase 10：Provider Console / Model Console
 ```
 
@@ -205,7 +208,7 @@ Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion
 4. 更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md，明确新阶段允许范围和禁止边界。
 ```
 
-不应在未立项的新 Phase 中破坏 Phase 1–8 P1 已冻结的 Runtime 主控、ProviderCapabilityPolicy、ProviderValidation、Safe DTO 与治理边界。
+不应在未立项的新 Phase 中破坏 Phase 1–8 P2 已冻结的 Runtime 主控、ProviderCapabilityPolicy、ProviderValidation、Model Governance、Safe DTO 与治理边界。
 
 ---
 

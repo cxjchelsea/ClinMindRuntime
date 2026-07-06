@@ -90,4 +90,32 @@ public final class IdGenerator {
     public static String providerQueryId() {
         return "provider_query_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String modelRegistryId() {
+        return "model_reg_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String promptRegistryId() {
+        return "prompt_reg_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String datasetVersionId() {
+        return "dataset_ver_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String modelExperimentId() {
+        return "model_exp_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String modelEvaluationReportId() {
+        return "model_report_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String modelReleaseCandidateId() {
+        return "model_release_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String modelRollbackPlanId() {
+        return "rollback_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

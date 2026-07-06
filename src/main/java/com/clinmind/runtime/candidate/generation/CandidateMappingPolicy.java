@@ -16,12 +16,17 @@ import com.clinmind.runtime.evaluation.scorer.DdxCoverageScorer;
 import com.clinmind.runtime.evaluation.scorer.JudgeBoundaryAgreementScorer;
 import com.clinmind.runtime.evaluation.scorer.JudgeTraceCompletenessScorer;
 import com.clinmind.runtime.evaluation.scorer.JudgeViolationDetectionScorer;
+import com.clinmind.runtime.evaluation.scorer.ModelExperimentTraceScorer;
+import com.clinmind.runtime.evaluation.scorer.ModelRegistryCompletenessScorer;
+import com.clinmind.runtime.evaluation.scorer.ModelReleaseReadinessScorer;
 import com.clinmind.runtime.evaluation.scorer.NextActionScorer;
 import com.clinmind.runtime.evaluation.scorer.PatientBoundaryScorer;
+import com.clinmind.runtime.evaluation.scorer.PromptRegistrySafetyScorer;
 import com.clinmind.runtime.evaluation.scorer.ProviderCapabilityProfileScorer;
 import com.clinmind.runtime.evaluation.scorer.RiskClassifierTraceScorer;
 import com.clinmind.runtime.evaluation.scorer.SafetyGateScorer;
 import com.clinmind.runtime.evaluation.scorer.TraceCompletenessScorer;
+import com.clinmind.runtime.evaluation.scorer.TrainingDatasetGovernanceScorer;
 import java.util.Locale;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -63,6 +68,10 @@ public class CandidateMappingPolicy {
             case TraceCompletenessScorer.METRIC_ID, JudgeTraceCompletenessScorer.METRIC_ID,
                     RiskClassifierTraceScorer.METRIC_ID, ProviderCapabilityProfileScorer.METRIC_ID ->
                     Optional.of(ExperienceCandidateType.TRACE_QUALITY_LESSON);
+            case ModelRegistryCompletenessScorer.METRIC_ID, ModelExperimentTraceScorer.METRIC_ID,
+                    TrainingDatasetGovernanceScorer.METRIC_ID, ModelReleaseReadinessScorer.METRIC_ID ->
+                    Optional.of(ExperienceCandidateType.TRACE_QUALITY_LESSON);
+            case PromptRegistrySafetyScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.PATIENT_BOUNDARY_LESSON);
             case AssetVersionTraceScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.ASSET_VERSION_LESSON);
             default -> Optional.empty();
         };
@@ -101,7 +110,10 @@ public class CandidateMappingPolicy {
             case DdxCoverageScorer.METRIC_ID -> Optional.of(TrainingTaskType.DDX_EXPECTATION);
             case NextActionScorer.METRIC_ID -> Optional.of(TrainingTaskType.NEXT_ACTION_EXPECTATION);
             case AssetVersionTraceScorer.METRIC_ID, ProviderCapabilityProfileScorer.METRIC_ID,
-                    JudgeTraceCompletenessScorer.METRIC_ID -> Optional.of(TrainingTaskType.ASSET_TRACE_EXPECTATION);
+                    JudgeTraceCompletenessScorer.METRIC_ID, ModelRegistryCompletenessScorer.METRIC_ID,
+                    ModelExperimentTraceScorer.METRIC_ID, TrainingDatasetGovernanceScorer.METRIC_ID,
+                    ModelReleaseReadinessScorer.METRIC_ID -> Optional.of(TrainingTaskType.ASSET_TRACE_EXPECTATION);
+            case PromptRegistrySafetyScorer.METRIC_ID -> Optional.of(TrainingTaskType.PATIENT_SAFE_REWRITE);
             default -> Optional.empty();
         };
     }
