@@ -1,8 +1,8 @@
-# ClinMindRuntime
+﻿# ClinMindRuntime
 
 受控医疗 AI Agent Runtime 与能力治理平台：以 Runtime 为主控，将 Agent / RAG / Model / Tool 作为受控能力单元接入统一主链路，并通过 Evaluation / Candidate / Audit / Governance 形成可追踪、可评估、可回滚的医疗 AI 能力闭环。
 
-当前版本：**Phase 8-P2 已冻结**（ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已完成并归档；Phase 1–8 P1 已落地/冻结）。
+当前版本：**Phase 9-P0 已冻结**（Tool / MCP / Skills 受控接入 MVP 已完成并归档；Phase 1–9 P0 已落地/冻结）。
 
 当前总设计：[`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) 已升级为 **v2.2**，项目定位为：
 
@@ -26,7 +26,7 @@ ClinMindRuntime 不是普通 RAG 医疗问答，也不是自由自治式医疗 A
 - **Agent 受控执行**：Agent 只能生成 Proposal / Draft / Candidate / Finding，不能直接修改 RuntimeState 或输出最终诊断。
 - **RAG 证据化**：RAG / GraphRAG 只能返回 EvidenceCandidate，进入 EvidenceGraph 后再由 Runtime 判断作用。
 - **Model Provider 化**：模型能力只能作为可评估、可替换、可回滚的 Provider 接入。
-- **Tool / MCP / Skills 最小权限**：外部工具调用必须经过 ToolAccessPolicy 和 Runtime Validation。
+- **Tool / MCP / Skills 最小权限**：外部工具调用必须经过 ToolInvocationPolicy、ToolResultValidationService 和 Runtime Validation。
 - **Evaluation 闭环**：标准病例集 → Runtime 执行 → Scorer 评分 → 聚合报告 → CapabilityProfile 更新建议。
 - **Candidate 治理**：从 Evaluation 暴露的问题中生成可追踪、可审核、不可自动生效的经验候选与训练数据候选。
 - **Persistence / Audit / Console 治理底座**：通过 PostgreSQL、Repository 双实现、AuditLog、Safe DTO 和最小 Console，让治理对象可持久化、可审计、可复盘。
@@ -63,17 +63,16 @@ Console 不暴露敏感原文和未脱敏候选输入。
 | Phase 8-P0 | Python AI Provider / EmbeddingProvider MVP | 已冻结 |
 | Phase 8-P1 | ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP | 已冻结 |
 | Phase 8-P2 | ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP | 已冻结 |
+| Phase 9-P0 | Tool / MCP / Skills 受控接入 MVP | 已冻结 |
 
-Phase 8-P2 冻结记录见 [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。Phase 8-P1 冻结记录见 [`docs/3-phase实现/Phase8_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。
+Phase 9-P0 冻结记录见 [`docs/3-phase实现/Phase9_P0冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase9_P0%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。Phase 8-P2 冻结记录见 [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。
 
 当前尚未完整实现：
 
 ```text
-Agent Execution Layer
-真实 RAG EvidenceProvider
-KG-lite / GraphRAG Provider
-Python AI Provider
-ToolAccessPolicy / MCP Adapter / Skills
+真实远程 MCP Adapter
+Skills 文件系统与 Skill Store
+Tool Console / Skill Console
 Multi-Agent / Handoffs
 生产级登录 / 多租户 / RBAC
 正式医生审核平台
@@ -169,6 +168,8 @@ Content-Type: application/json
 | [`docs/3-phase实现/Phase8_P1人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 8-P1 验收记录 |
 | [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 8-P2 冻结依据 |
 | [`docs/3-phase实现/Phase8_P2人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 8-P2 验收记录 |
+| [`docs/3-phase实现/Phase9_P0冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase9_P0%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 9-P0 冻结依据 |
+| [`docs/3-phase实现/Phase9_P0人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase9_P0%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 9-P0 验收记录 |
 | [`docs/1-总设计/ClinMindRuntime阶段拆分路线图.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E9%98%B6%E6%AE%B5%E6%8B%86%E5%88%86%E8%B7%AF%E7%BA%BF%E5%9B%BE.md) | 阶段路线图：Phase 6/7/8/9/10 长期演进顺序 |
 | [`docs/1-总设计/ClinMindRuntime技术实现总方案.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%80%BB%E6%96%B9%E6%A1%88.md) | 技术实现总方案：统一 Runtime 主链路、Capability Orchestration、AgentExecutionLayer、Runtime Validation |
 
@@ -176,7 +177,7 @@ Content-Type: application/json
 
 ## 当前不做什么
 
-- 不向 Phase 1–8 P2 已冻结阶段继续堆新能力。
+- 不向 Phase 1–9 P0 已冻结阶段继续堆新能力。
 - 不让模型能力接管 Runtime、SafetyGate 或 PatientOutput。
 - 不训练基础大模型 / 不做 RLHF。
 - 不自动修改生产资产包或 CapabilityProfile。
@@ -184,19 +185,19 @@ Content-Type: application/json
 - 不自动把 TrainingExampleCandidate 进入训练集。
 - 不把 Candidate review 当作正式临床审核。
 - 不做正式登录、OAuth、多租户。
-- 不提前做 MCP / LangGraph / 完整 RAG 平台。
+- 不提前接真实远程 MCP、Browser Agent / Computer Use / RPA 或高风险写工具。
 - 不让 Agent / RAG / Model / Tool 绕过 Runtime Validation 和 DecisionBoundary。
 
 ---
 
 ## 下一阶段
 
-**Phase 8-P2 已冻结。** 当前建议下一阶段进入：
+**Phase 9-P0 已冻结。** 当前建议下一阶段进入：
 
 ```text
-Phase 8-P3：模型治理增强
-或 Phase 9：Tool / MCP / Skills 受控接入
-或 Phase 10：Provider Console / Model Console
+Phase 9-P1：真实 MCP adapter 设计
+或 Phase 9-P2：Skills 文件系统与 Skill Store
+或 Phase 10：Tool Console / Skill Console / Provider Console
 ```
 
 进入下一阶段前，应先完成：
@@ -208,7 +209,7 @@ Phase 8-P3：模型治理增强
 4. 更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md，明确新阶段允许范围和禁止边界。
 ```
 
-不应在未立项的新 Phase 中破坏 Phase 1–8 P2 已冻结的 Runtime 主控、ProviderCapabilityPolicy、ProviderValidation、Model Governance、Safe DTO 与治理边界。
+不应在未立项的新 Phase 中破坏 Phase 1–9 P0 已冻结的 Runtime 主控、ProviderCapabilityPolicy、ProviderValidation、Model Governance、Tool Governance、Safe DTO 与治理边界。
 
 ---
 

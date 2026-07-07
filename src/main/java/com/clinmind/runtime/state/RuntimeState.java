@@ -7,6 +7,7 @@ import com.clinmind.runtime.modelgov.ModelGovernanceSnapshot;
 import com.clinmind.runtime.provider.ProviderEnhancementSnapshot;
 import com.clinmind.runtime.provider.ProviderGovernanceSnapshot;
 import com.clinmind.runtime.asset.AssetUsedRecord;
+import com.clinmind.runtime.toolgov.ToolGovernanceSnapshot;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class RuntimeState {
     private ProviderEnhancementSnapshot providerEnhancement;
     private ProviderGovernanceSnapshot providerGovernance;
     private ModelGovernanceSnapshot modelGovernance;
+    private ToolGovernanceSnapshot toolGovernance;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -309,6 +311,14 @@ public class RuntimeState {
 
     public void setModelGovernance(ModelGovernanceSnapshot modelGovernance) {
         this.modelGovernance = modelGovernance;
+    }
+
+    public ToolGovernanceSnapshot getToolGovernance() {
+        return toolGovernance;
+    }
+
+    public void setToolGovernance(ToolGovernanceSnapshot toolGovernance) {
+        this.toolGovernance = toolGovernance;
     }
 
     public Instant getCreatedAt() {

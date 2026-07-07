@@ -1,8 +1,8 @@
-# Phase 9-P0 开发任务清单：Tool / MCP / Skills 受控接入 MVP
+﻿# Phase 9-P0 开发任务清单：Tool / MCP / Skills 受控接入 MVP
 
-> 上位实现规格：`docs/3-phase实现/Phase9_P0Tool_MCP_Skills受控接入_实现规格.md`  
-> API 与测试设计：`docs/3-phase实现/Phase9_P0Tool_MCP_Skills_API与测试设计.md`  
-> 前置冻结：`docs/3-phase实现/Phase8_P2冻结记录.md`  
+> 上位实现规格：`docs/3-phase实现/Phase9_P0Tool_MCP_Skills受控接入_实现规格.md`
+> API 与测试设计：`docs/3-phase实现/Phase9_P0Tool_MCP_Skills_API与测试设计.md`
+> 前置冻结：`docs/3-phase实现/Phase8_P2冻结记录.md`
 > 当前目标：建立外部能力治理域的最小闭环，但不接真实第三方医疗系统、不做真实高风险写操作、不让 Tool / MCP / Skills 接管 Runtime。
 
 ---
@@ -39,18 +39,18 @@ Tool / MCP / Skills 可以被登记、授权、调用、校验、降级、追踪
 
 | 编号 | 任务 | 状态 |
 |---|---|---|
-| P9P0-A | 建立 tool governance domain 对象 | 待做 |
-| P9P0-B | 建立 in-memory store / registry | 待做 |
-| P9P0-C | 实现 Tool / MCP / Skill Registry Policy | 待做 |
-| P9P0-D | 实现 ToolInvocationPolicy | 待做 |
-| P9P0-E | 实现 mock/local adapters | 待做 |
-| P9P0-F | 实现 ToolInvocationRuntime | 待做 |
-| P9P0-G | 实现 ToolResultValidationService | 待做 |
-| P9P0-H | 实现 Debug / Governance API | 待做 |
-| P9P0-I | Trace / Audit 接入 | 待做 |
-| P9P0-J | Evaluation Scorer 接入 | 待做 |
-| P9P0-K | Candidate Mapping 接入 | 待做 |
-| P9P0-L | 测试、人工验证与冻结记录 | 待做 |
+| P9P0-A | 建立 tool governance domain 对象 | 已完成 |
+| P9P0-B | 建立 in-memory store / registry | 已完成 |
+| P9P0-C | 实现 Tool / MCP / Skill Registry Policy | 已完成 |
+| P9P0-D | 实现 ToolInvocationPolicy | 已完成 |
+| P9P0-E | 实现 mock/local adapters | 已完成 |
+| P9P0-F | 实现 ToolInvocationRuntime | 已完成 |
+| P9P0-G | 实现 ToolResultValidationService | 已完成 |
+| P9P0-H | 实现 Debug / Governance API | 已完成 |
+| P9P0-I | Trace / Audit 接入 | 已完成 |
+| P9P0-J | Evaluation Scorer 接入 | 已完成 |
+| P9P0-K | Candidate Mapping 接入 | 已完成 |
+| P9P0-L | 测试、人工验证与冻结记录 | 已完成 |
 
 ---
 
@@ -74,29 +74,29 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolRegistryEntry。
-[ ] 新增 ToolRegistryStatus。
-[ ] 新增 ToolType。
-[ ] 新增 ToolSideEffectLevel。
-[ ] 新增 McpServerRegistryEntry。
-[ ] 新增 McpServerType。
-[ ] 新增 SkillRegistryEntry。
-[ ] 新增 SkillType。
-[ ] 新增 ToolInvocationRequest。
-[ ] 新增 ToolInvocationResult。
-[ ] 新增 ToolInvocationStatus。
-[ ] 新增 ToolResultType。
-[ ] 新增 ToolGovernanceSnapshot。
-[ ] 新增 ToolValidationResult。
+[x] 新增 ToolRegistryEntry。
+[x] 新增 ToolRegistryStatus。
+[x] 新增 ToolType。
+[x] 新增 ToolSideEffectLevel。
+[x] 新增 McpServerRegistryEntry。
+[x] 新增 McpServerType。
+[x] 新增 SkillRegistryEntry。
+[x] 新增 SkillType。
+[x] 新增 ToolInvocationRequest。
+[x] 新增 ToolInvocationResult。
+[x] 新增 ToolInvocationStatus。
+[x] 新增 ToolResultType。
+[x] 新增 ToolGovernanceSnapshot。
+[x] 新增 ToolValidationResult。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 所有 registry 对象包含 id / version / status。
-[ ] Invocation 对象包含 invocation_id / runtime_id / use_case / schema_version。
-[ ] 不包含 raw patient dialogue。
-[ ] 不包含 secret / executable script。
+[x] 所有 registry 对象包含 id / version / status。
+[x] Invocation 对象包含 invocation_id / runtime_id / use_case / schema_version。
+[x] 不包含 raw patient dialogue。
+[x] 不包含 secret / executable script。
 ```
 
 ---
@@ -110,19 +110,19 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolRegistryStore。
-[ ] 新增 McpServerRegistryStore。
-[ ] 新增 SkillRegistryStore。
-[ ] 新增 ToolInvocationStore。
-[ ] 使用 ConcurrentHashMap。
-[ ] 支持 create / findById / findAll。
+[x] 新增 ToolRegistryStore。
+[x] 新增 McpServerRegistryStore。
+[x] 新增 SkillRegistryStore。
+[x] 新增 ToolInvocationStore。
+[x] 使用 ConcurrentHashMap。
+[x] 支持 create / findById / findAll。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 不暴露可变内部集合。
-[ ] 单元测试覆盖 save / find。
+[x] 不暴露可变内部集合。
+[x] 单元测试覆盖 save / find。
 ```
 
 ---
@@ -136,23 +136,23 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolRegistryPolicy。
-[ ] 校验 tool_id / tool_version / allowed_use_cases。
-[ ] side_effect_level=EXTERNAL_WRITE / HIGH_RISK_WRITE 在 P0 拒绝。
-[ ] patient_output_allowed=true 且 requires_validation=false 拒绝。
-[ ] 新增 McpServerRegistryPolicy。
-[ ] P0 只允许 MOCK / LOCAL server。
-[ ] 新增 SkillRegistryPolicy。
-[ ] 校验 input / output contract version。
-[ ] patient_direct_answer forbidden。
+[x] 新增 ToolRegistryPolicy。
+[x] 校验 tool_id / tool_version / allowed_use_cases。
+[x] side_effect_level=EXTERNAL_WRITE / HIGH_RISK_WRITE 在 P0 拒绝。
+[x] patient_output_allowed=true 且 requires_validation=false 拒绝。
+[x] 新增 McpServerRegistryPolicy。
+[x] P0 只允许 MOCK / LOCAL server。
+[x] 新增 SkillRegistryPolicy。
+[x] 校验 input / output contract version。
+[x] patient_direct_answer forbidden。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 高风险写能力不能登记为可调用。
-[ ] 远程 MCP server P0 拒绝。
-[ ] 所有拒绝带 reasons。
+[x] 高风险写能力不能登记为可调用。
+[x] 远程 MCP server P0 拒绝。
+[x] 所有拒绝带 reasons。
 ```
 
 ---
@@ -166,22 +166,22 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolInvocationPolicy。
-[ ] 未登记 tool 拒绝。
-[ ] disabled tool SKIPPED。
-[ ] forbidden use_case 拒绝。
-[ ] patient_direct_answer 拒绝。
-[ ] side_effect_level=EXTERNAL_WRITE / HIGH_RISK_WRITE 拒绝。
-[ ] schema_version mismatch 拒绝或降级。
+[x] 新增 ToolInvocationPolicy。
+[x] 未登记 tool 拒绝。
+[x] disabled tool SKIPPED。
+[x] forbidden use_case 拒绝。
+[x] patient_direct_answer 拒绝。
+[x] side_effect_level=EXTERNAL_WRITE / HIGH_RISK_WRITE 拒绝。
+[x] schema_version mismatch 拒绝或降级。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 合法 READ_ONLY tool 允许。
-[ ] patient_direct_answer 一律拒绝。
-[ ] high-risk write 一律拒绝。
-[ ] policy rejected 不执行 adapter。
+[x] 合法 READ_ONLY tool 允许。
+[x] patient_direct_answer 一律拒绝。
+[x] high-risk write 一律拒绝。
+[x] policy rejected 不执行 adapter。
 ```
 
 ---
@@ -195,22 +195,22 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolAdapter 接口。
-[ ] 新增 MockGuidelineLookupToolAdapter。
-[ ] 新增 LocalClinicalCalculatorToolAdapter。
-[ ] 新增 MockSkillSummarizerAdapter。
-[ ] adapter 只返回 structured_result。
-[ ] adapter 不返回 PatientOutput。
-[ ] adapter 不返回 final diagnosis / treatment instruction。
+[x] 新增 ToolAdapter 接口。
+[x] 新增 MockGuidelineLookupToolAdapter。
+[x] 新增 LocalClinicalCalculatorToolAdapter。
+[x] 新增 MockSkillSummarizerAdapter。
+[x] adapter 只返回 structured_result。
+[x] adapter 不返回 PatientOutput。
+[x] adapter 不返回 final diagnosis / treatment instruction。
 ```
 
 ## 验收标准
 
 ```text
-[ ] MockGuidelineLookupTool 返回 ExternalContext。
-[ ] LocalClinicalCalculatorTool 返回 ToolResult。
-[ ] MockSkillSummarizer 返回 SkillResult。
-[ ] adapter failure 可被 runtime fallback。
+[x] MockGuidelineLookupTool 返回 ExternalContext。
+[x] LocalClinicalCalculatorTool 返回 ToolResult。
+[x] MockSkillSummarizer 返回 SkillResult。
+[x] adapter failure 可被 runtime fallback。
 ```
 
 ---
@@ -224,21 +224,21 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolInvocationRuntime。
-[ ] 根据 tool_type / capability_type 选择 adapter。
-[ ] 执行前调用 ToolInvocationPolicy。
-[ ] 执行失败时返回 fallback result。
-[ ] 保存 ToolInvocationResult。
-[ ] 生成 ToolGovernanceSnapshot。
+[x] 新增 ToolInvocationRuntime。
+[x] 根据 tool_type / capability_type 选择 adapter。
+[x] 执行前调用 ToolInvocationPolicy。
+[x] 执行失败时返回 fallback result。
+[x] 保存 ToolInvocationResult。
+[x] 生成 ToolGovernanceSnapshot。
 ```
 
 ## 验收标准
 
 ```text
-[ ] policy rejected 时不执行 adapter。
-[ ] adapter exception 时 fallback。
-[ ] fallback 不阻断 Runtime 主链路。
-[ ] invocation store 可查询。
+[x] policy rejected 时不执行 adapter。
+[x] adapter exception 时 fallback。
+[x] fallback 不阻断 Runtime 主链路。
+[x] invocation store 可查询。
 ```
 
 ---
@@ -252,21 +252,21 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolResultValidationService。
-[ ] 校验 result_type。
-[ ] 校验 schema_version。
-[ ] 拒绝 PatientOutput 字段。
-[ ] 拒绝 final diagnosis 表达。
-[ ] 拒绝 treatment instruction 表达。
-[ ] 拒绝 raw external response / secret / script。
+[x] 新增 ToolResultValidationService。
+[x] 校验 result_type。
+[x] 校验 schema_version。
+[x] 拒绝 PatientOutput 字段。
+[x] 拒绝 final diagnosis 表达。
+[x] 拒绝 treatment instruction 表达。
+[x] 拒绝 raw external response / secret / script。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 合法 structured_result ACCEPTED。
-[ ] 越界结果 REJECTED。
-[ ] validation rejected 不进入 Runtime 采纳。
+[x] 合法 structured_result ACCEPTED。
+[x] 越界结果 REJECTED。
+[x] validation rejected 不进入 Runtime 采纳。
 ```
 
 ---
@@ -280,27 +280,27 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolGovernanceDebugController。
-[ ] POST /api/v1/debug/tool-governance/tools。
-[ ] GET /api/v1/debug/tool-governance/tools。
-[ ] GET /api/v1/debug/tool-governance/tools/{tool_registry_id}。
-[ ] POST /api/v1/debug/tool-governance/mcp-servers。
-[ ] GET /api/v1/debug/tool-governance/mcp-servers。
-[ ] POST /api/v1/debug/tool-governance/skills。
-[ ] GET /api/v1/debug/tool-governance/skills。
-[ ] POST /api/v1/debug/tool-governance/invocations/run。
-[ ] GET /api/v1/debug/tool-governance/invocations/{invocation_id}。
-[ ] 所有响应 Safe DTO。
-[ ] 接入 AccessPolicy。
+[x] 新增 ToolGovernanceDebugController。
+[x] POST /api/v1/debug/tool-governance/tools。
+[x] GET /api/v1/debug/tool-governance/tools。
+[x] GET /api/v1/debug/tool-governance/tools/{tool_registry_id}。
+[x] POST /api/v1/debug/tool-governance/mcp-servers。
+[x] GET /api/v1/debug/tool-governance/mcp-servers。
+[x] POST /api/v1/debug/tool-governance/skills。
+[x] GET /api/v1/debug/tool-governance/skills。
+[x] POST /api/v1/debug/tool-governance/invocations/run。
+[x] GET /api/v1/debug/tool-governance/invocations/{invocation_id}。
+[x] 所有响应 Safe DTO。
+[x] 接入 AccessPolicy。
 ```
 
 ## 验收标准
 
 ```text
-[ ] SYSTEM_ADMIN / EVALUATION_REVIEWER 可写和 run。
-[ ] READ_ONLY_OBSERVER 只读。
-[ ] PATIENT 禁止。
-[ ] Safe DTO 不泄露敏感内容。
+[x] SYSTEM_ADMIN / EVALUATION_REVIEWER 可写和 run。
+[x] READ_ONLY_OBSERVER 只读。
+[x] PATIENT 禁止。
+[x] Safe DTO 不泄露敏感内容。
 ```
 
 ---
@@ -314,23 +314,23 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] AuditActionType 新增 CREATE_TOOL_REGISTRY_ENTRY。
-[ ] AuditActionType 新增 CREATE_MCP_SERVER_REGISTRY_ENTRY。
-[ ] AuditActionType 新增 CREATE_SKILL_REGISTRY_ENTRY。
-[ ] AuditActionType 新增 RUN_TOOL_INVOCATION。
-[ ] AuditActionType 新增 TOOL_INVOCATION_POLICY_REJECTED。
-[ ] AuditActionType 新增 TOOL_RESULT_VALIDATION_REJECTED。
-[ ] AuditResourceType 新增 TOOL_GOVERNANCE / TOOL_INVOCATION。
-[ ] Service / Runtime 写操作记录 Audit。
+[x] AuditActionType 新增 CREATE_TOOL_REGISTRY_ENTRY。
+[x] AuditActionType 新增 CREATE_MCP_SERVER_REGISTRY_ENTRY。
+[x] AuditActionType 新增 CREATE_SKILL_REGISTRY_ENTRY。
+[x] AuditActionType 新增 RUN_TOOL_INVOCATION。
+[x] AuditActionType 新增 TOOL_INVOCATION_POLICY_REJECTED。
+[x] AuditActionType 新增 TOOL_RESULT_VALIDATION_REJECTED。
+[x] AuditResourceType 新增 TOOL_GOVERNANCE / TOOL_INVOCATION。
+[x] Service / Runtime 写操作记录 Audit。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 每次 create / run 有 audit record。
-[ ] policy rejected 有 audit record。
-[ ] validation rejected 有 audit record。
-[ ] audit 不包含 raw text / secret。
+[x] 每次 create / run 有 audit record。
+[x] policy rejected 有 audit record。
+[x] validation rejected 有 audit record。
+[x] audit 不包含 raw text / secret。
 ```
 
 ---
@@ -344,22 +344,22 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 新增 ToolRegistryCompletenessScorer。
-[ ] 新增 ToolInvocationTraceScorer。
-[ ] 新增 ToolResultBoundaryScorer。
-[ ] 新增 ToolSideEffectPolicyScorer。
-[ ] 新增 ToolFallbackSafetyScorer。
-[ ] 支持 tool_governance_eval / tool_invocation_eval tag。
+[x] 新增 ToolRegistryCompletenessScorer。
+[x] 新增 ToolInvocationTraceScorer。
+[x] 新增 ToolResultBoundaryScorer。
+[x] 新增 ToolSideEffectPolicyScorer。
+[x] 新增 ToolFallbackSafetyScorer。
+[x] 支持 tool_governance_eval / tool_invocation_eval tag。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 缺 tool version 得分失败。
-[ ] invocation 缺 trace 得分失败。
-[ ] result 边界泄露得分失败。
-[ ] high-risk side effect 被允许时得分失败。
-[ ] fallback 缺记录得分失败。
+[x] 缺 tool version 得分失败。
+[x] invocation 缺 trace 得分失败。
+[x] result 边界泄露得分失败。
+[x] high-risk side effect 被允许时得分失败。
+[x] fallback 缺记录得分失败。
 ```
 
 ---
@@ -373,20 +373,20 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 扩展 CandidateMappingPolicy。
-[ ] tool registry failure → governance candidate。
-[ ] tool boundary failure → patient boundary candidate。
-[ ] side effect policy failure → safety governance candidate。
-[ ] fallback trace failure → trace quality candidate。
-[ ] 确保所有 candidate review-required。
+[x] 扩展 CandidateMappingPolicy。
+[x] tool registry failure → governance candidate。
+[x] tool boundary failure → patient boundary candidate。
+[x] side effect policy failure → safety governance candidate。
+[x] fallback trace failure → trace quality candidate。
+[x] 确保所有 candidate review-required。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 不自动发布 ToolRegistryEntry / ToolPolicy。
-[ ] candidate risk level 合理。
-[ ] ToolGovernanceCandidateMappingTest 覆盖。
+[x] 不自动发布 ToolRegistryEntry / ToolPolicy。
+[x] candidate risk level 合理。
+[x] ToolGovernanceCandidateMappingTest 覆盖。
 ```
 
 ---
@@ -400,28 +400,28 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 ## 任务
 
 ```text
-[ ] 完成 ToolRegistryPolicyTest。
-[ ] 完成 McpServerRegistryPolicyTest。
-[ ] 完成 SkillRegistryPolicyTest。
-[ ] 完成 ToolInvocationPolicyTest。
-[ ] 完成 ToolResultValidationServiceTest。
-[ ] 完成 ToolInvocationRuntimeTest。
-[ ] 完成 ToolGovernanceDebugControllerTest。
-[ ] 完成 ToolGovernanceScorerTest。
-[ ] 完成 ToolGovernanceCandidateMappingTest。
-[ ] 运行 mvn test。
-[ ] 编写 Phase9_P0人工测试结果.md。
-[ ] 编写 Phase9_P0冻结记录.md。
-[ ] 更新 AI_IMPLEMENTATION_SKILL.md 为 Phase 9-P0 已冻结。
+[x] 完成 ToolRegistryPolicyTest。
+[x] 完成 McpServerRegistryPolicyTest。
+[x] 完成 SkillRegistryPolicyTest。
+[x] 完成 ToolInvocationPolicyTest。
+[x] 完成 ToolResultValidationServiceTest。
+[x] 完成 ToolInvocationRuntimeTest。
+[x] 完成 ToolGovernanceDebugControllerTest。
+[x] 完成 ToolGovernanceScorerTest。
+[x] 完成 ToolGovernanceCandidateMappingTest。
+[x] 运行 mvn test。
+[x] 编写 Phase9_P0人工测试结果.md。
+[x] 编写 Phase9_P0冻结记录.md。
+[x] 更新 AI_IMPLEMENTATION_SKILL.md 为 Phase 9-P0 已冻结。
 ```
 
 ## 验收标准
 
 ```text
-[ ] Java 测试通过。
-[ ] Phase 1–8 P2 回归不破坏。
-[ ] 人工测试覆盖工具登记、高风险工具拒绝、mock tool 调用、patient_direct_answer 拒绝、fallback。
-[ ] 冻结记录明确已做 / 未做 / 后置任务。
+[x] Java 测试通过。
+[x] Phase 1–8 P2 回归不破坏。
+[x] 人工测试覆盖工具登记、高风险工具拒绝、mock tool 调用、patient_direct_answer 拒绝、fallback。
+[x] 冻结记录明确已做 / 未做 / 后置任务。
 ```
 
 ---
@@ -482,17 +482,17 @@ src/main/java/com/clinmind/runtime/toolgov/api/
 Phase 9-P0 完成的最终标准：
 
 ```text
-[ ] ToolRegistryEntry 可创建 / 查询。
-[ ] McpServerRegistryEntry 可创建 / 查询。
-[ ] SkillRegistryEntry 可创建 / 查询。
-[ ] ToolInvocation 可运行 mock/local adapter。
-[ ] ToolInvocationPolicy 可拒绝 forbidden / patient_direct_answer / high-risk write。
-[ ] ToolResultValidationService 可拒绝越界结果。
-[ ] ToolGovernanceSnapshot 可追踪。
-[ ] Debug API 可用。
-[ ] Audit / Trace 可见。
-[ ] Evaluation Scorer 可识别工具治理缺口。
-[ ] Candidate Mapping 可沉淀待审核治理候选。
-[ ] Java 测试通过。
-[ ] Phase9_P0冻结记录完成。
+[x] ToolRegistryEntry 可创建 / 查询。
+[x] McpServerRegistryEntry 可创建 / 查询。
+[x] SkillRegistryEntry 可创建 / 查询。
+[x] ToolInvocation 可运行 mock/local adapter。
+[x] ToolInvocationPolicy 可拒绝 forbidden / patient_direct_answer / high-risk write。
+[x] ToolResultValidationService 可拒绝越界结果。
+[x] ToolGovernanceSnapshot 可追踪。
+[x] Debug API 可用。
+[x] Audit / Trace 可见。
+[x] Evaluation Scorer 可识别工具治理缺口。
+[x] Candidate Mapping 可沉淀待审核治理候选。
+[x] Java 测试通过。
+[x] Phase9_P0冻结记录完成。
 ```

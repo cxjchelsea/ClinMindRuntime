@@ -13,6 +13,7 @@ import com.clinmind.runtime.console.access.InvalidDebugRoleException;
 import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.modelgov.ModelGovernancePolicyException;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
+import com.clinmind.runtime.toolgov.ToolGovernancePolicyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -75,6 +76,12 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleModelGovernancePolicy(ModelGovernancePolicyException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.fail(new ApiError("MODEL_GOVERNANCE_POLICY_REJECTED", ex.getMessage())));
+    }
+
+    @ExceptionHandler(ToolGovernancePolicyException.class)
+    public ResponseEntity<ApiResponse<Void>> handleToolGovernancePolicy(ToolGovernancePolicyException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.fail(new ApiError("TOOL_GOVERNANCE_POLICY_REJECTED", ex.getMessage())));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

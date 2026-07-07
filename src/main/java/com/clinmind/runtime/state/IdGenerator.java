@@ -118,4 +118,20 @@ public final class IdGenerator {
     public static String modelRollbackPlanId() {
         return "rollback_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
+
+    public static String toolRegistryId() {
+        return "tool_reg_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String mcpServerRegistryId() {
+        return "mcp_reg_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String skillRegistryId() {
+        return "skill_reg_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    public static String toolInvocationId() {
+        return "tool_inv_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
 }

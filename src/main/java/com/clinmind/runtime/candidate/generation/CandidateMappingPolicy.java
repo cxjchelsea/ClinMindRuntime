@@ -27,6 +27,11 @@ import com.clinmind.runtime.evaluation.scorer.RiskClassifierTraceScorer;
 import com.clinmind.runtime.evaluation.scorer.SafetyGateScorer;
 import com.clinmind.runtime.evaluation.scorer.TraceCompletenessScorer;
 import com.clinmind.runtime.evaluation.scorer.TrainingDatasetGovernanceScorer;
+import com.clinmind.runtime.evaluation.scorer.ToolFallbackSafetyScorer;
+import com.clinmind.runtime.evaluation.scorer.ToolInvocationTraceScorer;
+import com.clinmind.runtime.evaluation.scorer.ToolRegistryCompletenessScorer;
+import com.clinmind.runtime.evaluation.scorer.ToolResultBoundaryScorer;
+import com.clinmind.runtime.evaluation.scorer.ToolSideEffectPolicyScorer;
 import java.util.Locale;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -71,6 +76,10 @@ public class CandidateMappingPolicy {
             case ModelRegistryCompletenessScorer.METRIC_ID, ModelExperimentTraceScorer.METRIC_ID,
                     TrainingDatasetGovernanceScorer.METRIC_ID, ModelReleaseReadinessScorer.METRIC_ID ->
                     Optional.of(ExperienceCandidateType.TRACE_QUALITY_LESSON);
+            case ToolRegistryCompletenessScorer.METRIC_ID, ToolInvocationTraceScorer.METRIC_ID,
+                    ToolFallbackSafetyScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.TRACE_QUALITY_LESSON);
+            case ToolResultBoundaryScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.PATIENT_BOUNDARY_LESSON);
+            case ToolSideEffectPolicyScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.SAFETY_LESSON);
             case PromptRegistrySafetyScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.PATIENT_BOUNDARY_LESSON);
             case AssetVersionTraceScorer.METRIC_ID -> Optional.of(ExperienceCandidateType.ASSET_VERSION_LESSON);
             default -> Optional.empty();
@@ -112,8 +121,12 @@ public class CandidateMappingPolicy {
             case AssetVersionTraceScorer.METRIC_ID, ProviderCapabilityProfileScorer.METRIC_ID,
                     JudgeTraceCompletenessScorer.METRIC_ID, ModelRegistryCompletenessScorer.METRIC_ID,
                     ModelExperimentTraceScorer.METRIC_ID, TrainingDatasetGovernanceScorer.METRIC_ID,
-                    ModelReleaseReadinessScorer.METRIC_ID -> Optional.of(TrainingTaskType.ASSET_TRACE_EXPECTATION);
-            case PromptRegistrySafetyScorer.METRIC_ID -> Optional.of(TrainingTaskType.PATIENT_SAFE_REWRITE);
+                    ModelReleaseReadinessScorer.METRIC_ID, ToolRegistryCompletenessScorer.METRIC_ID,
+                    ToolInvocationTraceScorer.METRIC_ID, ToolFallbackSafetyScorer.METRIC_ID ->
+                    Optional.of(TrainingTaskType.ASSET_TRACE_EXPECTATION);
+            case PromptRegistrySafetyScorer.METRIC_ID, ToolResultBoundaryScorer.METRIC_ID ->
+                    Optional.of(TrainingTaskType.PATIENT_SAFE_REWRITE);
+            case ToolSideEffectPolicyScorer.METRIC_ID -> Optional.of(TrainingTaskType.RISK_SIGNAL_CLASSIFICATION);
             default -> Optional.empty();
         };
     }

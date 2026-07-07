@@ -1,7 +1,7 @@
-# ClinMindRuntime 文档导航
+﻿# ClinMindRuntime 文档导航
 
-> 本文件是 `docs/` 目录入口，用于说明当前文档体系如何阅读、哪些文档是当前权威入口、哪些是专项设计、哪些是 Phase 实现规格、哪些是实现约束。  
-> 当前文档已经完成物理目录重构：入口、总设计、专项设计、Phase 实现和实现约束已分别归入独立目录。  
+> 本文件是 `docs/` 目录入口，用于说明当前文档体系如何阅读、哪些文档是当前权威入口、哪些是专项设计、哪些是 Phase 实现规格、哪些是实现约束。
+> 当前文档已经完成物理目录重构：入口、总设计、专项设计、Phase 实现和实现约束已分别归入独立目录。
 > 新增 Phase 文档时，应直接放入 `docs/3-phase实现/`；新增跨 Phase 的架构规划，应放入 `docs/2-专项设计/`。
 
 ---
@@ -25,12 +25,13 @@ Phase 7-P1：KG-lite / Graph Evidence 原型已完成并冻结。
 Phase 8-P0：Python AI Provider / EmbeddingProvider MVP 已完成并冻结。
 Phase 8-P1：ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已完成并冻结。
 Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已完成并冻结。
+Phase 9-P0：Tool / MCP / Skills 受控接入 MVP 已完成并冻结。
 ```
 
 当前下一阶段建议：
 
 ```text
-Phase 8-P3：模型治理增强 / Phase 9：Tool 与 MCP 受控接入 / Phase 10：Provider Console
+Phase 9-P1：真实 MCP adapter 设计 / Phase 9-P2：Skills 文件系统与 Skill Store / Phase 10：Tool Console / Skill Console / Provider Console
 ```
 
 当前新增专项规划：
@@ -77,6 +78,10 @@ docs/
     Phase6_P0*
     Phase7_P0*
     Phase7_P1*
+    Phase8_P0*
+    Phase8_P1*
+    Phase8_P2*
+    Phase9_P0*
 
   4-实现约束/
     AI_IMPLEMENTATION_SKILL.md
@@ -187,6 +192,7 @@ docs/
 | Phase 8-P0 | 已冻结 | `docs/3-phase实现/Phase8_P0*`、`docs/3-phase实现/Phase8_P0冻结记录.md` |
 | Phase 8-P1 | 已冻结 | `docs/3-phase实现/Phase8_P1*`、`docs/3-phase实现/Phase8_P1冻结记录.md` |
 | Phase 8-P2 | 已冻结 | `docs/3-phase实现/Phase8_P2*`、`docs/3-phase实现/Phase8_P2冻结记录.md` |
+| Phase 9-P0 | 已冻结 | `docs/3-phase实现/Phase9_P0*`、`docs/3-phase实现/Phase9_P0冻结记录.md` |
 
 ## 4.5 实现约束组
 
@@ -239,7 +245,7 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 # 六、当前不应做什么
 
 ```text
-1. 不应向 Phase 1–8 P2 已冻结阶段继续堆新能力。
+1. 不应向 Phase 1–9 P0 已冻结阶段继续堆新能力。
 2. 不应让 Python 成为 Runtime 主控。
 3. 不应让 Python Agent 自主循环。
 4. 不应让 Python 直接输出 PatientOutput。
@@ -248,8 +254,8 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 7. 不应让 RiskSignalClassifierProvider 直接触发 SafetyGate。
 8. 不应绕过 ProviderCapabilityPolicy / ProviderValidation。
 9. 不应提前做模型训练 / 后训练。
-10. 不应提前实现完整 ModelRegistry / PromptRegistry / MLOps。
-11. 不应提前实现正式医生审核平台或 Knowledge Console。
+10. 不应提前接真实远程 MCP、Browser Agent / Computer Use / RPA 或高风险写工具。
+11. 不应提前实现正式医生审核平台、Tool Console 或 Knowledge Console。
 ```
 
 ---
@@ -257,9 +263,9 @@ docs/3-phase实现/Phase8_P0冻结记录.md
 # 七、当前建议做什么
 
 ```text
-1. 保持 Phase 1–8 P1 冻结边界。
-2. 以 Phase8_P1冻结记录.md 作为模型 Provider 治理基线。
-3. 后续新增能力进入 Phase 8-P3 / Phase 9 / Phase 10。
+1. 保持 Phase 1–9 P0 冻结边界。
+2. 以 Phase9_P0冻结记录.md 作为 Tool / MCP / Skills 受控接入治理基线。
+3. 后续新增能力进入 Phase 9-P1 / Phase 9-P2 / Phase 10。
 4. 新阶段必须先建立实现规格、API 与测试设计、开发任务清单。
 5. 再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
 ```
@@ -278,12 +284,13 @@ Runtime 主控
 → Python AI Provider / EmbeddingProvider
 → ModelProvider / JudgeProvider / ProviderCapabilityProfile
 → ModelRegistry / PromptRegistry / TrainingDatasetVersion
+→ Tool / MCP / Skills 受控接入 MVP
 ```
 
-Phase 8-P2 已冻结归档。下一步不是继续向 P2 堆能力，而是进入：
+Phase 9-P0 已冻结归档。下一步不是继续向 P0 堆真实外部工具能力，而是进入：
 
 ```text
-Phase 8-P3：模型治理增强
-或 Phase 9：Tool / MCP / Skills 受控接入
-或 Phase 10：Provider Console / Model Console
+Phase 9-P1：真实 MCP adapter 设计
+或 Phase 9-P2：Skills 文件系统与 Skill Store
+或 Phase 10：Tool Console / Skill Console / Provider Console
 ```
