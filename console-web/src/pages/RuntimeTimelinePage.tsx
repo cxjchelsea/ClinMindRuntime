@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import type { Phase10RuntimeListItem, RuntimeTimelineNode } from '../api/types';
 import { DataTable, type DataTableColumn } from '../components/DataTable';
 import { DetailPanel } from '../components/DetailPanel';
@@ -11,10 +12,17 @@ import { useDebugContext } from '../auth/DebugContextProvider';
 import { formatInstant, useAsyncQuery } from '../hooks/useAsyncQuery';
 
 export function RuntimeTimelinePage() {
+  const { runtimeId } = useParams();
   const { client, context } = useDebugContext();
   const [status, setStatus] = useState('');
   const [limit, setLimit] = useState('20');
-  const [selectedId, setSelectedId] = useState<string>();
+  const [selectedId, setSelectedId] = useState<string | undefined>(runtimeId);
+
+  useEffect(() => {
+    if (runtimeId) {
+      setSelectedId(runtimeId);
+    }
+  }, [runtimeId]);
 
   const runtimeQuery = useAsyncQuery(
     () => client.listConsoleRuntimes({ status: status || undefined, limit: limit ? Number(limit) : undefined }),

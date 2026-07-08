@@ -3,12 +3,9 @@ import { AuditBrowserPage } from './pages/AuditBrowserPage';
 import { AppShell } from './layout/AppShell';
 import { AuditCenterPage } from './pages/AuditCenterPage';
 import { CandidatePage } from './pages/CandidatePage';
-import { CandidateInboxPage } from './pages/CandidateInboxPage';
 import { ConsoleOverviewPage } from './pages/ConsoleOverviewPage';
 import { EvaluationPage } from './pages/EvaluationPage';
 import { GovernanceDomainsPage } from './pages/GovernanceDomainsPage';
-import { ReviewQueuePage } from './pages/ReviewQueuePage';
-import { RuntimePage } from './pages/RuntimePage';
 import { RuntimeTimelinePage } from './pages/RuntimeTimelinePage';
 import { ForbiddenPage } from './pages/ForbiddenPage';
 import { CaseWorkspacePage } from './portals/clinician/pages/CaseWorkspacePage';
@@ -110,7 +107,7 @@ export default function App() {
           }
         />
         <Route
-          path="governance/runtime-timeline"
+          path="governance/runtimes"
           element={
             <RoleGuard portal="governance" permission="governance:read_runtime_timeline">
               <RuntimeTimelinePage />
@@ -134,26 +131,10 @@ export default function App() {
           }
         />
         <Route
-          path="governance/candidate-inbox"
-          element={
-            <RoleGuard portal="governance" permission="governance:read_candidate_inbox">
-              <CandidateInboxPage />
-            </RoleGuard>
-          }
-        />
-        <Route
           path="governance/audits"
           element={
             <RoleGuard portal="governance" permission="governance:read_audit">
               <AuditBrowserPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="governance/runtime"
-          element={
-            <RoleGuard portal="governance" permission="governance:read_runtime_timeline">
-              <RuntimePage />
             </RoleGuard>
           }
         />
@@ -174,14 +155,6 @@ export default function App() {
           }
         />
         <Route
-          path="governance/review-queue"
-          element={
-            <RoleGuard portal="governance" permission="governance:read_candidate_inbox">
-              <ReviewQueuePage />
-            </RoleGuard>
-          }
-        />
-        <Route
           path="governance/audit-center"
           element={
             <RoleGuard portal="governance" permission="governance:read_audit">
@@ -191,15 +164,19 @@ export default function App() {
         />
 
         <Route path="overview" element={<Navigate to="/governance/overview" replace />} />
-        <Route path="runtime-timeline" element={<Navigate to="/governance/runtime-timeline" replace />} />
+        <Route path="runtime-timeline" element={<Navigate to="/governance/runtimes" replace />} />
         <Route path="governance-domains" element={<Navigate to="/governance/domains" replace />} />
-        <Route path="candidate-inbox" element={<Navigate to="/governance/candidate-inbox" replace />} />
+        <Route path="candidate-inbox" element={<Navigate to="/governance/candidates" replace />} />
         <Route path="audit-browser" element={<Navigate to="/governance/audits" replace />} />
-        <Route path="runtime" element={<Navigate to="/governance/runtime" replace />} />
+        <Route path="runtime" element={<Navigate to="/governance/runtimes" replace />} />
         <Route path="evaluation" element={<Navigate to="/governance/evaluations" replace />} />
         <Route path="candidates" element={<Navigate to="/governance/candidates" replace />} />
-        <Route path="review-queue" element={<Navigate to="/governance/review-queue" replace />} />
+        <Route path="review-queue" element={<Navigate to="/governance/candidates" replace />} />
         <Route path="audit-center" element={<Navigate to="/governance/audit-center" replace />} />
+        <Route path="governance/runtime-timeline" element={<Navigate to="/governance/runtimes" replace />} />
+        <Route path="governance/candidate-inbox" element={<Navigate to="/governance/candidates" replace />} />
+        <Route path="governance/runtime" element={<Navigate to="/governance/runtimes" replace />} />
+        <Route path="governance/review-queue" element={<Navigate to="/governance/candidates" replace />} />
       </Route>
     </Routes>
   );

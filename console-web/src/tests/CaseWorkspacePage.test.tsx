@@ -15,5 +15,11 @@ describe('CaseWorkspacePage', () => {
     expect(rendered).not.toContain('secret');
     expect(rendered).not.toContain('raw_external_response');
     expect(rendered).not.toContain('full rationale');
+    expect(rendered).not.toContain('api_key');
+    expect(rendered).not.toContain('private_key');
+    expect(rendered).not.toContain('internal_chain_of_thought');
+    expect(rendered).not.toContain('full_rationale');
+    expect(rendered).not.toContain('unredacted_patient_dialogue');
+    expect(rendered).not.toContain('raw patient dialogue');
   });
 });

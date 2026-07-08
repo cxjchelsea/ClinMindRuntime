@@ -15,5 +15,10 @@ describe('PatientSafeSummaryPage', () => {
     expect(rendered).not.toContain('trace');
     expect(rendered).not.toContain('candidate');
     expect(rendered).not.toContain('evaluation');
+    expect(rendered).not.toContain('confidence_score');
+    expect(rendered).not.toContain('raw_evidence');
+    expect(rendered).not.toContain('raw_tool_result');
+    expect(rendered).not.toContain('model_prompt');
+    expect(rendered).not.toContain('internal_reasoning');
   });
 });

@@ -6,7 +6,7 @@ import App from '../App';
 import { DebugContextProvider } from '../auth/DebugContextProvider';
 import { DemoRoleProvider } from '../rbac/DemoRoleProvider';
 
-function renderApp(route = '/governance/runtime') {
+function renderApp(route = '/governance/runtimes') {
   return render(
     <DebugContextProvider>
       <DemoRoleProvider>
@@ -24,9 +24,9 @@ describe('App smoke', () => {
 
     expect(screen.getByText('ClinMind Runtime')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Portal navigation' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Runtime Sessions' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Runtimes' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Debug context' })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Runtime Sessions' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Runtime Timeline' })).toBeInTheDocument();
   });
 });
 

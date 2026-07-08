@@ -19,15 +19,12 @@ const CLINICIAN_NAV = [
 
 const GOVERNANCE_NAV = [
   { to: '/governance/overview', label: 'Overview' },
-  { to: '/governance/runtime-timeline', label: 'Runtime Timeline' },
-  { to: '/governance/runtimes/runtime-demo-001', label: 'Demo Runtime' },
+  { to: '/governance/runtimes', label: 'Runtimes' },
+  { to: '/governance/runtimes/runtime-demo-001', label: 'Runtime Projection' },
   { to: '/governance/domains', label: 'Governance Domains' },
-  { to: '/governance/candidate-inbox', label: 'Candidate Inbox' },
-  { to: '/governance/audits', label: 'Audit Browser' },
-  { to: '/governance/runtime', label: 'Runtime Sessions' },
-  { to: '/governance/evaluations', label: 'Evaluation Runs' },
   { to: '/governance/candidates', label: 'Candidates' },
-  { to: '/governance/review-queue', label: 'Review Queue' },
+  { to: '/governance/audits', label: 'Audits' },
+  { to: '/governance/evaluations', label: 'Evaluation Runs' },
   { to: '/governance/audit-center', label: 'Audit Center' },
 ] as const;
 

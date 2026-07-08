@@ -26,6 +26,8 @@ function createMockClient(): ConsoleClient {
       audit_event_count: 0,
       domain_cards: [],
     }),
+    listConsoleRuntimes: vi.fn().mockResolvedValue([]),
+    getRuntimeTimeline: vi.fn().mockResolvedValue({ nodes: [] }),
     listRuntimeSessions: vi.fn().mockResolvedValue([]),
     getRuntimeSession: vi.fn().mockResolvedValue({}),
     listEvaluationRuns: vi.fn().mockResolvedValue([]),
@@ -80,18 +82,14 @@ describe('ConsoleAppSmoke', () => {
     const user = userEvent.setup();
     renderApp('/runtime');
 
-    expect(screen.getByRole('heading', { name: 'Runtime Sessions' })).toBeInTheDocument();
-    expect(await screen.findByText(/暂无 Runtime 会话/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Runtime Timeline' })).toBeInTheDocument();
+    expect(await screen.findByText('No runtime sessions.')).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'Evaluation Runs' }));
     expect(await screen.findByRole('heading', { name: 'Evaluation Runs' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'Candidates' }));
     expect(await screen.findByRole('heading', { name: 'Candidates' })).toBeInTheDocument();
-
-    await user.click(screen.getByRole('link', { name: 'Review Queue' }));
-    expect(await screen.findByRole('heading', { name: 'Review Queue' })).toBeInTheDocument();
-    expect(screen.getByText(/自动上线经验或进入训练集/)).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'Audit Center' }));
     expect(await screen.findByRole('heading', { name: 'Audit Center' })).toBeInTheDocument();
