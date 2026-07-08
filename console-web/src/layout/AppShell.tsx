@@ -18,7 +18,7 @@ export function AppShell() {
       <header className="app-shell__header">
         <div className="app-shell__brand">
           <h1 className="app-shell__brand-title">ClinMind Console</h1>
-          <p className="app-shell__brand-subtitle">Governance MVP · Phase 5-P2</p>
+          <p className="app-shell__brand-subtitle">Governance Console / Runtime Console · Phase10-P0</p>
         </div>
         <div className="app-shell__status">
           <span className="app-shell__status-item">

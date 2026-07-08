@@ -7,10 +7,15 @@ import {
 import type {
   ApiResponse,
   AuditCenterSummary,
+  AuditBrowserItem,
+  AuditBrowserParams,
   AuditConsoleSummary,
   AuditLogListParams,
   CandidateConsoleDetail,
   CandidateConsoleSummary,
+  CandidateInboxItem,
+  CandidateInboxParams,
+  ConsoleOverview,
   CandidateGenerationConsoleSummary,
   CandidateGenerationListParams,
   CandidateListParams,
@@ -19,7 +24,10 @@ import type {
   EvaluationConsoleDetail,
   EvaluationConsoleSummary,
   EvaluationListParams,
+  GovernanceDomainCard,
+  Phase10RuntimeListItem,
   ReviewQueueListParams,
+  RuntimeTimeline,
   RuntimeConsoleDetail,
   RuntimeConsoleSummary,
   RuntimeListParams,
@@ -112,6 +120,32 @@ export function createConsoleClient(getContext: ContextGetter) {
       return request<RuntimeConsoleSummary[]>(
         `/api/v1/debug/console/runtime-sessions${buildQuery(params)}`,
       );
+    },
+
+    getConsoleOverview() {
+      return request<ConsoleOverview>('/api/v1/console/overview');
+    },
+
+    listConsoleRuntimes(params: RuntimeListParams = {}) {
+      return request<Phase10RuntimeListItem[]>(`/api/v1/console/runtimes${buildQuery(params)}`);
+    },
+
+    getRuntimeTimeline(runtimeId: string) {
+      return request<RuntimeTimeline>(
+        `/api/v1/console/runtimes/${encodeURIComponent(runtimeId)}/timeline`,
+      );
+    },
+
+    listGovernanceDomains() {
+      return request<GovernanceDomainCard[]>('/api/v1/console/governance/domains');
+    },
+
+    listCandidateInbox(params: CandidateInboxParams = {}) {
+      return request<CandidateInboxItem[]>(`/api/v1/console/candidates${buildQuery(params)}`);
+    },
+
+    listAuditBrowser(params: AuditBrowserParams = {}) {
+      return request<AuditBrowserItem[]>(`/api/v1/console/audits${buildQuery(params)}`);
     },
 
     getRuntimeSession(runtimeId: string) {

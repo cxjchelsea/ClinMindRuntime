@@ -38,6 +38,82 @@ export interface RuntimeConsoleDetail {
   updated_at: string;
 }
 
+export interface GovernanceDomainCard {
+  domain_id: string;
+  name: string;
+  status: string;
+  record_count: number;
+  alert_count: number;
+  latest_event_at: string | null;
+}
+
+export interface ConsoleOverview {
+  phase: string;
+  runtime_count: number;
+  provider_call_count: number;
+  tool_invocation_count: number;
+  model_governance_record_count: number;
+  candidate_count: number;
+  audit_event_count: number;
+  domain_cards: GovernanceDomainCard[];
+  generated_at: string;
+}
+
+export interface Phase10RuntimeListItem {
+  runtime_id: string;
+  session_id: string;
+  runtime_status: string;
+  mode: string;
+  version: number;
+  trace_count: number;
+  safety_gate_present: boolean;
+  decision_boundary_present: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RuntimeTimelineNode {
+  node_id: string;
+  type: string;
+  label: string;
+  status: string;
+  created_at: string | null;
+  summary: Record<string, unknown>;
+}
+
+export interface RuntimeTimeline {
+  runtime_id: string;
+  runtime_status: string;
+  trace_count: number;
+  nodes: RuntimeTimelineNode[];
+}
+
+export interface CandidateInboxItem {
+  candidate_id: string;
+  candidate_kind: string;
+  candidate_type: string;
+  title: string;
+  summary: string;
+  risk_level: string;
+  review_status: string;
+  sanitization_status: string | null;
+  tags: string[];
+  created_at: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface AuditBrowserItem {
+  audit_id: string;
+  request_id: string | null;
+  actor: string;
+  action_type: string;
+  resource_type: string;
+  resource_id: string;
+  result_status: string;
+  created_at: string;
+  metadata: Record<string, unknown>;
+}
+
 export interface EvaluationConsoleSummary {
   run_id: string;
   case_set_id: string;
@@ -175,6 +251,21 @@ export interface CandidateReviewRecord {
 export interface RuntimeListParams {
   status?: string;
   session_id?: string;
+  limit?: number;
+}
+
+export interface CandidateInboxParams {
+  review_status?: string;
+  risk_level?: string;
+  candidate_type?: string;
+  limit?: number;
+}
+
+export interface AuditBrowserParams {
+  actor_id?: string;
+  action_type?: string;
+  resource_type?: string;
+  status?: string;
   limit?: number;
 }
 

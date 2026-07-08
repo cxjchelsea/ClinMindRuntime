@@ -203,6 +203,32 @@
   color: #334155;
 }
 
+.console-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.console-metric {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.console-metric span {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.console-metric strong {
+  color: #0f2744;
+  font-size: 1.25rem;
+}
+
 @media (max-width: 960px) {
   .console-page__layout {
     grid-template-columns: 1fr;

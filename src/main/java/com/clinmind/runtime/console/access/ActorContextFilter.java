@@ -29,7 +29,9 @@ public class ActorContextFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path == null || !path.startsWith("/api/v1/debug/console/");
+        return path == null
+                || (!path.startsWith("/api/v1/debug/console/")
+                && !path.startsWith("/api/v1/console/"));
     }
 
     @Override

@@ -2,6 +2,11 @@ import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
 const NAV_ITEMS = [
+  { to: '/overview', label: 'Overview' },
+  { to: '/runtime-timeline', label: 'Runtime Timeline' },
+  { to: '/governance-domains', label: 'Governance Domains' },
+  { to: '/candidate-inbox', label: 'Candidate Inbox' },
+  { to: '/audit-browser', label: 'Audit Browser' },
   { to: '/runtime', label: 'Runtime Sessions' },
   { to: '/evaluation', label: 'Evaluation Runs' },
   { to: '/candidates', label: 'Candidates' },

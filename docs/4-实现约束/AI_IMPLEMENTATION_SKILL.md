@@ -126,6 +126,33 @@ Console 不能执行 Provider / Tool / Agent；
 Console 不能发布模型、工具、prompt、dataset 或 candidate。
 ```
 
+---
+
+## 2026-07-08 Freeze Update
+
+Phase 10-P0 Governance Console / Runtime Console MVP is implemented and frozen.
+
+Frozen scope:
+
+- Read-only `/api/v1/console` APIs.
+- Safe DTO mapper and sensitive field policy.
+- Runtime timeline observation.
+- Governance domain overview.
+- Candidate inbox observation.
+- Audit browser observation.
+- Console evaluation scorers.
+- console-web read-only pages.
+
+Still forbidden after freeze:
+
+- Patient UI.
+- Formal doctor workstation.
+- Production approval platform.
+- approve / reject / publish / run actions.
+- RuntimeState mutation from Console.
+- Provider / Tool / Agent invocation from Console.
+- Raw patient dialogue, raw prompt, secrets, raw external response, chain-of-thought, or full rationale exposure.
+
 Phase 10-P0 可以涉及：
 
 ```text
