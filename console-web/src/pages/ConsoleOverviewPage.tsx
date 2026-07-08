@@ -28,8 +28,8 @@ export function ConsoleOverviewPage() {
   return (
     <div className="console-page">
       <header className="console-page__header">
-        <h1>Console Overview</h1>
-        <p>Phase10-P0 read-only governance snapshot.</p>
+        <h1>Governance Overview</h1>
+        <p>Phase10-P0 read-only governance snapshot under the Phase11 governance portal.</p>
       </header>
 
       {overviewQuery.error && <PageError error={overviewQuery.error} roles={context.roles} />}

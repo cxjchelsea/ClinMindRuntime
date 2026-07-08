@@ -3,6 +3,8 @@ import { DebugContextPanel } from '../auth/DebugContextPanel';
 import { useDebugContext } from '../auth/DebugContextProvider';
 import { rolesLabel } from '../auth/debugContextTypes';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { DemoRoleSwitcher } from '../rbac/DemoRoleSwitcher';
+import { useDemoRole } from '../rbac/DemoRoleProvider';
 import './AppShell.css';
 import { Sidebar } from './Sidebar';
 
@@ -12,15 +14,20 @@ function apiStatusLabel(apiBaseUrl: string): string {
 
 export function AppShell() {
   const { context } = useDebugContext();
+  const { role } = useDemoRole();
 
   return (
     <div className="app-shell">
       <header className="app-shell__header">
         <div className="app-shell__brand">
-          <h1 className="app-shell__brand-title">ClinMind Console</h1>
-          <p className="app-shell__brand-subtitle">Governance Console / Runtime Console · Phase10-P0</p>
+          <h1 className="app-shell__brand-title">ClinMind Runtime</h1>
+          <p className="app-shell__brand-subtitle">Patient Portal / Clinician Workspace / Governance Console · Phase11-P0</p>
         </div>
         <div className="app-shell__status">
+          <span className="app-shell__status-item">
+            <span className="app-shell__status-label">Portal role</span>
+            <span>{role}</span>
+          </span>
           <span className="app-shell__status-item">
             <span className="app-shell__status-label">API</span>
             <span>{apiStatusLabel(context.apiBaseUrl)}</span>
@@ -33,6 +40,7 @@ export function AppShell() {
             <span className="app-shell__status-label">Roles</span>
             <span>{rolesLabel(context.roles)}</span>
           </span>
+          <DemoRoleSwitcher />
         </div>
       </header>
       <aside className="app-shell__sidebar">

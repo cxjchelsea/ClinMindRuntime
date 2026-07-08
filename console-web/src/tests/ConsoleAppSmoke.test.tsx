@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import type { ConsoleClient } from '../api/consoleClient';
 import App from '../App';
+import { DemoRoleProvider } from '../rbac/DemoRoleProvider';
 
 const emptySummary = {
   total_count: 0,
@@ -16,6 +17,15 @@ const emptySummary = {
 
 function createMockClient(): ConsoleClient {
   return {
+    getConsoleOverview: vi.fn().mockResolvedValue({
+      runtime_count: 0,
+      provider_call_count: 0,
+      tool_invocation_count: 0,
+      model_governance_record_count: 0,
+      candidate_count: 0,
+      audit_event_count: 0,
+      domain_cards: [],
+    }),
     listRuntimeSessions: vi.fn().mockResolvedValue([]),
     getRuntimeSession: vi.fn().mockResolvedValue({}),
     listEvaluationRuns: vi.fn().mockResolvedValue([]),
@@ -57,9 +67,11 @@ vi.mock('../auth/DebugContextProvider', async (importOriginal) => {
 
 function renderApp(route = '/runtime') {
   return render(
-    <MemoryRouter initialEntries={[route]}>
-      <App />
-    </MemoryRouter>,
+    <DemoRoleProvider>
+      <MemoryRouter initialEntries={[route]}>
+        <App />
+      </MemoryRouter>
+    </DemoRoleProvider>,
   );
 }
 
@@ -86,9 +98,9 @@ describe('ConsoleAppSmoke', () => {
     expect(await screen.findByText('Total: 0')).toBeInTheDocument();
   });
 
-  it('redirects index route to runtime', async () => {
+  it('redirects index route to the governance default route', async () => {
     renderApp('/');
 
-    expect(await screen.findByRole('heading', { name: 'Runtime Sessions' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Governance Overview' })).toBeInTheDocument();
   });
 });

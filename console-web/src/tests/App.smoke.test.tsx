@@ -4,22 +4,29 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import { DebugContextProvider } from '../auth/DebugContextProvider';
+import { DemoRoleProvider } from '../rbac/DemoRoleProvider';
 
-describe('App smoke', () => {
-  it('renders console shell with navigation and debug context', () => {
-    render(
-      <DebugContextProvider>
-        <MemoryRouter initialEntries={['/runtime']}>
+function renderApp(route = '/governance/runtime') {
+  return render(
+    <DebugContextProvider>
+      <DemoRoleProvider>
+        <MemoryRouter initialEntries={[route]}>
           <App />
         </MemoryRouter>
-      </DebugContextProvider>,
-    );
+      </DemoRoleProvider>
+    </DebugContextProvider>,
+  );
+}
 
-    expect(screen.getByText('ClinMind Console')).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: 'Console navigation' })).toBeInTheDocument();
+describe('App smoke', () => {
+  it('renders portal shell with governance navigation and debug context', async () => {
+    renderApp('/runtime');
+
+    expect(screen.getByText('ClinMind Runtime')).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Portal navigation' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Runtime Sessions' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Debug context' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Runtime Sessions' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Runtime Sessions' })).toBeInTheDocument();
   });
 });
 
@@ -28,13 +35,7 @@ describe('DebugContextPanel', () => {
     const user = userEvent.setup();
     localStorage.clear();
 
-    render(
-      <DebugContextProvider>
-        <MemoryRouter initialEntries={['/runtime']}>
-          <App />
-        </MemoryRouter>
-      </DebugContextProvider>,
-    );
+    renderApp('/runtime');
 
     const actorInput = screen.getByLabelText('X-Debug-Actor');
     await user.clear(actorInput);
@@ -56,13 +57,7 @@ describe('DebugContextPanel', () => {
       vi.fn().mockRejectedValue(new TypeError('Failed to fetch')),
     );
 
-    render(
-      <DebugContextProvider>
-        <MemoryRouter initialEntries={['/runtime']}>
-          <App />
-        </MemoryRouter>
-      </DebugContextProvider>,
-    );
+    renderApp('/runtime');
 
     await user.click(screen.getByRole('button', { name: '测试连接' }));
 
