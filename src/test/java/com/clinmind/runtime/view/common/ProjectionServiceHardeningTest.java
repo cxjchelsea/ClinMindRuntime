@@ -32,7 +32,7 @@ class ProjectionServiceHardeningTest {
         var actor = actor(DebugRole.READ_ONLY_OBSERVER);
         assertThatThrownBy(() -> service.listSessions(actor)).isInstanceOf(ViewProjectionException.class);
         verify(audit).record(actor, AuditActionType.VIEW_PROJECTION_POLICY_REJECTED,
-                DemoRuntimeSeedProvider.DEMO_RUNTIME_ID, "patient_sessions",
+                "runtime-list", "patient_sessions",
                 ProjectionStatus.UNAVAILABLE, AuditResultStatus.FAILURE);
     }
 
@@ -44,7 +44,7 @@ class ProjectionServiceHardeningTest {
         var actor = actor(DebugRole.PATIENT);
         assertThatThrownBy(() -> service.listCases(actor)).isInstanceOf(ViewProjectionException.class);
         verify(audit).record(actor, AuditActionType.VIEW_PROJECTION_POLICY_REJECTED,
-                DemoRuntimeSeedProvider.DEMO_RUNTIME_ID, "clinician_cases",
+                "runtime-list", "clinician_cases",
                 ProjectionStatus.UNAVAILABLE, AuditResultStatus.FAILURE);
     }
 
@@ -57,7 +57,7 @@ class ProjectionServiceHardeningTest {
         var actor = actor(DebugRole.PATIENT);
         assertThat(service.listSessions(actor)).isEmpty();
         verify(audit).record(actor, AuditActionType.PATIENT_VIEW_READ,
-                DemoRuntimeSeedProvider.DEMO_RUNTIME_ID, "patient_sessions",
+                "runtime-list", "patient_sessions",
                 ProjectionStatus.UNAVAILABLE, AuditResultStatus.SUCCESS);
     }
 
@@ -70,7 +70,7 @@ class ProjectionServiceHardeningTest {
         var actor = actor(DebugRole.CLINICIAN);
         assertThat(service.listCases(actor)).isEmpty();
         verify(audit).record(actor, AuditActionType.CLINICIAN_CASE_VIEW_READ,
-                DemoRuntimeSeedProvider.DEMO_RUNTIME_ID, "clinician_cases",
+                "runtime-list", "clinician_cases",
                 ProjectionStatus.UNAVAILABLE, AuditResultStatus.SUCCESS);
     }
 

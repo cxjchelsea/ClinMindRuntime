@@ -19,12 +19,14 @@ import com.clinmind.runtime.view.patient.dto.PatientRuntimeViewDto;
 import com.clinmind.runtime.view.patient.dto.PatientSafeSummaryDto;
 import com.clinmind.runtime.view.patient.dto.PatientSessionSummaryDto;
 import com.clinmind.runtime.view.patient.dto.SafetyNoticeDto;
+import com.clinmind.runtime.view.source.PatientViewSource;
+import com.clinmind.runtime.view.source.ClinicianViewSource;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DemoRuntimeSeedProvider {
+public class DemoRuntimeSeedProvider implements PatientViewSource, ClinicianViewSource {
 
     public static final String DEMO_RUNTIME_ID = "runtime-demo-001";
 

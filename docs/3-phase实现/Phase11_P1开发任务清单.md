@@ -500,3 +500,12 @@ ClinMindRuntime 已具备受控 Runtime、治理 Console、多角色前端，以
 - [x] Patient / Clinician policy reject 记录 VIEW_PROJECTION_POLICY_REJECTED。
 - [x] listSessions / listCases 支持空列表，并以 UNAVAILABLE 记录成功查询。
 - [ ] 接入 RuntimeStore / CaseFrame / PatientOutput / ClinicianReport，替代 DemoRuntimeSeedProvider。
+## 第二阶段：Runtime-backed source adapter
+
+已建立 PatientViewSource / ClinicianViewSource 抽象及以下实现：
+
+- RuntimeStoreViewSource：从 RuntimeStore 和 RuntimeState 生成角色视图，缺失领域段显式标记 PARTIAL。
+- DemoRuntimeSeedViewSource：保留演示数据作为 fallback，所有 fallback DTO 显式标记 FALLBACK。
+- RoleSpecificViewSource：RuntimeStore 主路径优先，真实来源无结果时才使用 seed fallback。
+
+Projection Service 已改为依赖 source 接口，不再直接依赖 DemoRuntimeSeedProvider。fallback 状态会随现有 projection read audit 写入 projection_status，避免被误认为真实 Runtime 投影。

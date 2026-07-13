@@ -3,8 +3,8 @@ package com.clinmind.runtime.view.patient;
 import com.clinmind.runtime.audit.AuditActionType;
 import com.clinmind.runtime.audit.AuditResultStatus;
 import com.clinmind.runtime.console.access.ActorContext;
-import com.clinmind.runtime.view.common.DemoRuntimeSeedProvider;
 import com.clinmind.runtime.view.common.RoleSpecificViewSanitizer;
+import com.clinmind.runtime.view.source.PatientViewSource;
 import com.clinmind.runtime.view.common.ViewProjectionAuditService;
 import com.clinmind.runtime.view.common.ViewProjectionException;
 import com.clinmind.runtime.view.common.dto.ProjectionStatus;
@@ -18,29 +18,29 @@ import org.springframework.stereotype.Service;
 public class PatientViewProjectionService {
 
     private final PatientViewPolicy policy;
-    private final DemoRuntimeSeedProvider seedProvider;
+    private final PatientViewSource viewSource;
     private final RoleSpecificViewSanitizer sanitizer;
     private final ViewProjectionAuditService auditService;
 
     public PatientViewProjectionService(
             PatientViewPolicy policy,
-            DemoRuntimeSeedProvider seedProvider,
+            PatientViewSource viewSource,
             RoleSpecificViewSanitizer sanitizer,
             ViewProjectionAuditService auditService) {
         this.policy = policy;
-        this.seedProvider = seedProvider;
+        this.viewSource = viewSource;
         this.sanitizer = sanitizer;
         this.auditService = auditService;
     }
 
     public List<PatientSessionSummaryDto> listSessions(ActorContext context) {
-        requireRead(context, "patient_sessions", DemoRuntimeSeedProvider.DEMO_RUNTIME_ID);
-        List<PatientSessionSummaryDto> sessions = seedProvider.patientSessions();
+        requireRead(context, "patient_sessions", "runtime-list");
+        List<PatientSessionSummaryDto> sessions = viewSource.patientSessions();
         sessions.forEach(sanitizer::validatePatientViewDto);
         auditService.record(
                 context,
                 AuditActionType.PATIENT_VIEW_READ,
-                DemoRuntimeSeedProvider.DEMO_RUNTIME_ID,
+                "runtime-list",
                 "patient_sessions",
                 sessions.isEmpty() ? ProjectionStatus.UNAVAILABLE : sessions.get(0).projectionStatus(),
                 AuditResultStatus.SUCCESS);
@@ -49,7 +49,7 @@ public class PatientViewProjectionService {
 
     public PatientRuntimeViewDto getRuntimeView(String sessionId, ActorContext context) {
         requireRead(context, "patient_runtime_view", sessionId);
-        PatientRuntimeViewDto view = seedProvider.patientRuntimeView(sessionId)
+        PatientRuntimeViewDto view = viewSource.patientRuntimeView(sessionId)
                 .orElseThrow(() -> new ViewProjectionException("PATIENT_VIEW_NOT_FOUND", "Patient session not found"));
         sanitizer.validatePatientViewDto(view);
         auditService.record(
@@ -64,7 +64,7 @@ public class PatientViewProjectionService {
 
     public PatientSafeSummaryDto getSafeSummary(String sessionId, ActorContext context) {
         requireRead(context, "patient_safe_summary", sessionId);
-        PatientSafeSummaryDto summary = seedProvider.patientSafeSummary(sessionId)
+        PatientSafeSummaryDto summary = viewSource.patientSafeSummary(sessionId)
                 .orElseThrow(() -> new ViewProjectionException("PATIENT_VIEW_NOT_FOUND", "Patient summary not found"));
         sanitizer.validatePatientViewDto(summary);
         auditService.record(
