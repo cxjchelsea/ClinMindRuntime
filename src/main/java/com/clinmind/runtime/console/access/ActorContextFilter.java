@@ -31,7 +31,9 @@ public class ActorContextFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return path == null
                 || (!path.startsWith("/api/v1/debug/console/")
-                && !path.startsWith("/api/v1/console/"));
+                && !path.startsWith("/api/v1/console/")
+                && !path.startsWith("/api/v1/patient/")
+                && !path.startsWith("/api/v1/clinician/"));
     }
 
     @Override

@@ -11,6 +11,8 @@ export const AVAILABLE_ROLES = [
   'CANDIDATE_REVIEWER',
   'AUDIT_REVIEWER',
   'READ_ONLY_OBSERVER',
+  'PATIENT',
+  'CLINICIAN',
 ] as const;
 
 export type DebugRole = (typeof AVAILABLE_ROLES)[number];

@@ -14,6 +14,7 @@ import com.clinmind.runtime.evaluation.EvaluationLoadException;
 import com.clinmind.runtime.modelgov.ModelGovernancePolicyException;
 import com.clinmind.runtime.storage.RuntimeNotFoundException;
 import com.clinmind.runtime.toolgov.ToolGovernancePolicyException;
+import com.clinmind.runtime.view.common.ViewProjectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -69,6 +70,15 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiResponse<Void>> handleApiException(ApiException ex) {
         return ResponseEntity.status(ex.getStatus())
+                .body(ApiResponse.fail(new ApiError(ex.getCode(), ex.getMessage())));
+    }
+
+    @ExceptionHandler(ViewProjectionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleViewProjection(ViewProjectionException ex) {
+        HttpStatus status = ex.getCode().endsWith("_FORBIDDEN")
+                ? HttpStatus.FORBIDDEN
+                : ex.getCode().endsWith("_NOT_FOUND") ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status)
                 .body(ApiResponse.fail(new ApiError(ex.getCode(), ex.getMessage())));
     }
 

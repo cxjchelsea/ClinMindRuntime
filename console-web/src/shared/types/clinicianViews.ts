@@ -6,6 +6,7 @@ export interface ClinicianCaseSummary {
   chief_complaint_summary: string;
   updated_at: string;
   assigned_clinician?: string;
+  projection_status?: string;
 }
 
 export interface PatientSummary {
@@ -56,11 +57,23 @@ export interface ReportDraftView {
   impression: string;
   suggested_questions: string[];
   clinician_note: string;
+  editable?: boolean;
+  submit_enabled?: boolean;
+  projection_status?: string;
+}
+
+export interface ClinicianReportDraftView extends ReportDraftView {
+  case_id: string;
+  runtime_id: string;
+  editable: boolean;
+  submit_enabled: boolean;
+  projection_status: string;
 }
 
 export interface ClinicianCaseView {
   case_id: string;
   runtime_id: string;
+  status?: string;
   patient_summary: PatientSummary;
   case_frame: CaseFrameView;
   inquiry_timeline: InquiryTurnView[];
@@ -69,4 +82,11 @@ export interface ClinicianCaseView {
   risk_panel: RiskSignalView[];
   ai_suggestions: ClinicianSuggestionView[];
   report_draft: ReportDraftView;
+  runtime_boundary_summary?: {
+    safety_gate: string;
+    decision_boundary: string;
+    safety_notes: string[];
+  };
+  projection_status?: string;
+  missing_sections?: string[];
 }

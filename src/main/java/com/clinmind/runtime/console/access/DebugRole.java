@@ -6,5 +6,6 @@ public enum DebugRole {
     CANDIDATE_REVIEWER,
     AUDIT_REVIEWER,
     READ_ONLY_OBSERVER,
-    PATIENT
+    PATIENT,
+    CLINICIAN
 }

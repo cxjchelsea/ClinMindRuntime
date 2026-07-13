@@ -1,6 +1,17 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CaseWorkspacePage } from '../portals/clinician/pages/CaseWorkspacePage';
+
+vi.mock('../auth/DebugContextProvider', () => ({
+  useDebugContext: () => ({
+    context: {
+      apiBaseUrl: '',
+      debugToken: '',
+      actor: 'clinician-test',
+      roles: ['CLINICIAN'],
+    },
+  }),
+}));
 
 describe('CaseWorkspacePage', () => {
   it('renders clinician projection without raw provider fields', () => {

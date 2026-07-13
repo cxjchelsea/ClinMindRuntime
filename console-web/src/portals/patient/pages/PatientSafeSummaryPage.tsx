@@ -1,18 +1,29 @@
-import { patientRuntimeView } from '../../../demo/runtimeDemoData';
+import { useParams } from 'react-router-dom';
 import { CollectedFactsCard } from '../components/CollectedFactsCard';
 import { PatientQuestionList } from '../components/PatientQuestionList';
 import { PatientSafetyNotice } from '../components/PatientSafetyNotice';
+import { usePatientRuntimeView } from '../hooks/usePatientRuntimeView';
 
 export function PatientSafeSummaryPage() {
+  const { sessionId = 'runtime-demo-001' } = useParams();
+  const { data: patientRuntimeView, loading, source, error } = usePatientRuntimeView(sessionId);
+
   return (
     <section className="console-page">
       <div className="console-page__header">
         <h1>Patient Safe Summary</h1>
         <p>同一 Runtime 的患者端投影：仅展示安全摘要、已收集事实和下一步问询。</p>
       </div>
+      {source === 'demo-fallback' ? (
+        <p className="audit-access-hint">
+          Demo fallback：Patient Runtime View API 暂不可用，当前使用本地演示投影。{error ? `原因：${error}` : ''}
+        </p>
+      ) : null}
+      {loading ? <p className="portal-muted">Loading Patient View API...</p> : null}
       <section className="portal-panel">
         <h2>Safe summary</h2>
         <p>{patientRuntimeView.safe_summary}</p>
+        <p className="portal-muted">Projection: {patientRuntimeView.projection_status ?? source}</p>
         <p className="portal-muted">{patientRuntimeView.disclaimer}</p>
       </section>
       <PatientSafetyNotice notices={patientRuntimeView.safety_notices} />

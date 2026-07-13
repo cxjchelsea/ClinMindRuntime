@@ -3,8 +3,10 @@ export interface PatientSessionSummary {
   runtime_id: string;
   status: string;
   chief_complaint_summary: string;
+  risk_hint?: string;
   updated_at: string;
   safe_next_step: string;
+  projection_status?: string;
 }
 
 export interface PatientFactSummary {
@@ -40,4 +42,16 @@ export interface PatientRuntimeView {
   care_navigation: CareNavigationSuggestion[];
   allowed_actions: string[];
   disclaimer: string;
+  projection_status?: string;
+  missing_sections?: string[];
+}
+
+export interface PatientSafeSummary {
+  session_id: string;
+  runtime_id: string;
+  safe_summary: string;
+  safety_notices: SafetyNotice[];
+  care_navigation: CareNavigationSuggestion[];
+  disclaimer: string;
+  projection_status: string;
 }

@@ -35,7 +35,9 @@ public class DebugTokenFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return path == null
                 || (!path.startsWith("/api/v1/debug/")
-                && !path.startsWith("/api/v1/console/"));
+                && !path.startsWith("/api/v1/console/")
+                && !path.startsWith("/api/v1/patient/")
+                && !path.startsWith("/api/v1/clinician/"));
     }
 
     @Override
