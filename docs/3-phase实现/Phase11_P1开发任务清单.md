@@ -483,3 +483,20 @@ ClinMindRuntime 已具备受控 Runtime、治理 Console、多角色前端，以
 ```
 
 但仍不能表达为生产级医疗系统。
+
+---
+
+# 当前实现状态补充（Seed-backed 第一版）
+
+当前 Phase 11-P1 实现的数据流为 DemoRuntimeSeedProvider 到 Projection Service，再到 Role-specific Safe DTO 与 API-first Portal。
+
+当前实现已经具备后端 API、policy、sanitizer 与 audit，但数据源仍为 DemoRuntimeSeedProvider，尚未完成真实 RuntimeState / CaseFrame / PatientOutput / ClinicianReport 到 Projection Service 的投影。
+
+因此当前状态为 **Seed-backed Role-specific View API**，不能标记为完整的 Runtime-backed projection，也暂不满足冻结条件。后续必须接入真实 RuntimeStore 及相关领域输出。
+
+本轮冻结前修复项：
+
+- [x] DemoRoleSwitcher 同步 DebugContext.roles。
+- [x] Patient / Clinician policy reject 记录 VIEW_PROJECTION_POLICY_REJECTED。
+- [x] listSessions / listCases 支持空列表，并以 UNAVAILABLE 记录成功查询。
+- [ ] 接入 RuntimeStore / CaseFrame / PatientOutput / ClinicianReport，替代 DemoRuntimeSeedProvider。

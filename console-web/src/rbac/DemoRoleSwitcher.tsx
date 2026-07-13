@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { useDebugContext } from '../auth/DebugContextProvider';
+import type { DebugRole } from '../auth/debugContextTypes';
 import { useDemoRole } from './DemoRoleProvider';
 import { getDefaultRouteForRole, type AppRole } from './rbac';
 
@@ -10,8 +12,13 @@ const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
   { value: 'SYSTEM_ADMIN', label: 'Admin' },
 ];
 
+export function debugRolesForAppRole(role: AppRole): DebugRole[] {
+  return role === 'GOVERNANCE_REVIEWER' ? ['READ_ONLY_OBSERVER'] : [role];
+}
+
 export function DemoRoleSwitcher() {
   const { role, setRole } = useDemoRole();
+  const { setContext } = useDebugContext();
   const navigate = useNavigate();
 
   return (
@@ -22,6 +29,7 @@ export function DemoRoleSwitcher() {
         onChange={(event) => {
           const nextRole = event.target.value as AppRole;
           setRole(nextRole);
+          setContext({ roles: debugRolesForAppRole(nextRole) });
           navigate(getDefaultRouteForRole(nextRole));
         }}
       >

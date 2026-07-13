@@ -10,6 +10,7 @@ import com.clinmind.runtime.view.common.DemoRuntimeSeedProvider;
 import com.clinmind.runtime.view.common.RoleSpecificViewSanitizer;
 import com.clinmind.runtime.view.common.ViewProjectionAuditService;
 import com.clinmind.runtime.view.common.ViewProjectionException;
+import com.clinmind.runtime.view.common.dto.ProjectionStatus;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class ClinicianCaseProjectionService {
     }
 
     public List<ClinicianCaseSummaryDto> listCases(ActorContext context) {
-        policy.requireRead(context);
+        requireRead(context, "clinician_cases", DemoRuntimeSeedProvider.DEMO_RUNTIME_ID);
         List<ClinicianCaseSummaryDto> cases = seedProvider.clinicianCases();
         cases.forEach(sanitizer::validateClinicianViewDto);
         auditService.record(
@@ -41,13 +42,13 @@ public class ClinicianCaseProjectionService {
                 AuditActionType.CLINICIAN_CASE_VIEW_READ,
                 DemoRuntimeSeedProvider.DEMO_RUNTIME_ID,
                 "clinician_cases",
-                cases.get(0).projectionStatus(),
+                cases.isEmpty() ? ProjectionStatus.UNAVAILABLE : cases.get(0).projectionStatus(),
                 AuditResultStatus.SUCCESS);
         return cases;
     }
 
     public ClinicianCaseViewDto getCaseView(String caseId, ActorContext context) {
-        policy.requireRead(context);
+        requireRead(context, "clinician_case_view", caseId);
         ClinicianCaseViewDto view = seedProvider.clinicianCaseView(caseId)
                 .orElseThrow(() -> new ViewProjectionException("CLINICIAN_CASE_NOT_FOUND", "Clinician case not found"));
         sanitizer.validateClinicianViewDto(view);
@@ -62,7 +63,7 @@ public class ClinicianCaseProjectionService {
     }
 
     public ClinicianReportDraftViewDto getReportDraft(String caseId, ActorContext context) {
-        policy.requireRead(context);
+        requireRead(context, "clinician_report_draft", caseId);
         ClinicianReportDraftViewDto draft = seedProvider.clinicianReportDraft(caseId)
                 .orElseThrow(() -> new ViewProjectionException("CLINICIAN_CASE_NOT_FOUND", "Clinician report draft not found"));
         sanitizer.validateClinicianViewDto(draft);
@@ -74,5 +75,14 @@ public class ClinicianCaseProjectionService {
                 draft.projectionStatus(),
                 AuditResultStatus.SUCCESS);
         return draft;
+    }
+    private void requireRead(ActorContext context, String projectionType, String resourceId) {
+        try {
+            policy.requireRead(context);
+        } catch (ViewProjectionException exception) {
+            auditService.record(context, AuditActionType.VIEW_PROJECTION_POLICY_REJECTED, resourceId,
+                    projectionType, ProjectionStatus.UNAVAILABLE, AuditResultStatus.FAILURE);
+            throw exception;
+        }
     }
 }
