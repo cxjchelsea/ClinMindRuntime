@@ -1294,7 +1294,26 @@ Phase 11-P1 冻结记录
 
 ---
 
-# 二十五、最终结论
+# 二十五、路线图覆盖验收清单
+
+合并前必须人工确认：
+
+- [x] 完整系统设计八个能力域均有阶段归属；
+- [x] 五层架构均有阶段归属；
+- [x] 技术实现总方案全部 Java 模块均有阶段归属；
+- [x] Agent、RAG、GraphRAG、ModelProvider、Tool、MCP、Skills 均有演进阶段；
+- [x] API、存储、Evaluation、Candidate、Audit、Console、发布和运维均有阶段；
+- [x] 训练、后训练、模型回滚和漂移监控均有阶段；
+- [x] Experience Memory、医生反馈和再认证均有阶段；
+- [x] 正式身份、租户、RBAC/ABAC、审核和合规均有阶段；
+- [x] Voice / Realtime、Browser / Computer Use 等实验能力有明确状态；
+- [x] 新增 Evidence、Clinical Fact、Policy、Risk、Recovery、Action Transaction 均有阶段；
+- [x] 永久禁止能力与条件后置能力已区分；
+- [x] 下一实现主线仍明确为 Phase 12，而非同时启动全部长期能力。
+
+---
+
+# 二十六、最终结论
 
 ClinMindRuntime 的路线不再只是：
 
