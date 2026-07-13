@@ -3,262 +3,239 @@
 > 文档性质：架构决策记录  
 > 对应路线图：`ClinMindRuntime阶段拆分路线图.md` v3.0  
 > 当前系统基线：Phase 1–11 P0 已冻结；Phase 11-P1 收口中  
-> 决策目标：确定 Phase 11 之后的主线，阻止项目继续无边界横向扩张。
+> 决策目标：确定实现优先级，同时保证完整系统设计、技术实现总方案和新增设计全部进入长期路线。
 
 ---
 
 # 一、背景
 
-ClinMindRuntime 已经覆盖 Runtime、Agent、RAG、KG-lite、Python Provider、模型治理、Tool/MCP/Skills 治理、Evaluation、Candidate、Persistence、Audit、Governance Console 和三角色前端。
+ClinMindRuntime 已覆盖 Runtime、Agent、RAG、KG-lite、Python Provider、模型治理、Tool / MCP / Skills 治理、Evaluation、Candidate、Persistence、Audit、Governance Console 和三角色前端。
 
-这证明了“Runtime 主控、能力受控、结果可验证、输出可治理”的架构原则可以成立。
-
-但代码和文档同时暴露出明显失衡：
+这证明以下架构原则可以成立：
 
 ```text
-控制平面：
+Runtime 主控
+能力受控
+结果可验证
+输出可治理
+过程可评估、可审计、可回滚
+```
+
+但当前系统存在明显失衡：
+
+```text
+控制平面
 Runtime / Policy / Validation / Audit / Evaluation / Governance
 相对完整
 
-真实能力平面：
-LLM Agent / Evidence / Embedding / Rerank / FHIR Tool / Clinical Workflow
+真实能力平面
+LLM Agent / Evidence / Embedding / Rerank / FHIR / Clinical Workflow
 仍以规则、Mock、YAML 或局部投影为主
 ```
 
-如果继续优先增加 Multi-Agent、MCP、Skill Store、更多 Console 页面和生产级平台对象，项目会进一步扩大“治理外壳”，但无法增强真实临床价值和求职展示可信度。
+如果继续无顺序地增加 Multi-Agent、MCP、Skill Store、Console 页面和生产平台对象，会进一步扩大治理外壳，却无法证明系统具有真实临床能力。
 
 ---
 
-# 二、核心判断
+# 二、决策澄清：收敛实现顺序，不收缩完整设计
 
-Phase 11 之后不应继续沿用“每个新技术单独增加一个 Phase”的横向扩张方式。
+“路线收敛”不等于删除总设计中的能力。
 
-后续路线必须收敛为三条有优先级的主线：
+本次决策采用：
+
+```text
+完整设计范围全部保留
++
+近期实现主线严格收敛
++
+所有后续能力按依赖和触发条件进入正式 Phase
+```
+
+因此：
+
+- 完整系统设计中的八个能力域全部保留；
+- 技术实现总方案中的全部包、API、存储和平台能力全部进入路线图；
+- Agent 扩展、GraphRAG、训练治理、MCP、Skills、Experience Memory、完整 Console、生产治理、Voice / Realtime 等都具有后续 Phase；
+- Phase 11 后新增的 Evidence Domain、Clinical Fact Plane、Policy IR、RuntimeRiskState、Recovery、Capability Lease、Shadow Execution 和分层 Evaluation 全部纳入；
+- 暂不优先实现只表示未满足依赖，不表示从产品愿景删除。
+
+---
+
+# 三、近期优先级
+
+Phase 11 后的前三个优先方向：
 
 ```text
 第一优先：真实临床证据与单场景纵切
-第二优先：Runtime 执行语义最小统一
+第二优先：真实能力接入所需的最小 Runtime 统一治理
 第三优先：患者事实与纵向状态
 ```
 
-其中只有第一优先是立即主线；第二优先随真实能力接入同步建设；第三优先在单次临床纵切稳定后启动。
+只有第一优先立即启动；第二优先随真实能力同步建设；第三优先在单次纵切稳定后进入。
 
----
-
-# 三、保留的架构原则
-
-以下原则继续作为不可突破的系统边界：
-
-1. Runtime 是唯一主控；
-2. Agent 只能生成 Proposal / Draft / Finding；
-3. RAG 只能生成 EvidenceCandidate / EvidenceRef；
-4. Model 只能作为可替换、可评估、可降级的 Provider；
-5. Tool / MCP / Skill 结果必须经过 Policy 和 Validation；
-6. SafetyGate 和 DecisionBoundary 不由模型接管；
-7. Patient View 与 Clinician View 必须在后端完成安全投影；
-8. Candidate 不自动上线；
-9. Trace、Audit、Evaluation 必须覆盖关键能力调用；
-10. 外部数据只能作为数据，不能自动成为 Runtime 控制指令。
-
----
-
-# 四、主要架构缺口
-
-## 4.1 Evidence 仍然偏检索原型
-
-当前 Evidence 能力已经具备 Candidate、Validation、EvidenceGraph、Trace 和 Evaluation，但真实临床价值仍受以下限制：
-
-- 医学语料规模和来源有限；
-- 缺少真实 embedding 和稳定 hybrid retrieval；
-- 缺少证据资产版本；
-- 缺少临床主张与证据片段的明确绑定；
-- 缺少 citation entailment；
-- 缺少 freshness、patient applicability 和 conflict 的独立判断；
-- 医生端 Evidence Panel 尚未形成完整真实数据展示。
-
-因此 EvidenceProvider 应升级为核心临床能力，而不是继续作为简单检索插件。
-
-## 4.2 Runtime Policy 仍然分散
-
-当前 Agent、Evidence、Provider、Tool、SafetyGate、DecisionBoundary 都有各自的 Policy 或 Validation。
-
-这些模块本身合理，但随着真实能力增加，需要最小统一语义：
+这解决当前最重要的问题：
 
 ```text
-ALLOW
-DEGRADE
-REVIEW_REQUIRED
-BLOCK
+被治理的能力仍然太薄。
 ```
 
-同时需要明确：
+---
 
-- 外部数据的来源与可信度；
-- 能力执行前授权；
-- 能力执行后安全重评估；
-- 失败后的恢复动作；
-- 为什么允许、降级或阻断。
+# 四、必须保留的系统边界
 
-本阶段不建设完整 Policy DSL，只建立可以支撑真实纵切的最小统一对象。
+1. Runtime 是唯一主控；
+2. Agent 只能生成 Proposal / Draft / Candidate / Finding；
+3. RAG 只能产生 EvidenceCandidate / EvidenceRef；
+4. Model 只能作为 Provider；
+5. Tool / MCP / Skill 结果必须经过授权和校验；
+6. SafetyGate 和 DecisionBoundary 不由模型接管；
+7. Patient / Clinician View 必须在后端完成安全投影；
+8. Candidate、Experience、Dataset、Model、Prompt、Asset 不自动发布；
+9. Trace、Audit、Evaluation 覆盖关键调用；
+10. 外部数据只能作为数据或证据，不能成为 Runtime 控制指令；
+11. 高风险外部写操作必须经过事务治理与人工批准；
+12. 任何框架都不得替代 Runtime 主控。
 
-## 4.3 缺少患者事实与纵向状态域
+---
 
-当前 RuntimeState 适合保存一次会话的执行状态，EvidenceGraph 适合保存本轮决策证据，Experience/Candidate 适合保存系统改进经验。
+# 五、当前主要架构缺口
 
-这些对象都不适合承担完整患者纵向事实。
+## 5.1 Evidence 缺少真实临床资产和 Claim 级证据链
 
-未来需要独立区分：
+需要补齐：
+
+```text
+SourceRegistry
+EvidenceAssetVersion
+EvidenceClaim
+ClaimEvidenceLink
+EvidenceGrade
+EvidenceApplicability
+Freshness
+Conflict
+Citation Verification
+```
+
+EvidenceProvider 应从简单检索插件升级为核心临床能力。
+
+## 5.2 Runtime Policy 语义仍然分散
+
+近期先建立：
+
+```text
+CapabilityDecision
+RuntimeDatum / Provenance / Trust
+Post-Capability Safety
+RecoveryAction
+```
+
+长期再收束为：
+
+```text
+Policy IR
+CapabilityDecisionEngine
+RuntimeRiskState
+Capability Lease
+Causal Trace
+```
+
+## 5.3 缺少独立患者事实与纵向状态域
+
+未来需要明确区分：
 
 ```text
 患者事实
 医学知识
-本轮证据
+本轮 Runtime Evidence
 系统经验
 Agent 推断
 ```
 
-但完整 Clinical Fact Ledger、双时间和冲突重建是独立大阶段，不应抢在真实单场景闭环之前实现。
+并建立 Raw Event、ClinicalFactLedger、Current State Projection、双时间和冲突重建。
 
-## 4.4 缺少真实能力失败后的恢复
+## 5.4 缺少有副作用动作的事务语义
 
-当前系统重视 reject、degrade、fail-safe 和 halt，但真实 Provider、LLM、RAG、FHIR Tool 接入后，还必须支持：
+真实写操作出现后，必须引入：
+
+```text
+RuntimeActionProposal
+ShadowRuntimeState
+Preconditions
+Staged Execution
+Postconditions
+Commit / Rollback
+Human Approval
+Kill Switch
+```
+
+## 5.5 缺少真实能力失败后的恢复
+
+系统不能以“全部阻断”为安全目标，还需要：
 
 ```text
 Rule fallback
 Restricted retry
 Ask clarification
 Human review
+Rollback
 Safe halt
 ```
 
-系统不能以“全部阻断”为安全目标，还需要衡量 false block rate 和恢复成功率。
+并评测 false block rate 和 recovery success。
 
 ---
 
-# 五、路线选择
+# 六、全量阶段决策
 
-## 选择 A：继续横向扩展平台
+```text
+Phase 11-P1
+收口真实 Runtime 角色投影
 
-包括：
+Phase 12
+真实 Evidence + 真实 LLM Agent + 只读 FHIR + 单场景纵切
 
-- 更多 Agent；
-- Multi-Agent / Handoff；
-- 远程 MCP；
-- Skill Store；
-- 更多 Console；
-- 生产级多租户；
-- 自动训练与发布。
+Phase 13
+Clinical Data / Fact / Longitudinal State
 
-结论：暂不采用。
+Phase 14
+Policy IR、RuntimeRiskState、Capability Lease 和因果 Trace
 
-原因：这些能力不能解决当前真实 Agent、Evidence、FHIR 数据和量化评测不足的问题。
+Phase 15
+真实写操作的 Shadow / Staged Commit / Rollback
 
-## 选择 B：优先建设完整 Clinical Fact Ledger
+Phase 16
+受控 Agent、可恢复 Workflow、Multi-Agent / Handoff
 
-包括：
+Phase 17
+Deep Evidence、KG-lite / GraphRAG 和知识资产治理
 
-- Append-only Event Ledger；
-- Bi-temporal Fact Ledger；
-- Reconciliation；
-- Current State Projection；
-- 多资源适配器。
+Phase 18
+真实 ModelProvider、训练、后训练、模型发布和回滚
 
-结论：保留为 Phase 13，不作为立即主线。
+Phase 19
+真实 Tool / MCP / Skills 与 FHIR/EHR/HIS/LIS/PACS 集成
 
-原因：架构价值高，但当前缺乏真实单次临床闭环，提前建设会继续扩大抽象层。
+Phase 20
+医生反馈、Clinical Experience Memory 和持续改进
 
-## 选择 C：真实临床证据纵切 + Runtime 最小收敛
+Phase 21
+生产认证、租户、完整治理 Console、发布、运维和合规
 
-包括：
+Phase 22
+Voice / Realtime、Browser / Computer Use 和隔离前沿实验
+```
 
-- 真实公开医学资料；
-- 真实 hybrid retrieval；
-- Evidence Asset / Claim / Citation；
-- LLM-backed InquiryPlanningAgent；
-- 只读 FHIR Tool；
-- CapabilityDecision；
-- Provenance / Trust；
-- Post-Capability SafetyGate；
-- Recovery；
-- 胸痛场景端到端 Evaluation。
-
-结论：采用，作为 Phase 12 主线。
+上述阶段全部属于正式长期路线，但进入顺序由依赖关系控制。
 
 ---
 
-# 六、目标架构
-
-Phase 12 目标主链路：
-
-```text
-Patient Input / FHIR Data / External Evidence
-↓
-Data Provenance & Trust Classification
-↓
-RuntimeState / CaseFrame / RuntimeRisk Context
-↓
-Pre-Capability SafetyGate
-↓
-CapabilityDecision
-↓
-LLM Agent / Evidence Engine / Read-only FHIR Tool
-↓
-Structured Proposal / Evidence / Tool Result
-↓
-Validation
-↓
-Post-Capability SafetyGate
-↓
-Recovery / Controlled Adoption
-↓
-DecisionBoundary
-↓
-Patient / Clinician / Governance Projection
-↓
-Trace / Audit / Evaluation
-```
-
-Phase 13 之后再扩展：
-
-```text
-RawSourceEvent
-↓
-ClinicalDatum / ClinicalFact
-↓
-Temporal Reconciliation
-↓
-CurrentClinicalStateProjection
-↓
-Runtime Context
-```
-
-Phase 14 仅在出现真实写操作后扩展：
-
-```text
-RuntimeActionProposal
-→ Shadow State
-→ Preconditions
-→ Staged Execution
-→ Postconditions
-→ Commit / Rollback
-```
-
----
-
-# 七、Phase 12 首个临床纵切
+# 七、Phase 12 首个纵切
 
 固定首个领域：
 
 ```text
 胸痛 / 胸闷风险分层与追问
 ```
-
-选择原因：
-
-- 当前项目已有胸痛测试和 SafetyGate 基础；
-- 能展示主动追问、危险信号、FHIR 病史、医学证据和角色化输出；
-- 容易设计正常、高风险、缺失、冲突和故障注入场景；
-- 范围足够小，能避免扩展为全病种系统。
 
 必须打通：
 
@@ -268,85 +245,73 @@ RuntimeActionProposal
 → Runtime 校验
 → FHIR 只读查询
 → Evidence Engine
-→ Evidence Validation
-→ Post-Safety
+→ Claim / Citation / Applicability
+→ Post-Capability Safety
 → PatientOutput / ClinicianReport
 → Governance Trace
 → Evaluation
 ```
 
+这是后续 Clinical Fact、统一 Policy、Agent Workflow、模型训练、Tool 集成和生产平台的真实基础。
+
 ---
 
-# 八、明确后置项
+# 八、后置不等于取消
 
-Phase 12 完成前不优先建设：
+Phase 12 完成前暂不优先建设：
 
-- Multi-Agent；
-- Handoff；
-- 远程 MCP；
-- Skill Store；
-- Browser / Computer Use；
-- 全病种知识库；
+- Multi-Agent / Handoff；
+- 大规模远程 MCP 和 Skill Store；
 - 完整 GraphRAG 平台；
 - 完整 Clinical Fact Ledger；
 - 写入型医疗工具；
-- 生产级认证、多租户和正式医生工作站；
-- LoRA、DPO、RLHF、RFT、蒸馏；
-- 自动 Evidence / Candidate / Model / Prompt / Dataset 发布。
+- LoRA、DPO、RFT、蒸馏；
+- 正式认证、多租户和完整审核平台；
+- Voice、Realtime、Browser / Computer Use；
+- 自动发布能力。
+
+这些项目已经在路线图的 Phase 13–22 中拥有明确归属，不能再被理解为“从设计中删除”。
 
 ---
 
-# 九、成功标准
+# 九、路线图完整性验收
 
-路线收敛成功不能只通过文档数量判断，必须满足：
+新版路线图必须能逐项回答：
 
-1. 主演示链路使用真实 LLM、真实检索和真实只读 FHIR 数据；
-2. Mock 仅作为明确 fallback；
-3. 医生端关键主张可追踪到来源、版本和 source span；
-4. 外部数据不能改变 Runtime 控制流；
-5. 能力执行后重新评估风险；
-6. Provider 或 Tool 失败后可以安全恢复；
-7. 患者端不泄露 DDx、Trace、原始证据和内部推理；
-8. 有 task success、safety violation、citation entailment、recovery success、false block rate 等量化结果；
-9. 三角色视图来自同一个真实 Runtime；
-10. Phase 11-P1 和 Phase 12 各自具有明确冻结记录。
+1. 八个能力域分别在哪个 Phase 实现；
+2. 五层架构分别在哪个 Phase 完善；
+3. 技术实现总方案中的 Java 包分别归属哪个 Phase；
+4. Agent、RAG、Model、Tool、MCP、Skill 各自如何演进；
+5. API、存储、Evaluation、Console、发布和运维在哪里实现；
+6. 模型训练、后训练、GraphRAG、Multi-Agent、Experience Memory 是否有正式阶段；
+7. 新增 Evidence、Clinical Fact、统一 Policy、Risk、Recovery、Action Transaction 是否有正式阶段；
+8. Voice / Realtime、Browser 等实验技术是否被明确标为条件能力；
+9. 永久禁止的能力是否与“后置能力”清楚区分。
+
+只有全部能够映射，路线图才算覆盖完整系统设计和技术实现总方案。
 
 ---
 
 # 十、决策结论
 
-ClinMindRuntime 已完成架构广度验证，下一阶段正式停止无边界横向扩张。
-
-采用以下路线：
+ClinMindRuntime 后续采用：
 
 ```text
-Phase 11-P1
-收口真实 Runtime 角色投影
-
-Phase 12
-真实 Evidence + 真实 LLM Agent + 只读 FHIR Tool + Runtime 最小统一治理
-
-Phase 13
-患者事实与纵向状态
-
-Phase 14
-真实写操作出现后的事务治理
-
-Phase 15
-深度证据综合
-
-Phase 16
-生产级平台化
+完整设计范围不缩减
++
+当前实现主线聚焦 Phase 12
++
+后续能力按 Phase 13–22 逐步进入
 ```
 
-核心目标是把 ClinMindRuntime 从：
+核心目标不是让路线图变得更短，而是让它同时做到：
 
 ```text
-模块完整的医疗 AI 治理原型
+近期可执行
+长期无遗漏
+依赖关系清楚
+禁止边界明确
+每项设计可追踪
 ```
 
-推进为：
-
-```text
-具有真实临床能力、受控执行、可追踪证据、故障恢复和量化评测的医疗 Agent Runtime
-```
+因此，新版路线图既阻止无边界横向开发，也保证完整系统设计、技术实现总方案和 Phase 11 后新增架构中的全部正式能力都具有明确落点。
