@@ -1,8 +1,8 @@
 # ClinMindRuntime 阶段拆分路线图
 
 > 路线图版本：v3.0  
-> 当前权威总设计：`docs/1-总设计/ClinMindRuntime完整系统设计.md` v2.2  
-> 当前权威技术蓝图：`docs/1-总设计/ClinMindRuntime技术实现总方案.md` v2.2  
+> 当前权威总设计：`docs/1-总设计/ClinMindRuntime完整系统设计.md` v3.0  
+> 当前权威技术蓝图：`docs/1-总设计/ClinMindRuntime技术实现总方案.md` v3.0  
 > 项目定位：受控医疗 AI Agent Runtime 与能力治理平台  
 > 当前状态：Phase 1–11 P0 已冻结；Phase 11-P1 正在收口；下一条实现主线为 Phase 12。  
 > 路线决策：`docs/1-总设计/Phase11后架构缺口与路线收敛决策.md`
@@ -1165,182 +1165,230 @@ Evidence refs / KG-lite                                Phase 7
 governed model / prompt / dataset metadata             Phase 8
 Tool / MCP / Skill metadata and trace                  Phase 9
 role projections / read models                         Phase 11
-source / asset / claim / citation / vector index       Phase 12
-raw events / clinical facts / provenance / conflicts   Phase 13
-policy decisions / risk states / leases / causal links Phase 14
-action proposals / checkpoints / approvals             Phase 15
-workflow / handoff / agent registry versions           Phase 16
-knowledge graph / ingestion / index versions           Phase 17
-training runs / releases / drift / rollback             Phase 18
-tool credentials refs / integration metadata           Phase 19
-feedback / experience assets / recertification          Phase 20
-users / tenants / roles / permissions / release audit  Phase 21
-realtime sessions / browser action trace               Phase 22
+Evidence source / asset / claim / citation             Phase 12
+Raw event / ClinicalDatum / ClinicalFact / projection  Phase 13
+Policy / decision / risk / lease / causal trace        Phase 14
+Action / shadow / approval / commit / rollback         Phase 15
+Workflow / checkpoint / handoff                        Phase 16
+Deep evidence / knowledge graph / asset lifecycle      Phase 17
+Model artifact / experiment / release / drift          Phase 18
+Remote integration / credentials / tool versions       Phase 19
+Feedback / experience / improvement candidate          Phase 20
+Identity / tenant / access / release workflow          Phase 21
+```
+
+## 20.3 治理平台
+
+```text
+Runtime / Evaluation / Candidate / Audit MVP        Phase 5 / 10
+Role Frontends                                      Phase 11
+Evidence Panel / Trace                              Phase 12
+Fact Timeline / Conflict Review                     Phase 13
+Policy / Risk / Capability Console                  Phase 14
+Action Approval / Kill Switch                       Phase 15
+Workflow / Agent Governance                         Phase 16
+Knowledge Console                                   Phase 17
+Model Registry / Training Center                    Phase 18
+Tool / MCP / Skill Console                          Phase 19
+Experience Memory Center                            Phase 20
+完整生产 Governance Platform                        Phase 21
 ```
 
 ---
 
-# 二十一、AI 技术覆盖矩阵
+# 二十一、AI 与技术选型完整归属
 
-| 技术 / 能力 | 正式归属 | 阶段 | 约束 |
-|---|---|---|---|
-| Structured Output | 全部外部能力基础 | Phase 2 起持续 | 不能绕过 Runtime |
-| Function / Tool Calling | Tool 能力 | Phase 9、19 | 最小权限、结构化结果 |
-| MCP / Spring AI MCP | 外部连接 | Phase 9、19 | 不是主控 |
-| Agents SDK 类框架 | Agent 内部实现参考 | Phase 16 / 22 | 不能接管 Runtime |
-| LangGraph | 可恢复 Workflow 参考 | Phase 16 / 22 | 只能位于 Provider / Agent 内部 |
-| LangChain / LlamaIndex | RAG / Tool 实验实现 | Phase 12、17、22 | 不是领域边界 |
-| GraphRAG | Evidence 增强 | Phase 17 | 不直接诊断 |
-| LLM-as-a-Judge | Evaluation 辅助 | Phase 8、18 | 不是唯一安全判据 |
-| Guardrails | Provider / Output 校验 | Phase 12、14 | 不替代 SafetyGate / Boundary |
-| Skills | 可复用能力资产 | Phase 9、19 | 不自动授权 |
-| Agent Memory | Experience / Fact / Agent 上下文 | Phase 13、20 | 不做无治理自由记忆 |
-| Multi-Agent / Handoff | 后台和复杂受控 Workflow | Phase 16 | 不主控医疗输出 |
-| CrewAI / AutoGen | 实验框架 | Phase 16-P2 / 22 | 实验隔离 |
-| Voice / Realtime | 交互入口 | Phase 22 | 不改变 Runtime 权力 |
-| Browser / Computer Use | 高风险工具实验 | Phase 19-P2 / 22 | 需 Phase 15 治理 |
-| Fine-tuning / SFT / LoRA | ModelProvider 优化 | Phase 18 | 输出仍需 Validation |
-| DPO / RFT | 偏好和任务优化 | Phase 18-P2 | 不自动扩权 |
-| Distillation / Pruning / Quantization | 部署和成本优化 | Phase 18-P2 | 需效果评测 |
-| Embedding / Reranker | Evidence / Memory 检索 | Phase 12、17、18 | 与证据质量分离 |
-| pgvector | 默认向量基础设施 | Phase 12、17 | 优先于复杂平台 |
-| Neo4j / Milvus / Qdrant | 规模化候选 | Phase 17-P2 | 由评测和规模触发 |
-| Codex / Claude Code / OpenHands | 开发辅助 | 当前可用 | 非产品 Runtime 能力 |
+| 技术 | 正式落点 | 定位 |
+|---|---|---|
+| Structured Output | Phase 6+ | 所有能力返回结构化对象 |
+| Function Calling | Phase 9、19 | Tool 调用机制，不是主控 |
+| MCP / Spring AI MCP | Phase 9、19 | 外部连接 Adapter |
+| LangChain / LlamaIndex | Phase 12、17 实现候选 | RAG / Index Provider 内部实现 |
+| GraphRAG | Phase 17 | Evidence 增强 |
+| LangGraph / Agent SDK | Phase 16、22 | Workflow 内部实现或实验 |
+| Multi-Agent / Handoff | Phase 16 | 后台受控协作 |
+| LLM-as-a-Judge | Phase 8、18 | 辅助 Scorer，非唯一判据 |
+| Agent Memory | Phase 20、22 | 受治理 Experience，不自由记忆 |
+| Fine-tuning / SFT | Phase 18 | 任务 Provider 优化 |
+| LoRA / QLoRA | Phase 18 | 低成本适配 |
+| DPO / RFT | Phase 18 条件能力 | 偏好或奖励优化 |
+| Distillation / Pruning / Quantization | Phase 18 条件能力 | 部署优化 |
+| Embedding / Reranker | Phase 12、18 | Evidence 和检索能力 |
+| pgvector | Phase 12、17 | 默认向量基础设施 |
+| Neo4j / Milvus / Qdrant | Phase 17 条件能力 | 规模证明必要后进入 |
+| Voice / Realtime | Phase 22 | 新交互通道 |
+| Browser / Computer Use | Phase 19、22 条件实验 | 受控 Tool Adapter |
+| Codex / Claude Code / OpenHands | NON-PRODUCT | 开发辅助工具 |
 
 ---
 
 # 二十二、Phase 11 后新增设计追踪矩阵
 
-| 新增设计 | 路线阶段 |
+| 新增设计 | 正式阶段 |
 |---|---|
 | SourceRegistry / EvidenceAssetVersion | Phase 12、17 |
-| EvidenceClaim / ClaimEvidenceLink | Phase 12、17 |
-| 证据质量、适用性、新鲜度、冲突、引用验证 | Phase 12、17 |
-| Quick / Deep Evidence Mode | Phase 12、17 |
-| Clinician Feedback | Phase 20 |
-| Raw Clinical Event Ledger | Phase 13 |
-| ClinicalFactLedger / Current State Projection | Phase 13 |
-| FHIR 资源适配器和原生状态语义 | Phase 12、13、19 |
-| 双时间、替代、冲突、纵向重建 | Phase 13 |
-| Clinical Fact Graph / Runtime Evidence Graph 分离 | Phase 13、17 |
-| Data Provenance / Trust / Instruction Boundary | Phase 12、14 |
-| CapabilityDecision / Policy IR | Phase 12、14 |
-| Post-Capability SafetyGate | Phase 12、14 |
+| EvidenceClaim / ClaimEvidenceLink | Phase 12 |
+| Applicability / Grade / Freshness / Citation Verification | Phase 12、17 |
+| EvidenceConflictSet | Phase 12、17 |
+| ClinicalQuestionNormalizer / RetrievalPlanner | Phase 12 最小版，Phase 17 完整版 |
+| Clinician Evidence Panel | Phase 11 收口、Phase 12 实数据、Phase 17 增强 |
+| ClinicianFeedback | Phase 20 |
+| RawSourceEvent / append-only ledger | Phase 13 |
+| ClinicalFactLedger / CurrentClinicalStateProjection | Phase 13 |
+| FHIR resource-specific adapters | Phase 12 只读，Phase 13 事实化 |
+| Bi-temporal / Supersession / Conflict | Phase 13 |
+| Clinical Fact Graph / Runtime Evidence Graph | Phase 13 |
+| RuntimeDatum / Provenance / Trust | Phase 12、14 |
+| CapabilityDecision / Policy IR | Phase 12 最小版，Phase 14 正式版 |
+| Pre / Post Capability Safety | Phase 12、14 |
 | RuntimeRiskState | Phase 14 |
-| RecoveryPolicy | Phase 12、14、16 |
-| Capability Lease | Phase 14 |
-| ActionProposal / Shadow / Staged Commit | Phase 15 |
-| 错误传播链和因果 Trace | Phase 14 |
-| 分层 Evaluation 与 False Block Rate | Phase 12 起持续 |
+| RecoveryPolicy | Phase 12、14 |
+| CapabilityLease | Phase 14 |
+| Causal Trace / Error Propagation Chain | Phase 14 |
+| RuntimeActionProposal | Phase 15 |
+| Shadow / Staged Execution / Commit / Rollback | Phase 15 |
+| 分层 Evaluation / False Block Rate | Phase 12 起持续，Phase 14 / 15 加固 |
 
 ---
 
-# 二十三、永久禁止与非产品能力
+# 二十三、永久禁止与条件能力
 
-以下内容不是“以后再做”，而是系统永久边界：
+## 23.1 永久禁止
 
 ```text
-Agent / Model / RAG 直接生成不受控患者最终医疗结论
-Agent、Tool、MCP、Skill 直接修改 RuntimeState
-RAG 检索结果直接拼接成患者答案
-外部文档、ToolResult 或患者输入成为 Runtime 控制指令
-Candidate / Experience / Dataset / Model / Prompt / Asset 自动发布
-未经 Evaluation 和 Review 扩大 CapabilityProfile
-LLM-as-a-Judge 成为唯一医疗安全判据
-自由自治式 AI 医生取代医生
-未授权自动处方或自主治疗决策
-Console 绕过 Runtime 和发布流程改变医疗能力
+LLM / Agent / Multi-Agent 成为 Runtime 主控；
+Agent 直接写 ClinicalFactLedger 或 RuntimeState；
+RAG 直接回答患者或决定诊断；
+外部文档 / ToolResult 作为控制指令；
+未经授权和验证执行外部副作用；
+自动处方或自主医疗决定；
+Candidate / Feedback / Training Trace 自动上线；
+Console 绕过 Evaluation / Review / Release；
+患者端暴露 Chain-of-Thought、Secret、内部 Policy / Risk 或 raw PHI。
 ```
 
-开发辅助工具不属于产品能力完成度：
+## 23.2 条件能力
 
 ```text
-Codex
-Claude Code
-OpenHands
-IDE Agent
-CI 自动代码生成工具
+写操作
+→ Phase 15 冻结后启用。
+
+Multi-Agent
+→ 单 Agent、Policy、Trace 和 Evaluation 稳定后启用。
+
+复杂 Graph / Vector Infrastructure
+→ 数据规模和评测证明必要后启用。
+
+训练 / 后训练
+→ 真实数据、明确任务和可靠 Evaluation 后启用。
+
+Browser / Computer Use
+→ 隔离、最小权限、完整 Trace 和人工审批后实验。
 ```
 
 ---
 
-# 二十四、当前执行顺序
+# 二十四、跨阶段验证要求
 
-虽然路线图覆盖完整系统，实际执行仍必须保持优先级：
+任何阶段均需按适用性覆盖：
+
+```text
+Backend Unit / Integration
+InMemory / PostgreSQL parity
+Provider Contract / Schema
+Frontend Test / Build
+Role Projection Security
+Failure Injection
+Regression
+Manual Clinical Review
+Performance / Cost
+Audit Completeness
+```
+
+重要故障注入：
+
+```text
+LLM timeout / malformed JSON
+Embedding / Reranker failure
+stale / conflicting evidence
+citation not entailed
+FHIR timeout / unauthorized / malformed resource
+patient-reported vs EHR conflict
+prompt injection in RAG / ToolResult
+illegal AgentProposal
+unauthorized state write
+role leakage
+expired lease
+partial external write
+rollback failure
+revoked model / tool / policy version
+```
+
+---
+
+# 二十五、当前实际执行顺序
+
+尽管路线覆盖 Phase 0–22，当前只允许按以下顺序推进：
 
 ```text
 1. 收口并冻结 Phase 11-P1。
-2. 进入 Phase 12-P0 Clinical Evidence Engine。
-3. 完成 Phase 12-P1 真实 Agent、FHIR 和最小统一治理。
-4. 完成 Phase 12-P2 胸痛纵切和量化 Evaluation。
-5. 根据纵切暴露的问题进入 Phase 13 和 Phase 14。
-6. 只有出现真实写操作才启动 Phase 15。
-7. 再依次扩展 Agent、Knowledge、Model、Tool、Experience 和 Production Platform。
-8. Phase 22 始终保持条件触发和实验隔离。
-```
-
-下一步文档顺序：
-
-```text
-Phase 11-P1 冻结记录
-→ ClinMindRuntime 完整系统设计 v3.0 同步
-→ ClinMindRuntime 技术实现总方案 v3.0 同步
-→ 项目设计地图 / README / AI_IMPLEMENTATION_SKILL 同步
-→ Phase 12-P0 实现规格
-→ Phase 12-P0 API 与测试设计
-→ Phase 12-P0 开发任务清单
-→ 代码与测试
+2. 建立 Phase 12-P0 实现规格、API 与测试设计、任务清单。
+3. 完成 Clinical Evidence Engine MVP。
+4. 完成真实 LLM Agent、只读 FHIR 和最小统一治理。
+5. 完成胸痛 / 胸闷纵切与量化评测。
+6. 冻结 Phase 12。
+7. 再决定进入 Phase 13，禁止并行铺开 Phase 14–22。
 ```
 
 ---
 
-# 二十五、路线图覆盖验收清单
+# 二十六、文档同步与完整性验收
 
-合并前必须人工确认：
+路线图每次升级必须检查：
 
-- [x] 完整系统设计八个能力域均有阶段归属；
-- [x] 五层架构均有阶段归属；
-- [x] 技术实现总方案全部 Java 模块均有阶段归属；
-- [x] Agent、RAG、GraphRAG、ModelProvider、Tool、MCP、Skills 均有演进阶段；
-- [x] API、存储、Evaluation、Candidate、Audit、Console、发布和运维均有阶段；
-- [x] 训练、后训练、模型回滚和漂移监控均有阶段；
-- [x] Experience Memory、医生反馈和再认证均有阶段；
-- [x] 正式身份、租户、RBAC/ABAC、审核和合规均有阶段；
-- [x] Voice / Realtime、Browser / Computer Use 等实验能力有明确状态；
-- [x] 新增 Evidence、Clinical Fact、Policy、Risk、Recovery、Action Transaction 均有阶段；
-- [x] 永久禁止能力与条件后置能力已区分；
-- [x] 下一实现主线仍明确为 Phase 12，而非同时启动全部长期能力。
+- 完整系统设计中的每个能力域是否有 Phase；
+- 技术实现总方案中的每个包、API、存储对象是否有 Phase；
+- 专项规划中的正式能力是否进入路线；
+- 新增架构对象是否同时进入总设计、技术方案和路线图；
+- 历史冻结状态是否保持真实；
+- 当前下一阶段是否唯一、明确且满足依赖；
+- 永久禁止项和条件后置项是否被区分。
+
+本 v3.0 已完成对当前完整系统设计、技术实现总方案和 Phase 11 后新增三组设计建议的全量映射。
 
 ---
 
-# 二十六、最终结论
-
-ClinMindRuntime 的路线不再只是：
-
-```text
-下一阶段做真实 RAG 和一个 FHIR Tool。
-```
-
-而是形成一条覆盖完整设计的长期实现路径：
+# 二十七、最终路线
 
 ```text
 Phase 0–11
-建立 Runtime、治理和原型能力广度
+建立 Runtime、治理和原型能力基础。
 
 Phase 12
-完成真实临床证据、真实 Agent、只读 FHIR 和单场景闭环
+用真实 Evidence、真实 Agent、只读 FHIR 和胸痛纵切证明系统价值。
 
 Phase 13–15
-补齐患者事实、统一 Runtime 内核和有副作用动作事务治理
+补齐患者事实、统一 Runtime 治理和事务动作内核。
 
 Phase 16–20
-完成 Agent、Knowledge、Model、Tool、Experience 的全部能力域
+补齐 Agent、Workflow、Knowledge、Model、Tool 和 Experience 完整生命周期。
 
 Phase 21
-完成生产级治理、发布、运维和合规平台
+形成生产治理、审核、发布、运维和合规平台。
 
 Phase 22
-承载语音、Realtime、Browser 和前沿框架的受控实验
+在隔离边界内探索高级交互与前沿技术。
 ```
 
-这样既保证当前工作不会继续无边界横向扩张，也保证完整系统设计、技术实现总方案和新增架构建议中的每一项，都在正式路线图中拥有明确归属。
+完整设计范围全部进入路线，但实现始终坚持：
+
+```text
+Runtime 主控，
+事实与证据分离，
+能力最小权限，
+结果结构化校验，
+风险前后重评估，
+动作分阶段提交，
+角色输出隔离，
+全过程可追踪、可评估、可审核、可恢复、可回滚。
+```
