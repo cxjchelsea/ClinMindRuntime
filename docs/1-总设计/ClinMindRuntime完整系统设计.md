@@ -1005,8 +1005,8 @@ Model / Knowledge / Tool Drift Monitoring
 截至 v3.0 设计写回时：
 
 ```text
-Phase 0–11 P0 已完成并形成架构与治理原型；
-Phase 11-P1 正在收口 Runtime-backed Role View；
+Phase 0–11 P1 已完成并形成架构与治理原型；
+Phase 11-P1 Runtime-backed Role View 已完成并冻结；
 Phase 12 是下一条实现主线。
 ```
 

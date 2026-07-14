@@ -4,7 +4,7 @@
 > 当前权威总设计：`docs/1-总设计/ClinMindRuntime完整系统设计.md` v3.0  
 > 当前权威技术蓝图：`docs/1-总设计/ClinMindRuntime技术实现总方案.md` v3.0  
 > 项目定位：受控医疗 AI Agent Runtime 与能力治理平台  
-> 当前状态：Phase 1–11 P0 已冻结；Phase 11-P1 正在收口；下一条实现主线为 Phase 12。  
+> 当前状态：Phase 1–11 P1 已冻结；下一条实现主线为 Phase 12。
 > 路线决策：`docs/1-总设计/Phase11后架构缺口与路线收敛决策.md`
 
 本文档不是只描述“最近准备做什么”，而是 ClinMindRuntime 的**全量实现路线总表**。
@@ -147,7 +147,7 @@ Phase X-P2
 | Phase 9-P0 | Tool / MCP / Skills 治理原型 | Registry、Policy、Validation、Mock / Local Adapter | FROZEN |
 | Phase 10-P0 | Governance / Runtime Console MVP | 只读治理聚合、Runtime Timeline 和安全治理视图 | FROZEN |
 | Phase 11-P0 | Role-based Frontend Suite | Patient / Clinician / Governance 三角色前端 | FROZEN |
-| Phase 11-P1 | Runtime-backed Role View | 后端安全投影、API-first 前端、RuntimeStore 与 fallback | CLOSING |
+| Phase 11-P1 | Runtime-backed Role View | 后端安全投影、API-first 前端、RuntimeStore 与 fallback | FROZEN |
 | Phase 12-P0 | Clinical Evidence Engine MVP | 真实证据资产、混合检索、Claim 和 Citation 验证 | NEXT |
 | Phase 12-P1 | Controlled Real Capability Slice | 真实 LLM Agent、只读 FHIR、最小统一决策、Post-Safety、Recovery | PLANNED |
 | Phase 12-P2 | Chest-pain Clinical Vertical | 胸痛/胸闷单场景端到端闭环与量化评测 | PLANNED |
@@ -203,7 +203,7 @@ Patient / Clinician / Governance 三角色视图
 
 ---
 
-# 五、Phase 11-P1：当前收口阶段
+# 五、Phase 11-P1：已冻结基线
 
 ## 5.1 目标链路
 
@@ -215,7 +215,7 @@ RuntimeState / CaseFrame / PatientOutput / ClinicianReport / DecisionBoundary
 → API-first Frontend
 ```
 
-## 5.2 冻结前必须完成
+## 5.2 冻结门槛（已完成）
 
 1. 更新开发任务清单实际状态；
 2. 补齐人工测试与冻结记录；
@@ -1331,13 +1331,12 @@ revoked model / tool / policy version
 尽管路线覆盖 Phase 0–22，当前只允许按以下顺序推进：
 
 ```text
-1. 收口并冻结 Phase 11-P1。
-2. 建立 Phase 12-P0 实现规格、API 与测试设计、任务清单。
-3. 完成 Clinical Evidence Engine MVP。
-4. 完成真实 LLM Agent、只读 FHIR 和最小统一治理。
-5. 完成胸痛 / 胸闷纵切与量化评测。
-6. 冻结 Phase 12。
-7. 再决定进入 Phase 13，禁止并行铺开 Phase 14–22。
+1. 建立 Phase 12-P0 实现规格、API 与测试设计、任务清单。
+2. 完成 Clinical Evidence Engine MVP。
+3. 完成真实 LLM Agent、只读 FHIR 和最小统一治理。
+4. 完成胸痛 / 胸闷纵切与量化评测。
+5. 冻结 Phase 12。
+6. 再决定进入 Phase 13，禁止并行铺开 Phase 14–22。
 ```
 
 ---

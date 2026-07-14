@@ -1,10 +1,10 @@
-# AI Implementation Skill：ClinMindRuntime（Phase 11-P1 冻结阻塞修复期）
+# AI Implementation Skill：ClinMindRuntime（Phase 11-P1 已冻结 / Phase 12-P0 设计入口）
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> Phase 1–5 均已落地并冻结；Phase 6-P0 受控 Agent 执行层 MVP 已冻结；Phase 7-P0 RAG EvidenceProvider MVP 已冻结；Phase 7-P1 KG-lite / Graph Evidence 原型已冻结；Phase 8-P0 Python AI Provider / EmbeddingProvider MVP 已冻结；Phase 8-P1 ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已冻结；Phase 8-P2 ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已冻结；Phase 9-P0 Tool / MCP / Skills 受控接入 MVP 已冻结；Phase 10-P0 Governance Console / Runtime Console MVP 已冻结；Phase 11-P0 Role-based Frontend Suite MVP 已冻结。  
+> Phase 1–5 均已落地并冻结；Phase 6-P0 受控 Agent 执行层 MVP 已冻结；Phase 7-P0/P1 已冻结；Phase 8-P0/P1/P2 已冻结；Phase 9-P0 已冻结；Phase 10-P0 已冻结；Phase 11-P0/P1 已冻结。
 > 总设计 v2.2：受控医疗 AI Agent Runtime 与能力治理平台。  
 > 本文件位于 `docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md`。  
-> 当前允许进入 Phase 11-P1 Role-specific View API / Frontend BFF 的受限实现，但必须严格遵守本文件、Phase 11-P1 设计文档、Phase 11-P0 冻结记录与 Phase 10 Safe DTO 边界。
+> Phase 11-P1 已冻结；当前只允许修复明确回归，Phase 12-P0 必须先完成 Clinical Evidence Engine 的实现规格、API/测试设计和任务清单，再进入代码实现。
 
 ---
 
@@ -12,14 +12,14 @@
 
 | 项 | 内容 |
 |---|---|
-| 当前阶段 | Phase 11-P1 冻结阻塞修复期 |
-| 前置状态 | Phase 1–11 P0 已冻结 |
-| 前置冻结记录 | `docs/3-phase实现/Phase11_P0冻结记录.md` |
-| 前置人工测试 | `docs/3-phase实现/Phase11_P0人工测试结果.md` |
+| 当前阶段 | Phase 11-P1 已冻结；Phase 12-P0 设计准备入口 |
+| 前置状态 | Phase 1–11 P1 已冻结 |
+| 前置冻结记录 | `docs/3-phase实现/Phase11_P1冻结记录.md` |
+| 前置人工测试 | `docs/3-phase实现/Phase11_P1人工测试结果.md` |
 | 当前设计依据 | `docs/3-phase实现/Phase11_P1RoleSpecificViewAPI_BFF_实现规格.md` |
 | API 与测试依据 | `docs/3-phase实现/Phase11_P1ViewAPI与测试设计.md` |
 | 开发任务清单 | `docs/3-phase实现/Phase11_P1开发任务清单.md` |
-| 当前实现目标 | Role-specific View API / Frontend BFF：让 Patient / Clinician 前端从 mock projection 推进到 API-first 的 Runtime 投影读取 |
+| 当前实现目标 | 保持 Phase 11-P1 冻结边界；下一步先设计 Phase 12-P0 Clinical Evidence Engine |
 
 已完成主线：
 
@@ -462,13 +462,8 @@ Phase 11-P1 Role-specific View API / Frontend BFF 已完成设计，当前可进
 
 Phase 11-P1 的 RuntimeStore 主路径、PARTIAL、FALLBACK、Patient Care Navigation、Clinician Inquiry Timeline / Evidence Panel / AI Suggestions 已完成代码收口。
 
-当前冻结状态：**BLOCKED / NOT FROZEN**。
+当前冻结状态：**FROZEN**。
 
-只允许继续：
+Phase 11-P1 的 RuntimeStore 主路径、PARTIAL、FALLBACK、安全边界、自动化测试和浏览器人工验证均已完成。冻结后只允许修复明确回归，不再扩展 Phase 11 范围。
 
-1. 修复 Vitest 全量套件无法结束的问题；
-2. 完成 Patient / Clinician 浏览器人工验证；
-3. 修复验证发现的 Phase 11-P1 缺陷；
-4. 回写人工测试与冻结记录。
-
-在 Phase11_P1冻结记录.md 改为 FROZEN 前，不得进入 Phase 12 代码实现，也不得将 Phase 11-P1 描述为已冻结。
+下一阶段入口为 Phase 12-P0 Clinical Evidence Engine。进入代码实现前，必须先建立与 v3.0 总设计一致的实现规格、API/测试设计和开发任务清单。

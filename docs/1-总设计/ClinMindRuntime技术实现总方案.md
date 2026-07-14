@@ -4,7 +4,7 @@
 > 上位总设计：`docs/1-总设计/ClinMindRuntime完整系统设计.md` v3.0  
 > 阶段路线：`docs/1-总设计/ClinMindRuntime阶段拆分路线图.md` v3.0  
 > 架构决策：`docs/1-总设计/Phase11后架构缺口与路线收敛决策.md`  
-> 当前实现状态：Phase 0–11 P0 已冻结；Phase 11-P1 收口中；下一实现主线为 Phase 12。
+> 当前实现状态：Phase 0–11 P1 已冻结；下一实现主线为 Phase 12。
 
 本文档说明 ClinMindRuntime 的完整系统设计如何落到代码、模块、依赖、领域对象、接口、API、存储、测试、部署和运维中。
 
@@ -1594,7 +1594,7 @@ Operations
 
 ```text
 Phase 11-P1
-收口 Projection / API / Frontend / Freeze。
+Projection / API / Frontend 已完成并冻结。
 
 Phase 12
 Evidence Engine、真实 LLM Agent、只读 FHIR、最小 CapabilityDecision、Post-Safety、Recovery 和胸痛纵切。
@@ -1635,15 +1635,14 @@ Voice / Realtime、Browser / Computer Use 和隔离技术实验。
 # 二十二、当前最优实现顺序
 
 ```text
-1. 完成 Phase 11-P1 文档、投影、测试和冻结。
-2. 编写 Phase 12-P0 Clinical Evidence Engine 实现规格。
-3. 建立 SourceRegistry、EvidenceAssetVersion、EvidenceClaim 和 ClaimEvidenceLink。
-4. 接入真实 BM25 + Embedding + Reranker + Citation Verification。
-5. 接入 LLM-backed InquiryPlanningAgent，保留规则 fallback。
-6. 接入只读 FHIR Condition / Observation / MedicationRequest / AllergyIntolerance。
-7. 建立最小 CapabilityDecision、RuntimeDatum、Post-Safety 和 Recovery。
-8. 打通胸痛 / 胸闷纵切并形成分层 Evaluation。
-9. 冻结 Phase 12 后再进入 Phase 13。
+1. 编写 Phase 12-P0 Clinical Evidence Engine 实现规格。
+2. 建立 SourceRegistry、EvidenceAssetVersion、EvidenceClaim 和 ClaimEvidenceLink。
+3. 接入真实 BM25 + Embedding + Reranker + Citation Verification。
+4. 接入 LLM-backed InquiryPlanningAgent，保留规则 fallback。
+5. 接入只读 FHIR Condition / Observation / MedicationRequest / AllergyIntolerance。
+6. 建立最小 CapabilityDecision、RuntimeDatum、Post-Safety 和 Recovery。
+7. 打通胸痛 / 胸闷纵切并形成分层 Evaluation。
+8. 冻结 Phase 12 后再进入 Phase 13。
 ```
 
 当前不应同时启动 Phase 13–22。

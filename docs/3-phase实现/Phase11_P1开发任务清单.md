@@ -35,16 +35,16 @@ Governance Console 继续沿用 Phase10 Safe DTO。
 
 | 编号 | 任务 | 状态 |
 |---|---|---|
-| P11P1-A | 建立 role-specific view DTO | 待做 |
-| P11P1-B | 建立 view safety policy / sanitizer | 待做 |
-| P11P1-C | 实现 PatientViewProjectionService | 待做 |
-| P11P1-D | 实现 ClinicianCaseProjectionService | 待做 |
-| P11P1-E | 实现 PatientViewController | 待做 |
-| P11P1-F | 实现 ClinicianViewController | 待做 |
-| P11P1-G | 建立 runtime-demo-001 seed runtime adapter | 待做 |
-| P11P1-H | 前端 patientClient / clinicianClient API-first 改造 | 待做 |
-| P11P1-I | Java / Frontend 自动测试 | 待做 |
-| P11P1-J | 人工验证与冻结记录 | 待做 |
+| P11P1-A | 建立 role-specific view DTO | 已完成 |
+| P11P1-B | 建立 view safety policy / sanitizer | 已完成 |
+| P11P1-C | 实现 PatientViewProjectionService | 已完成 |
+| P11P1-D | 实现 ClinicianCaseProjectionService | 已完成 |
+| P11P1-E | 实现 PatientViewController | 已完成 |
+| P11P1-F | 实现 ClinicianViewController | 已完成 |
+| P11P1-G | 建立 runtime-demo-001 seed runtime adapter | 已完成 |
+| P11P1-H | 前端 patientClient / clinicianClient API-first 改造 | 已完成 |
+| P11P1-I | Java / Frontend 自动测试 | 已完成 |
+| P11P1-J | 人工验证与冻结记录 | 已完成 |
 
 ---
 
@@ -65,33 +65,33 @@ src/main/java/com/clinmind/runtime/view/common/dto/
 ## 任务
 
 ```text
-[ ] 新增 PatientSessionSummaryDto。
-[ ] 新增 PatientRuntimeViewDto。
-[ ] 新增 PatientSafeSummaryDto。
-[ ] 新增 PatientFactSummaryDto。
-[ ] 新增 PatientQuestionDto。
-[ ] 新增 SafetyNoticeDto。
-[ ] 新增 CareNavigationDto。
-[ ] 新增 ClinicianCaseSummaryDto。
-[ ] 新增 ClinicianCaseViewDto。
-[ ] 新增 PatientSummaryDto。
-[ ] 新增 CaseFrameViewDto。
-[ ] 新增 InquiryTurnViewDto。
-[ ] 新增 DdxCandidateViewDto。
-[ ] 新增 EvidenceItemViewDto。
-[ ] 新增 RiskSignalViewDto。
-[ ] 新增 ClinicianSuggestionDto。
-[ ] 新增 ClinicianReportDraftViewDto。
-[ ] 新增 RuntimeBoundarySummaryDto。
-[ ] 所有 DTO 增加 projection_status / missing_sections。
+[x] 新增 PatientSessionSummaryDto。
+[x] 新增 PatientRuntimeViewDto。
+[x] 新增 PatientSafeSummaryDto。
+[x] 新增 PatientFactSummaryDto。
+[x] 新增 PatientQuestionDto。
+[x] 新增 SafetyNoticeDto。
+[x] 新增 CareNavigationDto。
+[x] 新增 ClinicianCaseSummaryDto。
+[x] 新增 ClinicianCaseViewDto。
+[x] 新增 PatientSummaryDto。
+[x] 新增 CaseFrameViewDto。
+[x] 新增 InquiryTurnViewDto。
+[x] 新增 DdxCandidateViewDto。
+[x] 新增 EvidenceItemViewDto。
+[x] 新增 RiskSignalViewDto。
+[x] 新增 ClinicianSuggestionDto。
+[x] 新增 ClinicianReportDraftViewDto。
+[x] 新增 RuntimeBoundarySummaryDto。
+[x] 所有 DTO 增加 projection_status / missing_sections。
 ```
 
 ## 验收标准
 
 ```text
-[ ] Patient DTO 不含 ddx / trace / audit / evaluation / candidate 字段。
-[ ] Clinician DTO 不含 raw prompt / secret / raw external response / full rationale 字段。
-[ ] DTO 字段命名与前端类型一致或有明确 mapper。
+[x] Patient DTO 不含 ddx / trace / audit / evaluation / candidate 字段。
+[x] Clinician DTO 不含 raw prompt / secret / raw external response / full rationale 字段。
+[x] DTO 字段命名与前端类型一致或有明确 mapper。
 ```
 
 ---
@@ -114,21 +114,21 @@ ViewProjectionException.java
 ## 任务
 
 ```text
-[ ] 定义 Patient DTO 禁止字段列表。
-[ ] 定义 Clinician DTO 禁止字段列表。
-[ ] 实现 sanitizeMap / sanitizeMetadata。
-[ ] 实现 validatePatientViewDto。
-[ ] 实现 validateClinicianViewDto。
-[ ] 实现 projection read audit 记录。
-[ ] 对 policy reject 输出受控错误码。
+[x] 定义 Patient DTO 禁止字段列表。
+[x] 定义 Clinician DTO 禁止字段列表。
+[x] 实现 sanitizeMap / sanitizeMetadata。
+[x] 实现 validatePatientViewDto。
+[x] 实现 validateClinicianViewDto。
+[x] 实现 projection read audit 记录。
+[x] 对 policy reject 输出受控错误码。
 ```
 
 ## 验收标准
 
 ```text
-[ ] sanitizer 单测覆盖所有敏感字段。
-[ ] 错误响应不泄露 raw payload。
-[ ] projection audit metadata 不包含患者原文、prompt、raw external response。
+[x] sanitizer 单测覆盖所有敏感字段。
+[x] 错误响应不泄露 raw payload。
+[x] projection audit metadata 不包含患者原文、prompt、raw external response。
 ```
 
 ---
@@ -151,24 +151,24 @@ PatientViewPolicy.java
 ## 任务
 
 ```text
-[ ] listSessions(actorContext)：返回 PatientSessionSummaryDto[]。
-[ ] getRuntimeView(sessionId, actorContext)：返回 PatientRuntimeViewDto。
-[ ] getSafeSummary(sessionId, actorContext)：返回 PatientSafeSummaryDto。
-[ ] 从 RuntimeState / CaseFrame / PatientOutput / DecisionBoundary 读取数据。
-[ ] PatientOutput 缺失时返回 fallback view。
-[ ] SafetyGate high-risk 时优先返回 urgent safety notice。
-[ ] 不返回 DDx / Trace / Audit / Evaluation / Candidate。
-[ ] 记录 PATIENT_VIEW_READ / PATIENT_SUMMARY_READ audit。
+[x] listSessions(actorContext)：返回 PatientSessionSummaryDto[]。
+[x] getRuntimeView(sessionId, actorContext)：返回 PatientRuntimeViewDto。
+[x] getSafeSummary(sessionId, actorContext)：返回 PatientSafeSummaryDto。
+[x] 从 RuntimeState / CaseFrame / PatientOutput / DecisionBoundary 读取数据。
+[x] PatientOutput 等 Runtime 段缺失时返回 PARTIAL；Runtime 不存在时才使用显式 seed FALLBACK。
+[x] SafetyGate high-risk 时优先返回 urgent safety notice。
+[x] 不返回 DDx / Trace / Audit / Evaluation / Candidate。
+[x] 记录 PATIENT_VIEW_READ / PATIENT_SUMMARY_READ audit。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 正常 Runtime 返回 COMPLETE。
-[ ] 缺失 PatientOutput 返回 FALLBACK 或 PARTIAL。
-[ ] 不存在 session 返回 PATIENT_VIEW_NOT_FOUND。
-[ ] forbidden 返回 PATIENT_VIEW_FORBIDDEN。
-[ ] Patient DTO 禁止字段测试通过。
+[x] 正常 Runtime 返回 COMPLETE。
+[x] 缺失 PatientOutput 返回 FALLBACK 或 PARTIAL。
+[x] 不存在 session 返回 PATIENT_VIEW_NOT_FOUND。
+[x] forbidden 返回 PATIENT_VIEW_FORBIDDEN。
+[x] Patient DTO 禁止字段测试通过。
 ```
 
 ---
@@ -192,25 +192,25 @@ ClinicianViewPolicy.java
 ## 任务
 
 ```text
-[ ] listCases(actorContext)：返回 ClinicianCaseSummaryDto[]。
-[ ] getCaseView(caseId, actorContext)：返回 ClinicianCaseViewDto。
-[ ] getReportDraft(caseId, actorContext)：返回 ClinicianReportDraftViewDto。
-[ ] 从 RuntimeState / CaseFrame / DDxBoard / EvidenceGraph / ClinicianReport 读取数据。
-[ ] DDxBoard 只输出候选方向。
-[ ] EvidencePanel 只输出 summary / source / relevance。
-[ ] ReportDraft submit_enabled 固定 false。
-[ ] 不返回 raw prompt / secret / raw external response / full rationale。
-[ ] 记录 CLINICIAN_CASE_VIEW_READ / CLINICIAN_REPORT_DRAFT_READ audit。
+[x] listCases(actorContext)：返回 ClinicianCaseSummaryDto[]。
+[x] getCaseView(caseId, actorContext)：返回 ClinicianCaseViewDto。
+[x] getReportDraft(caseId, actorContext)：返回 ClinicianReportDraftViewDto。
+[x] 从 RuntimeState / CaseFrame / DDxBoard / EvidenceGraph / ClinicianReport 读取数据。
+[x] DDxBoard 只输出候选方向。
+[x] EvidencePanel 只输出 summary / source / relevance。
+[x] ReportDraft submit_enabled 固定 false。
+[x] 不返回 raw prompt / secret / raw external response / full rationale。
+[x] 记录 CLINICIAN_CASE_VIEW_READ / CLINICIAN_REPORT_DRAFT_READ audit。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 正常 Runtime 返回 COMPLETE。
-[ ] 缺失 DDx / Evidence / ReportDraft 返回 PARTIAL。
-[ ] 不存在 case 返回 CLINICIAN_CASE_NOT_FOUND。
-[ ] forbidden 返回 CLINICIAN_CASE_FORBIDDEN。
-[ ] Clinician DTO 禁止字段测试通过。
+[x] 正常 Runtime 返回 COMPLETE。
+[x] 缺失 DDx / Evidence / ReportDraft 返回 PARTIAL。
+[x] 不存在 case 返回 CLINICIAN_CASE_NOT_FOUND。
+[x] forbidden 返回 CLINICIAN_CASE_FORBIDDEN。
+[x] Clinician DTO 禁止字段测试通过。
 ```
 
 ---
@@ -238,20 +238,20 @@ GET /api/v1/patient/sessions/{sessionId}/summary
 ## 任务
 
 ```text
-[ ] 新增 controller。
-[ ] 复用 ActorContext。
-[ ] 调用 PatientViewProjectionService。
-[ ] 使用统一 ApiResponse / CommonResult。
-[ ] 错误码受控。
-[ ] controller 测试覆盖。
+[x] 新增 controller。
+[x] 复用 ActorContext。
+[x] 调用 PatientViewProjectionService。
+[x] 使用统一 ApiResponse / CommonResult。
+[x] 错误码受控。
+[x] controller 测试覆盖。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 三个 GET 接口可返回 JSON。
-[ ] 不存在 session 返回受控错误。
-[ ] response body 不含敏感字段。
+[x] 三个 GET 接口可返回 JSON。
+[x] 不存在 session 返回受控错误。
+[x] response body 不含敏感字段。
 ```
 
 ---
@@ -279,21 +279,21 @@ GET /api/v1/clinician/cases/{caseId}/report-draft
 ## 任务
 
 ```text
-[ ] 新增 controller。
-[ ] 复用 ActorContext。
-[ ] 调用 ClinicianCaseProjectionService。
-[ ] 使用统一 ApiResponse / CommonResult。
-[ ] 错误码受控。
-[ ] controller 测试覆盖。
+[x] 新增 controller。
+[x] 复用 ActorContext。
+[x] 调用 ClinicianCaseProjectionService。
+[x] 使用统一 ApiResponse / CommonResult。
+[x] 错误码受控。
+[x] controller 测试覆盖。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 三个 GET 接口可返回 JSON。
-[ ] 不存在 case 返回受控错误。
-[ ] response body 不含 raw provider/tool/model 字段。
-[ ] report draft 不可提交。
+[x] 三个 GET 接口可返回 JSON。
+[x] 不存在 case 返回受控错误。
+[x] response body 不含 raw provider/tool/model 字段。
+[x] report draft 不可提交。
 ```
 
 ---
@@ -307,19 +307,19 @@ GET /api/v1/clinician/cases/{caseId}/report-draft
 ## 任务
 
 ```text
-[ ] 建立 DemoRuntimeSeedProvider 或 SeedRuntimeAdapter。
-[ ] 提供 runtime-demo-001 的 RuntimeState / CaseFrame / PatientOutput / ClinicianReport 近似结构。
-[ ] 确保该 seed 数据不包含真实患者身份信息。
-[ ] 确保该 seed 数据不包含真实处方、剂量、治疗方案。
-[ ] seed 数据只用于 demo profile。
+[x] 建立 DemoRuntimeSeedProvider 或 SeedRuntimeAdapter。
+[x] 提供 runtime-demo-001 的 RuntimeState / CaseFrame / PatientOutput / ClinicianReport 近似结构。
+[x] 确保该 seed 数据不包含真实患者身份信息。
+[x] 确保该 seed 数据不包含真实处方、剂量、治疗方案。
+[x] seed 数据只通过 DemoRuntimeSeedViewSource 后备路径使用，并始终标记 FALLBACK。
 ```
 
 ## 验收标准
 
 ```text
-[ ] Patient API 可以读取 runtime-demo-001。
-[ ] Clinician API 可以读取 runtime-demo-001。
-[ ] Governance Console 仍可使用自己的 Console API 查看 runtime-demo-001 或显示缺失状态。
+[x] Patient API 可以读取 runtime-demo-001。
+[x] Clinician API 可以读取 runtime-demo-001。
+[x] Governance Console 仍可使用自己的 Console API 查看 runtime-demo-001 或显示缺失状态。
 ```
 
 ---
@@ -343,23 +343,23 @@ console-web/src/shared/api/httpClient.ts
 ## 任务
 
 ```text
-[ ] 新增 patientClient。
-[ ] 新增 clinicianClient。
-[ ] PatientHomePage 改为优先 listPatientSessions。
-[ ] PatientSafeSummaryPage 改为优先 getPatientSafeSummary / getPatientRuntimeView。
-[ ] ClinicianCaseInboxPage 改为优先 listClinicianCases。
-[ ] CaseWorkspacePage 改为优先 getClinicianCase。
-[ ] API failure 时显示受控错误或 demo fallback 标记。
-[ ] runtimeDemoData.ts 降级为 fallback/seed，不再作为主要数据源。
+[x] 新增 patientClient。
+[x] 新增 clinicianClient。
+[x] PatientHomePage 改为优先 listPatientSessions。
+[x] PatientSafeSummaryPage 改为优先 getPatientSafeSummary / getPatientRuntimeView。
+[x] ClinicianCaseInboxPage 改为优先 listClinicianCases。
+[x] CaseWorkspacePage 改为优先 getClinicianCase。
+[x] API failure 时显示受控错误或 demo fallback 标记。
+[x] runtimeDemoData.ts 降级为 fallback/seed，不再作为主要数据源。
 ```
 
 ## 验收标准
 
 ```text
-[ ] 后端可用时页面展示 API 数据。
-[ ] 后端不可用时页面明确 demo fallback。
-[ ] 不在 console.log 打印完整医疗 DTO。
-[ ] 前端敏感字段测试仍通过。
+[x] 后端可用时页面展示 API 数据。
+[x] 后端不可用时页面明确 demo fallback。
+[x] 不在 console.log 打印完整医疗 DTO。
+[x] 前端敏感字段测试仍通过。
 ```
 
 ---
@@ -369,35 +369,35 @@ console-web/src/shared/api/httpClient.ts
 ## Java tests
 
 ```text
-[ ] PatientViewProjectionServiceTest
-[ ] PatientViewPolicyTest
-[ ] PatientViewSanitizerTest
-[ ] PatientViewControllerTest
-[ ] ClinicianCaseProjectionServiceTest
-[ ] ClinicianViewPolicyTest
-[ ] ClinicianViewSanitizerTest
-[ ] ClinicianViewControllerTest
-[ ] RoleSpecificViewSafetyPolicyTest
+[x] PatientViewProjectionServiceTest
+[x] Patient policy coverage：PatientViewProjectionServiceTest / RoleSpecificViewSafetyPolicyTest
+[x] PatientViewSanitizerTest
+[x] PatientViewControllerTest
+[x] ClinicianCaseProjectionServiceTest
+[x] Clinician policy coverage：ClinicianCaseProjectionServiceTest / RoleSpecificViewSafetyPolicyTest
+[x] ClinicianViewSanitizerTest
+[x] ClinicianViewControllerTest
+[x] RoleSpecificViewSafetyPolicyTest
 ```
 
 ## Frontend tests
 
 ```text
-[ ] patientClient.test.ts
-[ ] clinicianClient.test.ts
-[ ] PatientPortalApiFallback.test.tsx
-[ ] ClinicianWorkspaceApiFallback.test.tsx
-[ ] PatientApiProjectionRender.test.tsx
-[ ] ClinicianApiProjectionRender.test.tsx
+[x] patientClient.test.ts
+[x] clinicianClient.test.ts
+[x] PatientPortalApiFallback.test.tsx
+[x] ClinicianWorkspaceApiFallback.test.tsx
+[x] PatientApiProjectionRender.test.tsx
+[x] ClinicianApiProjectionRender.test.tsx
 ```
 
 ## Regression
 
 ```text
-[ ] mvn test 或 targeted Java tests。
-[ ] npm run typecheck。
-[ ] npm run build。
-[ ] npm run test，如 Vitest 环境仍有 caveat，必须记录。
+[x] mvn test：Docker JDK17 全量 559 tests，0 failures，0 errors，23 skipped。
+[x] npm run typecheck。
+[x] npm run build。
+[x] npm run test：27 test files、55 tests，19.88s，正常退出。
 ```
 
 ---
@@ -413,13 +413,13 @@ docs/3-phase实现/Phase11_P1人工测试结果.md
 必须覆盖：
 
 ```text
-[ ] Patient session list API。
-[ ] Patient safe summary API。
-[ ] Clinician case list API。
-[ ] Clinician case workspace API。
-[ ] 后端不可用 fallback。
-[ ] 三角色 runtime-demo-001 展示。
-[ ] 敏感字段页面检索。
+[x] Patient session list API。
+[x] Patient safe summary API。
+[x] Clinician case list API。
+[x] Clinician case workspace API。
+[x] 后端不可用 fallback。
+[x] 三角色 runtime-demo-001 展示。
+[x] 敏感字段页面检索。
 ```
 
 ## 冻结记录文件
@@ -499,7 +499,7 @@ ClinMindRuntime 已具备受控 Runtime、治理 Console、多角色前端，以
 - [x] DemoRoleSwitcher 同步 DebugContext.roles。
 - [x] Patient / Clinician policy reject 记录 VIEW_PROJECTION_POLICY_REJECTED。
 - [x] listSessions / listCases 支持空列表，并以 UNAVAILABLE 记录成功查询。
-- [ ] 接入 RuntimeStore / CaseFrame / PatientOutput / ClinicianReport，替代 DemoRuntimeSeedProvider。
+- [x] 接入 RuntimeStore / CaseFrame / PatientOutput / ClinicianReport，替代 DemoRuntimeSeedProvider。
 ## 第二阶段：Runtime-backed source adapter
 
 已建立 PatientViewSource / ClinicianViewSource 抽象及以下实现：
@@ -526,8 +526,8 @@ Projection Service 已改为依赖 source 接口，不再直接依赖 DemoRuntim
 | Python 测试 | 10/10 通过 |
 | TypeScript | 通过 |
 | 前端生产构建 | 通过 |
-| Vitest 全量 | 阻塞：运行超时，未获得完成结果 |
-| 浏览器人工验证 | 未执行 |
-| Phase 11-P1 冻结 | **未冻结** |
+| Vitest 全量 | 通过：27 test files、55 tests，19.88s，正常退出 |
+| 浏览器人工验证 | 通过：Patient / Clinician RuntimeStore、PARTIAL、seed/local fallback、Report Draft 与敏感字段边界 |
+| Phase 11-P1 冻结 | **FROZEN** |
 
 冻结判定以 Phase11_P1冻结记录.md 为准。不得因路线图写有“收口”或“即将完成”而标记为已冻结。

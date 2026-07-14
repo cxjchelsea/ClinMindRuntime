@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDebugContext } from '../../../auth/DebugContextProvider';
 import { clinicianCaseSummaries, clinicianCaseView } from '../../../demo/runtimeDemoData';
 import type {
@@ -16,7 +16,18 @@ interface ClinicianViewState<T> {
 
 export function useClinicianCases(): ClinicianViewState<ClinicianCaseSummary[]> {
   const { context } = useDebugContext();
-  const client = useMemo(() => createClinicianClient(() => context), [context]);
+  const contextRef = useRef(context);
+  contextRef.current = context;
+  const requestContextKey = [
+    context.apiBaseUrl,
+    context.debugToken,
+    context.actor,
+    context.roles.join(','),
+  ].join('\u0000');
+  const client = useMemo(
+    () => createClinicianClient(() => contextRef.current),
+    [],
+  );
   const [state, setState] = useState<ClinicianViewState<ClinicianCaseSummary[]>>({
     data: clinicianCaseSummaries,
     loading: true,
@@ -46,14 +57,25 @@ export function useClinicianCases(): ClinicianViewState<ClinicianCaseSummary[]> 
     return () => {
       active = false;
     };
-  }, [client]);
+  }, [client, requestContextKey]);
 
   return state;
 }
 
 export function useClinicianCaseView(caseId: string): ClinicianViewState<ClinicianCaseView> {
   const { context } = useDebugContext();
-  const client = useMemo(() => createClinicianClient(() => context), [context]);
+  const contextRef = useRef(context);
+  contextRef.current = context;
+  const requestContextKey = [
+    context.apiBaseUrl,
+    context.debugToken,
+    context.actor,
+    context.roles.join(','),
+  ].join('\u0000');
+  const client = useMemo(
+    () => createClinicianClient(() => contextRef.current),
+    [],
+  );
   const [state, setState] = useState<ClinicianViewState<ClinicianCaseView>>({
     data: clinicianCaseView,
     loading: true,
@@ -83,7 +105,7 @@ export function useClinicianCaseView(caseId: string): ClinicianViewState<Clinici
     return () => {
       active = false;
     };
-  }, [caseId, client]);
+  }, [caseId, client, requestContextKey]);
 
   return state;
 }

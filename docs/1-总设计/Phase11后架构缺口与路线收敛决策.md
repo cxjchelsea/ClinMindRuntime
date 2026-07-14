@@ -4,7 +4,7 @@
 > 对应路线图：`ClinMindRuntime阶段拆分路线图.md` v3.0  
 > 对应总设计：`ClinMindRuntime完整系统设计.md` v3.0  
 > 对应技术蓝图：`ClinMindRuntime技术实现总方案.md` v3.0  
-> 当前系统基线：Phase 1–11 P0 已冻结；Phase 11-P1 收口中  
+> 当前系统基线：Phase 1–11 P1 已冻结；下一条实现主线为 Phase 12
 > 决策目标：确定 Phase 11 之后的主线，在不删除完整设计范围的前提下阻止项目无边界横向扩张。
 
 ---

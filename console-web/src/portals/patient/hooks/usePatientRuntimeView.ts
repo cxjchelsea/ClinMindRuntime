@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDebugContext } from '../../../auth/DebugContextProvider';
 import { patientRuntimeView, patientSessionSummaries } from '../../../demo/runtimeDemoData';
 import type {
@@ -16,7 +16,18 @@ interface PatientViewState<T> {
 
 export function usePatientSessions(): PatientViewState<PatientSessionSummary[]> {
   const { context } = useDebugContext();
-  const client = useMemo(() => createPatientClient(() => context), [context]);
+  const contextRef = useRef(context);
+  contextRef.current = context;
+  const requestContextKey = [
+    context.apiBaseUrl,
+    context.debugToken,
+    context.actor,
+    context.roles.join(','),
+  ].join('\u0000');
+  const client = useMemo(
+    () => createPatientClient(() => contextRef.current),
+    [],
+  );
   const [state, setState] = useState<PatientViewState<PatientSessionSummary[]>>({
     data: patientSessionSummaries,
     loading: true,
@@ -46,14 +57,25 @@ export function usePatientSessions(): PatientViewState<PatientSessionSummary[]> 
     return () => {
       active = false;
     };
-  }, [client]);
+  }, [client, requestContextKey]);
 
   return state;
 }
 
 export function usePatientRuntimeView(sessionId: string): PatientViewState<PatientRuntimeView> {
   const { context } = useDebugContext();
-  const client = useMemo(() => createPatientClient(() => context), [context]);
+  const contextRef = useRef(context);
+  contextRef.current = context;
+  const requestContextKey = [
+    context.apiBaseUrl,
+    context.debugToken,
+    context.actor,
+    context.roles.join(','),
+  ].join('\u0000');
+  const client = useMemo(
+    () => createPatientClient(() => contextRef.current),
+    [],
+  );
   const [state, setState] = useState<PatientViewState<PatientRuntimeView>>({
     data: patientRuntimeView,
     loading: true,
@@ -83,7 +105,7 @@ export function usePatientRuntimeView(sessionId: string): PatientViewState<Patie
     return () => {
       active = false;
     };
-  }, [client, sessionId]);
+  }, [client, requestContextKey, sessionId]);
 
   return state;
 }
