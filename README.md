@@ -1,8 +1,8 @@
-﻿# ClinMindRuntime
+# ClinMindRuntime
 
 受控医疗 AI Agent Runtime 与能力治理平台：以 Runtime 为主控，将 Agent / RAG / Model / Tool 作为受控能力单元接入统一主链路，并通过 Evaluation / Candidate / Audit / Governance 形成可追踪、可评估、可回滚的医疗 AI 能力闭环。
 
-当前版本：**Phase 9-P0 已冻结**（Tool / MCP / Skills 受控接入 MVP 已完成并归档；Phase 1–9 P0 已落地/冻结）。
+当前版本：**Phase 11-P1 收口完成度待验证，尚未冻结**（Runtime-backed Role View 已补齐；Java/Python/TypeScript/build 已通过，Vitest 与浏览器人工验证仍阻塞）。
 
 当前总设计：[`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) 已升级为 **v2.2**，项目定位为：
 
@@ -216,3 +216,12 @@ Phase 9-P1：真实 MCP adapter 设计
 ## License
 
 Internal prototype — 见仓库根目录许可说明（如有）。
+
+## Phase 11-P1 当前状态（2026-07-14）
+
+Patient / Clinician 已采用 RuntimeStore 主路径与显式 seed fallback；PARTIAL、FALLBACK、policy、sanitizer 和 audit 边界已实现。当前冻结状态为 **BLOCKED / NOT FROZEN**，详见：
+
+- docs/3-phase实现/Phase11_P1人工测试结果.md
+- docs/3-phase实现/Phase11_P1冻结记录.md
+
+在 Vitest 全量测试和浏览器人工验证完成前，不得宣称 Phase 11-P1 已冻结。

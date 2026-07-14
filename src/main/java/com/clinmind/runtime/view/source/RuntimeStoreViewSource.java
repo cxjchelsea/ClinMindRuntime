@@ -69,7 +69,7 @@ public class RuntimeStoreViewSource implements PatientViewSource, ClinicianViewS
         List<SafetyNoticeDto> notices = safetyNotices(s);
         return new PatientRuntimeViewDto(s.getSessionId(), s.getRuntimeId(), status(s),
                 s.getPatientOutput() == null ? "Runtime output is not available yet." : s.getPatientOutput().content(),
-                facts, questions, notices, List.of(), List.of("view_safe_summary"), DISCLAIMER,
+                facts, questions, notices, careNavigation(s), List.of("view_safe_summary"), DISCLAIMER,
                 missing.isEmpty() ? ProjectionStatus.COMPLETE : ProjectionStatus.PARTIAL, missing);
     }
 
@@ -85,7 +85,7 @@ public class RuntimeStoreViewSource implements PatientViewSource, ClinicianViewS
         return new ClinicianCaseViewDto(s.getRuntimeId(), s.getRuntimeId(), status(s),
                 new PatientSummaryDto(ageBand(profile), profile == null ? null : profile.sex(), complaint(s), List.of()),
                 new CaseFrameViewDto(complaint(s), knownContext(frame), frame == null ? List.of() : frame.missingSlots()),
-                List.of(), ddx, List.of(), risks, List.of(), reportDraft(s),
+                inquiryTimeline(s), ddx, evidencePanel(s), risks, clinicianSuggestions(s), reportDraft(s),
                 new RuntimeBoundarySummaryDto(s.getSafetyGate() == null ? "not_available" : risk(s),
                         s.getDecisionBoundary() == null ? "not_available" : text(s.getDecisionBoundary().allowedOutputLevel()),
                         s.getDecisionBoundary() == null ? List.of() : s.getDecisionBoundary().constraints()),
@@ -105,6 +105,7 @@ public class RuntimeStoreViewSource implements PatientViewSource, ClinicianViewS
         if (s.getCaseFrame() == null) result.add("case_frame");
         if (s.getPatientOutput() == null) result.add("patient_output");
         if (s.getDecisionBoundary() == null) result.add("decision_boundary");
+        if (s.getSafetyGate() == null) result.add("safety_gate");
         return List.copyOf(result);
     }
 
@@ -113,6 +114,10 @@ public class RuntimeStoreViewSource implements PatientViewSource, ClinicianViewS
         if (s.getCaseFrame() == null) result.add("case_frame");
         if (s.getClinicianReport() == null) result.add("clinician_report");
         if (s.getDecisionBoundary() == null) result.add("decision_boundary");
+        if (s.getDifferentialBoard() == null || s.getDifferentialBoard().candidates().isEmpty()) result.add("ddx_board");
+        if (evidencePanel(s).isEmpty()) result.add("evidence_panel");
+        if (inquiryTimeline(s).isEmpty()) result.add("inquiry_timeline");
+        if (clinicianSuggestions(s).isEmpty()) result.add("ai_suggestions");
         return List.copyOf(result);
     }
 
@@ -135,6 +140,64 @@ public class RuntimeStoreViewSource implements PatientViewSource, ClinicianViewS
         return List.of(new SafetyNoticeDto(risk(s).toLowerCase(), s.getSafetyGate().requiredAction()));
     }
 
+    private List<CareNavigationDto> careNavigation(RuntimeState s) {
+        List<CareNavigationDto> result = new ArrayList<>();
+        if (s.getSafetyGate() != null && s.getSafetyGate().requiredAction() != null
+                && !s.getSafetyGate().requiredAction().isBlank()) {
+            result.add(new CareNavigationDto("Safety action", s.getSafetyGate().requiredAction()));
+        }
+        if (s.getDecisionBoundary() != null) {
+            if (s.getDecisionBoundary().reason() != null && !s.getDecisionBoundary().reason().isBlank()) {
+                result.add(new CareNavigationDto("Runtime guidance", s.getDecisionBoundary().reason()));
+            }
+            s.getDecisionBoundary().constraints().forEach(value ->
+                    result.add(new CareNavigationDto("Safety constraint", value)));
+        }
+        return List.copyOf(result);
+    }
+
+    private List<InquiryTurnViewDto> inquiryTimeline(RuntimeState s) {
+        List<InquiryTurnViewDto> result = new ArrayList<>();
+        if (s.getInputHistory() != null) {
+            s.getInputHistory().forEach(input -> result.add(new InquiryTurnViewDto(
+                    "patient", input.text(), text(input.receivedAt()))));
+        }
+        if (s.getAgentOrchestration() != null) {
+            s.getAgentOrchestration().acceptedQuestions().forEach(question -> result.add(new InquiryTurnViewDto(
+                    "assistant", question.questionText(), "")));
+        }
+        return List.copyOf(result);
+    }
+
+    private List<EvidenceItemViewDto> evidencePanel(RuntimeState s) {
+        if (s.getEvidenceRetrieval() != null && !s.getEvidenceRetrieval().acceptedCandidates().isEmpty()) {
+            return s.getEvidenceRetrieval().acceptedCandidates().stream().map(candidate -> {
+                var ref = candidate.evidenceRef();
+                return new EvidenceItemViewDto(
+                        ref == null ? candidate.candidateId() : ref.title(),
+                        ref == null ? candidate.relatedDdxItem() : ref.sourceId(),
+                        candidate.reasonSummary(),
+                        "confidence=" + candidate.confidence());
+            }).toList();
+        }
+        if (s.getEvidenceGraph() == null) return List.of();
+        return s.getEvidenceGraph().items().stream().flatMap(item -> item.evidenceRefs().stream()
+                .map(ref -> new EvidenceItemViewDto(ref.evidenceId(), ref.sourceId(),
+                        ref.reasonSummary(), ref.confidence()))).toList();
+    }
+
+    private List<ClinicianSuggestionDto> clinicianSuggestions(RuntimeState s) {
+        List<ClinicianSuggestionDto> result = new ArrayList<>();
+        if (s.getAgentOrchestration() != null) {
+            s.getAgentOrchestration().acceptedQuestions().forEach(question -> result.add(
+                    new ClinicianSuggestionDto(question.questionText(), question.clinicalPurpose())));
+        }
+        if (result.isEmpty() && s.getClinicianReport() != null) {
+            s.getClinicianReport().recommendedQuestions().forEach(question ->
+                    result.add(new ClinicianSuggestionDto(question, "Runtime clinician report suggestion")));
+        }
+        return List.copyOf(result);
+    }
     private List<String> knownContext(CaseFrame f) {
         if (f == null) return List.of();
         List<String> result = new ArrayList<>(f.pastHistory());

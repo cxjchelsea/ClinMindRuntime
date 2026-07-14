@@ -1,4 +1,4 @@
-# AI Implementation Skill：ClinMindRuntime（Phase 11-P1 可实现但受限）
+# AI Implementation Skill：ClinMindRuntime（Phase 11-P1 冻结阻塞修复期）
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
 > Phase 1–5 均已落地并冻结；Phase 6-P0 受控 Agent 执行层 MVP 已冻结；Phase 7-P0 RAG EvidenceProvider MVP 已冻结；Phase 7-P1 KG-lite / Graph Evidence 原型已冻结；Phase 8-P0 Python AI Provider / EmbeddingProvider MVP 已冻结；Phase 8-P1 ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已冻结；Phase 8-P2 ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已冻结；Phase 9-P0 Tool / MCP / Skills 受控接入 MVP 已冻结；Phase 10-P0 Governance Console / Runtime Console MVP 已冻结；Phase 11-P0 Role-based Frontend Suite MVP 已冻结。  
@@ -12,7 +12,7 @@
 
 | 项 | 内容 |
 |---|---|
-| 当前阶段 | Phase 11-P1 可实现但受限 |
+| 当前阶段 | Phase 11-P1 冻结阻塞修复期 |
 | 前置状态 | Phase 1–11 P0 已冻结 |
 | 前置冻结记录 | `docs/3-phase实现/Phase11_P0冻结记录.md` |
 | 前置人工测试 | `docs/3-phase实现/Phase11_P0人工测试结果.md` |
@@ -457,3 +457,18 @@ Phase 11-P1 Role-specific View API / Frontend BFF 已完成设计，当前可进
 不可以在 Phase 11-P1 中加入 approve / reject / publish / run 写操作；
 不可以让任何前端页面绕过 Runtime、SafetyGate、DecisionBoundary、Trace、Audit、Evaluation 或 Candidate Governance。
 ```
+
+# 十二、2026-07-14 状态覆盖
+
+Phase 11-P1 的 RuntimeStore 主路径、PARTIAL、FALLBACK、Patient Care Navigation、Clinician Inquiry Timeline / Evidence Panel / AI Suggestions 已完成代码收口。
+
+当前冻结状态：**BLOCKED / NOT FROZEN**。
+
+只允许继续：
+
+1. 修复 Vitest 全量套件无法结束的问题；
+2. 完成 Patient / Clinician 浏览器人工验证；
+3. 修复验证发现的 Phase 11-P1 缺陷；
+4. 回写人工测试与冻结记录。
+
+在 Phase11_P1冻结记录.md 改为 FROZEN 前，不得进入 Phase 12 代码实现，也不得将 Phase 11-P1 描述为已冻结。

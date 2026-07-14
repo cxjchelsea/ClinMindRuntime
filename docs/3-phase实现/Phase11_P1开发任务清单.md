@@ -509,3 +509,25 @@ ClinMindRuntime 已具备受控 Runtime、治理 Console、多角色前端，以
 - RoleSpecificViewSource：RuntimeStore 主路径优先，真实来源无结果时才使用 seed fallback。
 
 Projection Service 已改为依赖 source 接口，不再直接依赖 DemoRuntimeSeedProvider。fallback 状态会随现有 projection read audit 写入 projection_status，避免被误认为真实 Runtime 投影。
+---
+
+# 十五、2026-07-14 收口状态（权威回写）
+
+| 收口项 | 状态 |
+|---|---|
+| RuntimeStore 主路径 | 已完成 |
+| PARTIAL missing_sections | 已完成 |
+| seed fallback 显式 FALLBACK | 已完成 |
+| Patient Care Navigation | 已完成 |
+| Clinician Inquiry Timeline | 已完成 |
+| Clinician Evidence Panel | 已完成（当前 Runtime snapshot / graph ref） |
+| Clinician AI Suggestions | 已完成（当前 Agent snapshot / report） |
+| Java 全量测试 | 559 tests，0 failures，0 errors，23 skipped；P11-P1 定向 11/11 |
+| Python 测试 | 10/10 通过 |
+| TypeScript | 通过 |
+| 前端生产构建 | 通过 |
+| Vitest 全量 | 阻塞：运行超时，未获得完成结果 |
+| 浏览器人工验证 | 未执行 |
+| Phase 11-P1 冻结 | **未冻结** |
+
+冻结判定以 Phase11_P1冻结记录.md 为准。不得因路线图写有“收口”或“即将完成”而标记为已冻结。

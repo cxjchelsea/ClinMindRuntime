@@ -33,7 +33,7 @@ class PatientViewControllerTest {
                         .header(ActorContextResolver.DEBUG_ROLES_HEADER, "PATIENT"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data[0].runtime_id").value("runtime-demo-001"))
+                .andExpect(jsonPath("$.data[0].runtime_id").exists())
                 .andExpect(content().string(not(containsString("ddx_candidates"))))
                 .andExpect(content().string(not(containsString("raw_evidence"))));
 

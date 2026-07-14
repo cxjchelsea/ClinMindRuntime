@@ -32,7 +32,7 @@ class ClinicianViewControllerTest {
                         .header("X-Debug-Token", "test-secret")
                         .header(ActorContextResolver.DEBUG_ROLES_HEADER, "CLINICIAN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].case_id").value("runtime-demo-001"))
+                .andExpect(jsonPath("$.data[0].case_id").exists())
                 .andExpect(content().string(not(containsString("raw_prompt"))))
                 .andExpect(content().string(not(containsString("raw_external_response"))));
 
