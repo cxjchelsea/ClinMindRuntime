@@ -1,469 +1,513 @@
-# AI Implementation Skill：ClinMindRuntime（Phase 11-P1 已冻结 / Phase 12-P0 设计入口）
+# AI Implementation Skill：ClinMindRuntime（Phase 12-P0 Clinical Evidence Engine）
 
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
-> Phase 1–5 均已落地并冻结；Phase 6-P0 受控 Agent 执行层 MVP 已冻结；Phase 7-P0/P1 已冻结；Phase 8-P0/P1/P2 已冻结；Phase 9-P0 已冻结；Phase 10-P0 已冻结；Phase 11-P0/P1 已冻结。
-> 总设计 v2.2：受控医疗 AI Agent Runtime 与能力治理平台。  
-> 本文件位于 `docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md`。  
-> Phase 11-P1 已冻结；当前只允许修复明确回归，Phase 12-P0 必须先完成 Clinical Evidence Engine 的实现规格、API/测试设计和任务清单，再进入代码实现。
+> Phase 1–11 P1 已完成并冻结。  
+> 当前总设计版本：v3.0。  
+> 当前阶段：Phase 12-P0 设计评审期，尚未进入代码实现。  
+> 只有 Phase 12 总体设计、P0 实现规格、API/测试设计和开发任务清单通过评审后，才允许建立实现分支并按任务清单编码。
 
 ---
 
-# 一、当前项目阶段
+# 一、当前权威状态
 
 | 项 | 内容 |
 |---|---|
-| 当前阶段 | Phase 11-P1 已冻结；Phase 12-P0 设计准备入口 |
+| 当前阶段 | Phase 12-P0 Clinical Evidence Engine 设计评审期 |
 | 前置状态 | Phase 1–11 P1 已冻结 |
 | 前置冻结记录 | `docs/3-phase实现/Phase11_P1冻结记录.md` |
-| 前置人工测试 | `docs/3-phase实现/Phase11_P1人工测试结果.md` |
-| 当前设计依据 | `docs/3-phase实现/Phase11_P1RoleSpecificViewAPI_BFF_实现规格.md` |
-| API 与测试依据 | `docs/3-phase实现/Phase11_P1ViewAPI与测试设计.md` |
-| 开发任务清单 | `docs/3-phase实现/Phase11_P1开发任务清单.md` |
-| 当前实现目标 | 保持 Phase 11-P1 冻结边界；下一步先设计 Phase 12-P0 Clinical Evidence Engine |
-
-已完成主线：
-
-- Phase 1-P0 ~ Phase 7-P1：已冻结
-- Phase 8-P0：Python AI Provider / EmbeddingProvider MVP，已冻结
-- Phase 8-P1：ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP，已冻结
-- Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP，已冻结
-- Phase 9-P0：Tool / MCP / Skills 受控接入 MVP，已冻结
-- Phase 10-P0：Governance Console / Runtime Console MVP，已冻结
-- Phase 11-P0：Role-based Frontend Suite MVP，已冻结
-- Phase 11-P1：Role-specific View API / Frontend BFF 已完成设计，当前可进入受限实现
-
-当前项目权威定位：
-
-- ClinMindRuntime = 受控医疗 AI Agent Runtime 与能力治理平台
-- Phase 11-P1 = 后端 role-specific view projection + 前端 API-first BFF 改造
-- 不是普通 RAG 医疗问答、不是自由自治式 Agent、不是 Python 主控系统、不是模型直接诊断系统、不是自动训练/自动发布平台、不是外部工具自治调用平台、不是生产级在线诊疗系统、不是生产级医生工作站、不是生产级认证与权限系统
-
-当前统一主链路：
-
-`用户输入 → Runtime API → SafetyGate → Agent / RAG / Graph / Python Provider / Tool-MCP-Skills → Policy / Validation → DDx / EvidenceGraph → PatientOutput / ClinicianReport → Trace / Audit → Evaluation → Candidate / Governance → PatientViewProjectionService / ClinicianCaseProjectionService → Role-specific DTO → Patient / Clinician / Governance Frontend Projection`
+| 总体设计 | `docs/3-phase实现/Phase12真实临床能力纵切_总体设计.md` |
+| P0 实现规格 | `docs/3-phase实现/Phase12_P0ClinicalEvidenceEngine_实现规格.md` |
+| P0 API 与测试设计 | `docs/3-phase实现/Phase12_P0EvidenceEngine_API与测试设计.md` |
+| P0 开发任务清单 | `docs/3-phase实现/Phase12_P0开发任务清单.md` |
+| 当前允许工作 | 设计审阅、语料与许可证调研、Provider 候选验证、实现前技术 Spike |
+| 当前禁止工作 | 在设计评审完成前提交正式 Phase 12-P0 产品代码 |
 
 ---
 
 # 二、权威文档优先级
 
-AI 实现或修改本仓库时，必须优先参考以下文档（从高到低）：
-
-1. `docs/0-项目入口/00_项目设计地图.md`
-2. `docs/1-总设计/ClinMindRuntime完整系统设计.md`
-3. `docs/README.md`
-4. `docs/3-phase实现/Phase11_P1RoleSpecificViewAPI_BFF_实现规格.md`
-5. `docs/3-phase实现/Phase11_P1ViewAPI与测试设计.md`
-6. `docs/3-phase实现/Phase11_P1开发任务清单.md`
-7. `docs/3-phase实现/Phase11_P0冻结记录.md`
-8. `docs/3-phase实现/Phase11_P0人工测试结果.md`
-9. `docs/3-phase实现/Phase11_P0RoleBasedFrontendSuite_实现规格.md`
-10. `docs/3-phase实现/Phase11_P0FrontendRBAC_API与测试设计.md`
-11. `docs/3-phase实现/Phase11_P0开发任务清单.md`
-12. `docs/3-phase实现/Phase10_P0冻结记录.md`
-13. `docs/3-phase实现/Phase10_P0人工测试结果.md`
-14. `docs/3-phase实现/Phase10_P0GovernanceConsole_RuntimeConsole_实现规格.md`
-15. `docs/3-phase实现/Phase10_P0Console_API与测试设计.md`
-16. `docs/3-phase实现/Phase9_P0冻结记录.md`
-17. `docs/3-phase实现/Phase9_P0人工测试结果.md`
-18. Phase 1–8 各阶段冻结记录
-
----
-
-# 三、当前允许做的事情
-
-当前只允许围绕 Phase 11-P1 任务清单进行受限实现：
-
-1. 建立 Patient / Clinician role-specific view DTO。
-2. 建立 view safety policy / sanitizer / projection read audit。
-3. 实现 `PatientViewProjectionService`，从 Runtime / CaseFrame / PatientOutput / DecisionBoundary 生成患者端安全视图。
-4. 实现 `ClinicianCaseProjectionService`，从 Runtime / CaseFrame / DDxBoard / EvidenceGraph / ClinicianReport 生成医生端病例工作台视图。
-5. 实现只读 `PatientViewController`。
-6. 实现只读 `ClinicianViewController`。
-7. 建立 `runtime-demo-001` seed runtime adapter，使 P0 demo projection 可由后端 API 读取。
-8. 新增前端 `patientClient` / `clinicianClient` / hooks，使 Patient Portal 与 Clinician Workspace 从 mock-first 改为 API-first。
-9. 保留 demo fallback，但必须明确标记为 demo/fallback，不能当作真实业务数据。
-10. 编写 Java projection tests、controller tests、view sanitizer tests。
-11. 编写前端 API-first / fallback / sensitive-field tests。
-12. 运行并记录 Java targeted tests、`npm run typecheck`、`npm run build`、`npm run test`。
-13. 对 Phase 1–11 P0 已冻结阶段进行必要 bug fix、测试补强、文档修正，但不得借 bug fix 增加新能力。
-
----
-
-# 四、当前禁止做的事情
-
-1. 向 Phase 1–11 P0 已冻结阶段继续堆新能力（除非走 bug fix）。
-2. 不做生产级登录、注册、身份认证系统。
-3. 不接入真实患者数据。
-4. 不接入真实 HIS / EMR / LIS / PACS / 预约 / 支付系统。
-5. 不做真实在线诊疗闭环。
-6. 不做患者端自动诊断、自动开药、自动处方、自动转诊。
-7. 不做医生端正式报告提交到真实医疗系统。
-8. 不做真实处方、检查、检验、预约、支付、外部消息发送。
-9. 不做生产级患者数据权限隔离；P1 只做 role-specific DTO 与 demo actor 边界。
-10. 不让前端直接调用 Agent / Provider / Tool / Model。
-11. 不让 Patient API 返回 DDx Board、Trace、Audit、Evaluation、Candidate Governance。
-12. 不让 Clinician API 返回 raw prompt、secret、api key、private key、raw external response、internal chain-of-thought、full rationale、unredacted patient dialogue。
-13. 不让 Governance API 放宽 Phase 10 Safe DTO 边界。
-14. 不做 Candidate approve / reject / publish。
-15. 不让前端拿完整 Runtime DTO 后再靠 role 隐藏字段。
-16. 不在 localStorage、URL query、console.log 中保存或输出敏感医疗内容。
-17. 不展示 raw patient dialogue。
-18. 不展示完整 prompt 原文。
-19. 不展示 secret / api key / private key。
-20. 不展示 raw external response。
-21. 不展示完整内部推理链或 full rationale。
-22. 不改写历史冻结记录中的事实。
-
----
-
-# 五、已冻结能力边界（勿再扩展）
-
-| Phase | 边界 |
-|---|---|
-| Phase 6-P0 | InquiryPlanningAgent / AgentRuntime / AgentProposalValidator |
-| Phase 7-P0 | RagEvidenceProvider / EvidenceValidation |
-| Phase 7-P1 | KG-lite / GraphEvidenceProvider |
-| Phase 8-P0 | `python-provider`、PythonProviderClient、ProviderValidation、Evidence rerank 增强、Provider Debug API |
-| Phase 8-P1 | ProviderCapabilityProfile、ProviderCapabilityPolicy、JudgeProvider、RiskSignalClassifierProvider、Judge / Risk / Profile Validation、Debug API、Evaluation Scorer、ProviderGovernanceSnapshot、Candidate 映射 |
-| Phase 8-P2 | ModelRegistryEntry、PromptRegistryEntry、TrainingDatasetVersion、ModelExperimentRecord、ModelEvaluationReport、ModelReleaseCandidate、ModelRollbackPlan、ModelGovernanceService、Model Governance Debug API、Evaluation Scorer、Candidate 映射 |
-| Phase 9-P0 | ToolRegistryEntry、McpServerRegistryEntry、SkillRegistryEntry、ToolInvocationRuntime、ToolResultValidationService、Tool Governance Debug API、Evaluation Scorer、Candidate 映射 |
-| Phase 10-P0 | Governance Console / Runtime Console 只读 API、Safe DTO、Runtime Timeline、Governance Domain Dashboard、Candidate Inbox、Audit Browser、Console Evaluation Scorer、console-web 只读页面 |
-| Phase 11-P0 | Role-based Frontend Suite MVP、前端 RBAC demo、Patient Portal、Clinician Workspace、Governance Console 路由迁移、role-specific demo projection、runtime-demo-001 三角色 walkthrough |
-
-Phase 6–11 P0 已冻结能力只能被 Phase 11-P1 按设计观察、复用和扩展，不能继续向已冻结范围堆新能力。
-
----
-
-# 六、Phase 11-P1 可涉及范围
-
-Phase 11-P1 可以涉及：
+实现或修改本仓库时，按以下顺序理解约束：
 
 ```text
-PatientSessionSummaryDto
-PatientRuntimeViewDto
-PatientSafeSummaryDto
-PatientFactSummaryDto
-PatientQuestionDto
-SafetyNoticeDto
-CareNavigationDto
-ClinicianCaseSummaryDto
-ClinicianCaseViewDto
-PatientSummaryDto
-CaseFrameViewDto
-InquiryTurnViewDto
-DdxCandidateViewDto
-EvidenceItemViewDto
-RiskSignalViewDto
-ClinicianSuggestionDto
-ClinicianReportDraftViewDto
-RuntimeBoundarySummaryDto
-RoleSpecificViewSafetyPolicy
-RoleSpecificViewSanitizer
-ViewProjectionAuditService
-ViewProjectionException
-PatientViewProjectionService
-PatientRuntimeViewMapper
-PatientSessionQueryService
-PatientViewPolicy
-PatientViewController
-ClinicianCaseProjectionService
-ClinicianCaseViewMapper
-ClinicianCaseQueryService
-ClinicianReportDraftQueryService
-ClinicianViewPolicy
-ClinicianViewController
-DemoRuntimeSeedProvider / SeedRuntimeAdapter
-patientClient
-clinicianClient
-usePatientRuntimeView
-useClinicianCaseView
+1. docs/0-项目入口/00_项目设计地图.md
+2. docs/1-总设计/ClinMindRuntime完整系统设计.md
+3. docs/1-总设计/ClinMindRuntime阶段拆分路线图.md
+4. docs/1-总设计/ClinMindRuntime技术实现总方案.md
+5. docs/1-总设计/Phase11后架构缺口与路线收敛决策.md
+6. docs/3-phase实现/Phase12真实临床能力纵切_总体设计.md
+7. docs/3-phase实现/Phase12_P0ClinicalEvidenceEngine_实现规格.md
+8. docs/3-phase实现/Phase12_P0EvidenceEngine_API与测试设计.md
+9. docs/3-phase实现/Phase12_P0开发任务清单.md
+10. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
+11. Phase 1–11 冻结记录
 ```
 
-Phase 11-P1 可以输出或创建：
+冲突处理：
 
 ```text
-Patient role-specific DTO
-Clinician role-specific DTO
-Patient read-only API
-Clinician read-only API
-Role-specific projection services
-Projection sanitizer / safety policy
-Projection read audit events
-runtime-demo-001 backend seed adapter
-API-first frontend client / hooks
-API fallback demo mode
-Projection service tests
-Controller tests
-Frontend API-first tests
-Manual verification record
-Freeze record
+上位总设计 > 阶段路线 > 当前 Phase 实现规格 > API/测试设计 > 任务清单 > 代码便利性
 ```
 
-Phase 11-P1 不能输出或触发：
+不得以“实现更简单”为由突破安全、来源、版本、引用或 Runtime 主控边界。
+
+---
+
+# 三、系统永久权力边界
 
 ```text
-Final diagnosis
-Prescription
-Medication dosage
-Treatment plan execution
-Referral order
-Appointment booking
-Payment
-External message sending
-RuntimeState mutation beyond controlled read/projection
-Provider run from frontend
-Tool invocation from frontend
-Agent invocation from frontend
-Candidate approval / rejection / publishing
-Model / Prompt / Dataset / Tool / Skill publication
-Raw Patient Dialogue
-Raw Prompt
-Secret / API Key / Private Key
-Raw External Response
-Internal Chain-of-thought / Full Rationale
+Java Runtime
+拥有状态、控制流、能力调用、验证、部分采纳、提交、安全、恢复和角色输出边界。
+
+Clinical Evidence Engine
+只能返回 EvidenceRetrievalResult / EvidenceCandidate / EvidenceGraph Patch。
+
+Python Provider
+只能返回 Embedding、Rerank、Citation Entailment 等结构化模型结果。
+
+PostgreSQL
+保存证据资产、版本、索引元数据、Claim、Citation 和 Trace。
+
+Patient / Clinician / Governance Frontend
+只消费后端 role-specific DTO，不直接调用 Provider，不读取 raw Runtime DTO。
+```
+
+永远禁止：
+
+```text
+模型直接修改 RuntimeState
+RAG 直接生成 PatientOutput
+Python 成为系统主控
+前端直接调用 Agent / Model / Tool / Evidence Provider
+未验证 Citation 进入 accepted EvidenceGraph
+未确认许可证的正式资产发布
+模型自动发布资产、Prompt、模型或 Capability
 ```
 
 ---
 
-# 七、三端 API 边界
-
-## 7.1 Patient API
-
-允许：
+# 四、Phase 12-P0 唯一目标
 
 ```text
-GET /api/v1/patient/sessions
-GET /api/v1/patient/sessions/{sessionId}
-GET /api/v1/patient/sessions/{sessionId}/summary
-PatientSessionSummaryDto
-PatientRuntimeViewDto
-PatientSafeSummaryDto
-PatientFactSummaryDto
-PatientQuestionDto
-SafetyNoticeDto
-CareNavigationDto
-safe_summary
-collected_facts
-next_questions
-safety_notices
-care_navigation
-allowed_actions
-disclaimer
-projection_status
-missing_sections
+建立真实、版本化、可追踪、可评测并受 Runtime 控制的 Clinical Evidence Engine MVP。
 ```
+
+P0 允许涉及：
+
+```text
+SourceRegistryEntry
+EvidenceAssetVersion
+EvidenceChunk
+EvidenceSpan
+EvidenceClaim
+ClaimEvidenceLink
+CitationVerificationResult
+EvidenceApplicabilityContext
+EvidenceScore
+EvidenceConflictSet
+EvidenceRetrievalResult
+EvidenceRetrievalTrace
+
+EvidenceIngestionService
+EvidenceAssetGovernanceService
+ClinicalEvidenceQueryService
+ClinicalQuestionNormalizer
+RuleBasedRetrievalPlanner
+LexicalEvidenceRetriever
+DenseEvidenceRetriever
+ReciprocalRankFusionService
+EvidenceCandidateDeduplicator
+EvidenceReranker
+EvidenceFreshnessEvaluator
+EvidenceApplicabilityEvaluator
+CitationVerificationService
+EvidenceConflictDetectionService
+ClinicalEvidenceValidationService
+RuntimeEvidenceGraphAdapter
+```
+
+P0 可以新增：
+
+```text
+PostgreSQL evidence tables
+PostgreSQL full-text search
+optional pgvector DenseIndexPort
+Python embedding endpoint
+Python rerank endpoint
+Python citation-entailment endpoint
+Debug evidence source / asset / query / trace API
+Offline evidence Evaluation CaseSet 与 Scorer
+Source Manifest 与许可证审核记录
+```
+
+---
+
+# 五、Phase 12-P0 禁止范围
+
+```text
+1. 不做 LLM-backed InquiryPlanningAgent；属于 Phase 12-P1。
+2. 不做 FHIR / EHR 接入；属于 Phase 12-P1 / Phase 13。
+3. 不建立 ClinicalFactLedger；属于 Phase 13。
+4. 不建立完整 Policy IR / RuntimeRiskState / CapabilityLease；属于 Phase 14。
+5. 不做病历、预约、转诊、处方或其他写操作；属于 Phase 15。
+6. 不做 Multi-Agent / Handoff；属于 Phase 16。
+7. 不做完整 Deep Evidence / GraphRAG 平台；属于 Phase 17。
+8. 不做模型训练、微调、DPO、RFT、蒸馏；属于 Phase 18。
+9. 不接真实远程 MCP / HIS / LIS / PACS；属于 Phase 19。
+10. 不做生产级认证、多租户和合规平台；属于 Phase 21。
+11. 不自动抓取任意互联网 URL。
+12. 不导入真实患者或 PHI 数据。
+13. 不用 hash embedding 冒充真实 Dense Retrieval。
+14. 不用 token overlap 冒充最终 Cross-encoder Rerank。
+15. 不用一个 final similarity score 代替 Authority / Quality / Applicability / Freshness / Citation / Conflict。
+16. 不让网页或文档中的文本成为控制指令。
+17. 不把未审核模型提取 Claim 当作正式 Published Claim。
+18. 不一次性创建 Phase 13–22 空包或空表。
+```
+
+---
+
+# 六、Java 与 Python 责任边界
+
+## Java 必须负责
+
+```text
+Source / Asset lifecycle
+License / Review / Publication policy
+Ingestion orchestration
+Retrieval planning
+Eligible scope hard filter
+Lexical retrieval
+Hybrid fusion
+Deduplication
+Authority / Freshness / Applicability
+Citation policy decision
+Conflict detection
+Evidence validation
+RuntimeEvidenceGraph Patch
+Trace / Audit / Evaluation
+```
+
+## Python 只允许负责
+
+```text
+Embedding generation
+Cross-encoder rerank
+Citation entailment / NLI
+Provider metadata / health
+```
+
+Python 返回必须包含：
+
+```text
+provider_id
+provider_version
+model_id
+model_version
+schema_version
+latency_ms
+warnings
+structured_result
+```
+
+Python 不得：
+
+```text
+发布资产
+写 PostgreSQL 权威领域表
+选择 PUBLISHED 状态
+决定 Runtime 是否采用结果
+返回自由文本作为唯一安全依据
+保存或扩大患者上下文
+```
+
+---
+
+# 七、证据资产硬约束
+
+正式参与检索的资产必须满足：
+
+```text
+source.review_status == APPROVED
+source.license_status == VERIFIED
+source.trust_status != BLOCKED
+asset.lifecycle_status == PUBLISHED
+asset checksum 有效
+asset 在 effective interval 内
+```
+
+默认排除：
+
+```text
+DRAFT
+INGESTED but not evaluated
+SUPERSEDED
+DEPRECATED
+REVOKED
+license UNKNOWN / RESTRICTED / REJECTED
+```
+
+所有 Published Claim 必须具有：
+
+```text
+claim_id
+asset version
+primary span
+span locator
+claim checksum
+review status
+```
+
+---
+
+# 八、检索链路约束
+
+允许链路：
+
+```text
+Question
+→ Normalize
+→ Plan
+→ Eligible Asset Filter
+→ Lexical Recall + Dense Recall
+→ RRF
+→ Dedup
+→ Rerank
+→ Authority / Freshness / Applicability
+→ Citation Entailment
+→ Conflict Detection
+→ EvidenceValidation
+→ EvidenceRetrievalResult
+→ RuntimeEvidenceGraphAdapter
+→ Runtime Commit
+```
+
+禁止链路：
+
+```text
+Question → Vector DB → LLM → Patient Answer
+```
+
+硬要求：
+
+```text
+BM25 和 cosine 原始分数不能直接相加；使用 RRF 或评审通过的可解释融合。
+硬过滤必须发生在排序之前。
+Chunk 是召回单位，Span 是引用单位。
+Reranker 不能修改来源文本和 provenance。
+未验证 Citation 不进入 accepted。
+```
+
+---
+
+# 九、失败与降级约束
+
+```text
+Dense Provider 不可用
+→ DEGRADED_LEXICAL_ONLY
+
+Reranker 不可用
+→ DEGRADED_NO_RERANK
+
+Citation Provider 不可用
+→ REVIEW_REQUIRED / UNAVAILABLE，未验证 Claim 不得 accepted
+
+PostgreSQL / Asset Repository 不可用
+→ UNAVAILABLE，fail closed
+
+无结果
+→ EMPTY，不生成无来源补全
+```
+
+禁止静默 fallback。
+
+所有降级必须进入：
+
+```text
+status
+warnings
+reason_codes
+trace
+Evaluation
+```
+
+---
+
+# 十、Feature Flag
+
+```text
+clinmind.evidence.engine.mode=legacy | shadow | active
+```
+
+```text
+legacy
+仅使用 Phase 7 baseline。
+
+shadow
+真实引擎执行、记录 Trace 和 Evaluation，但不影响 Runtime 正式结果。
+
+active
+真实引擎结果经过 EvidenceValidation 后可形成 RuntimeEvidenceGraphPatch。
+```
+
+开发期默认 `shadow`。
+
+不得在没有 Evaluation 和人工验收证据时将默认值改成 `active`。
+
+---
+
+# 十一、数据与日志安全
+
+禁止普通日志、API 或测试快照包含：
+
+```text
+完整患者输入
+真实 PHI
+raw prompt
+system prompt
+secret / api key / private key
+raw external response
+完整来源文档
+internal chain-of-thought
+full rationale
+```
+
+允许记录：
+
+```text
+checksum
+source / asset / version / span id
+provider/model version
+阶段耗时
+rank / score
+accepted / rejected reason codes
+trace ref
+```
+
+外部证据文本默认：
+
+```text
+instructionAllowed=false
+```
+
+任何 source text 中的“忽略规则”“调用工具”等文本只作为数据处理。
+
+---
+
+# 十二、实现任务纪律
+
+正式编码必须严格按：
+
+```text
+P12P0-A → B → C → D → E → F → G → H → I → J → K → L → M → N → O → P → Q → R
+```
+
+执行规则：
+
+```text
+1. 一次只实现一个可验证任务组。
+2. 每个任务同时提交测试。
+3. 不提前创建后续阶段空类。
+4. 不用 TODO 伪装已完成能力。
+5. Mock / InMemory 必须显式命名并只用于测试或 baseline。
+6. 真实 Provider 与 Mock Provider 的 metadata 必须可区分。
+7. 任务状态只能依据代码和测试更新。
+8. 不改写历史冻结记录以适配新实现。
+9. 发现设计缺口时先更新设计文档，再改代码。
+10. 不把多个高风险模块压成一个不可审阅提交。
+```
+
+---
+
+# 十三、测试硬要求
+
+每个实现 PR 至少按影响范围运行：
+
+```text
+mvn test
+PostgreSQL Testcontainers
+python -m pytest -q
+Provider contract tests
+Offline Evidence Evaluation
+console-web npm run typecheck
+console-web npm test
+console-web npm run build
+```
+
+P0 冻结阈值以 `Phase12_P0EvidenceEngine_API与测试设计.md` 为准。
 
 禁止：
 
 ```text
-ddx_candidates
-confidence_score
-risk_score_internal
-raw_evidence
-raw_tool_result
-trace_nodes
-audit_events
-evaluation_result
-candidate_governance
-model_prompt
-internal_reasoning
-provider_metadata
-tool_metadata
-raw_prompt
-raw_external_response
-secret
-api_key
-private_key
-```
-
-## 7.2 Clinician API
-
-允许：
-
-```text
-GET /api/v1/clinician/cases
-GET /api/v1/clinician/cases/{caseId}
-GET /api/v1/clinician/cases/{caseId}/report-draft
-ClinicianCaseSummaryDto
-ClinicianCaseViewDto
-CaseFrameViewDto
-InquiryTurnViewDto
-DdxCandidateViewDto as candidate direction
-EvidenceItemViewDto as summary/source/relevance
-RiskSignalViewDto
-ClinicianSuggestionDto
-ClinicianReportDraftViewDto
-RuntimeBoundarySummaryDto
-projection_status
-missing_sections
-```
-
-禁止：
-
-```text
-raw_prompt
-prompt_text
-secret
-api_key
-private_key
-raw_external_response
-raw_tool_result
-internal_chain_of_thought
-full_rationale
-unredacted_patient_dialogue
-provider_secret_metadata
-tool_raw_response
-real report submit
-prescription / referral / appointment / payment / external message
-```
-
-## 7.3 Governance Console
-
-允许：
-
-```text
-继续沿用 Phase 10-P0 Safe DTO
-/api/v1/console/overview
-/api/v1/console/runtimes
-/api/v1/console/runtimes/{runtimeId}/timeline
-/api/v1/console/governance/domains
-/api/v1/console/candidates
-/api/v1/console/audits
-```
-
-禁止：
-
-```text
-因为 P11-P1 放宽 Safe DTO
-展示未脱敏患者原文
-展示 raw prompt
-展示 secret
-展示 raw external response
-展示 full rationale
-approve / reject / publish / run actions
+删除失败 Case 以满足阈值
+只报告平均值而隐藏关键安全失败
+用手工演示代替自动化测试
+用 Mock Provider 结果宣称真实模型通过
 ```
 
 ---
 
-# 八、Phase 11-P1 实现顺序
+# 十四、当前设计评审期允许的工作
 
-必须按以下顺序推进：
+在本设计 PR 合并前允许：
 
-1. P11P1-A：建立 role-specific view DTO。
-2. P11P1-B：建立 view safety policy / sanitizer。
-3. P11P1-C：实现 PatientViewProjectionService。
-4. P11P1-D：实现 ClinicianCaseProjectionService。
-5. P11P1-E：实现 PatientViewController。
-6. P11P1-F：实现 ClinicianViewController。
-7. P11P1-G：建立 runtime-demo-001 seed runtime adapter。
-8. P11P1-H：前端 patientClient / clinicianClient API-first 改造。
-9. P11P1-I：Java / Frontend 自动测试。
-10. P11P1-J：人工验证与冻结记录。
+```text
+审阅和修改四份 Phase 12 设计文档
+梳理真实语料候选与许可证信息
+验证 PostgreSQL full-text / pgvector 本地可用性
+验证 Embedding / Rerank / Citation Provider 候选的接口可行性
+创建一次性 Spike，不提交到正式产品路径
+补充 Evaluation CaseSet 草案
+```
 
-不得跳过 DTO / policy / sanitizer，直接在 Controller 或前端页面拼装医疗视图。
+不允许：
+
+```text
+在 main 上直接实现 Phase 12 产品代码
+修改 Runtime 主链路默认行为
+将 Evidence Engine 默认设为 active
+发布任何未经审核的语料
+```
 
 ---
 
-# 九、回归测试要求
+# 十五、进入实现阶段的条件
 
-Phase 11-P1 修改后端时，至少新增或回归：
-
-```text
-PatientViewProjectionServiceTest
-PatientViewPolicyTest
-PatientViewSanitizerTest
-PatientViewControllerTest
-ClinicianCaseProjectionServiceTest
-ClinicianViewPolicyTest
-ClinicianViewSanitizerTest
-ClinicianViewControllerTest
-RoleSpecificViewSafetyPolicyTest
-```
-
-Phase 11-P1 修改前端时，至少回归：
+必须全部完成：
 
 ```text
-npm run typecheck
-npm run build
-npm run test
+1. Phase12真实临床能力纵切_总体设计.md 评审通过。
+2. Phase12_P0ClinicalEvidenceEngine_实现规格.md 评审通过。
+3. Phase12_P0EvidenceEngine_API与测试设计.md 评审通过。
+4. Phase12_P0开发任务清单.md 评审通过。
+5. Source Manifest 范围和许可证记录方式确定。
+6. Provider 候选与 DenseIndexPort 方案确定。
+7. Offline Evaluation CaseSet 结构确定。
+8. 开发分支从最新 main 创建。
 ```
 
-前端新增或回归：
+进入实现后，本文件标题和当前阶段应更新为：
 
 ```text
-patientClient.test.ts
-clinicianClient.test.ts
-PatientPortalApiFallback.test.tsx
-ClinicianWorkspaceApiFallback.test.tsx
-PatientApiProjectionRender.test.tsx
-ClinicianApiProjectionRender.test.tsx
-PatientSafeSummaryPage sensitive-field test
-CaseWorkspacePage sensitive-field test
+Phase 12-P0 实现中
 ```
-
-如果修改 Phase 10 Console 页面或 Console API 相关代码，必须额外回归：
-
-- Java：ConsoleSafeDtoMapperTest
-- Java：ConsoleAccessPolicyTest
-- Java：ConsoleOverviewControllerTest
-- Java：RuntimeTimelineControllerTest
-- Java：GovernanceDashboardControllerTest
-- Java：ConsoleCandidateInboxControllerTest
-- Java：ConsoleAuditBrowserControllerTest
-- Java：ConsoleScorerTest
-
-并保持 Phase 1–11 P0 既有 Runtime / Agent / Evidence / Graph / Provider / ModelGov / ToolGov / Evaluation / Candidate / Persistence / Audit / Frontend RBAC 测试不回归。
 
 ---
 
-# 十、冻结记录要求
+# 十六、冻结要求
 
-Phase 11-P1 完成后必须新增：
-
-```text
-docs/3-phase实现/Phase11_P1人工测试结果.md
-docs/3-phase实现/Phase11_P1冻结记录.md
-```
-
-冻结记录必须说明：
-
-1. PatientViewProjectionService 如何生成患者视图。
-2. ClinicianCaseProjectionService 如何生成医生视图。
-3. Patient DTO 禁止了哪些字段。
-4. Clinician DTO 禁止了哪些字段。
-5. Patient / Clinician API scope 如何分离。
-6. 前端如何从 mock-first 切到 API-first。
-7. runtime-demo-001 seed runtime 如何工作。
-8. Projection read audit 如何记录。
-9. Java / frontend 测试结果。
-10. P1 仍不具备哪些生产级能力和后续 Phase 11-P2 入口。
-
----
-
-# 十一、最终结论
-
-当前 AI 实现约束是：
+Phase 12-P0 只有在以下证据齐全时可冻结：
 
 ```text
-Phase 10-P0 Governance Console / Runtime Console MVP 已冻结；
-Phase 11-P0 Role-based Frontend Suite MVP 已冻结；
-Phase 11-P1 Role-specific View API / Frontend BFF 已完成设计，当前可进入受限实现；
-允许实现 Patient / Clinician 只读 role-specific view API；
-允许将 Patient / Clinician 前端从 mock-first 改为 API-first；
-必须由后端 projection service 保证数据边界，前端 RoleGuard 只保护路由；
-不可以接真实患者数据、真实医疗系统或生产级认证；
-不可以让 Patient API 返回 DDx / Trace / Audit / Evaluation / Candidate Governance；
-不可以让 Clinician API 返回 raw prompt、secret、raw external response 或 full rationale；
-不可以在 Phase 11-P1 中加入 approve / reject / publish / run 写操作；
-不可以让任何前端页面绕过 Runtime、SafetyGate、DecisionBoundary、Trace、Audit、Evaluation 或 Candidate Governance。
+真实许可语料
+真实 lexical / dense / rerank / citation 能力
+完整 provenance
+license / freshness / applicability / conflict 测试
+Provider failure / degrade / fail-closed 测试
+Offline Evaluation 达标
+Shadow / Active Debug 集成通过
+Patient / Clinician / Governance 回归通过
+Phase12_P0人工测试结果.md
+Phase12_P0冻结记录.md
 ```
 
-# 十二、2026-07-14 状态覆盖
-
-Phase 11-P1 的 RuntimeStore 主路径、PARTIAL、FALLBACK、Patient Care Navigation、Clinician Inquiry Timeline / Evidence Panel / AI Suggestions 已完成代码收口。
-
-当前冻结状态：**FROZEN**。
-
-Phase 11-P1 的 RuntimeStore 主路径、PARTIAL、FALLBACK、安全边界、自动化测试和浏览器人工验证均已完成。冻结后只允许修复明确回归，不再扩展 Phase 11 范围。
-
-下一阶段入口为 Phase 12-P0 Clinical Evidence Engine。进入代码实现前，必须先建立与 v3.0 总设计一致的实现规格、API/测试设计和开发任务清单。
+冻结前不得开始 Phase 12-P1 产品实现。

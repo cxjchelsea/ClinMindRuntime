@@ -1,296 +1,209 @@
-﻿# ClinMindRuntime 文档导航
+# ClinMindRuntime 文档导航
 
-> 本文件是 `docs/` 目录入口，用于说明当前文档体系如何阅读、哪些文档是当前权威入口、哪些是专项设计、哪些是 Phase 实现规格、哪些是实现约束。
-> 当前文档已经完成物理目录重构：入口、总设计、专项设计、Phase 实现和实现约束已分别归入独立目录。
-> 新增 Phase 文档时，应直接放入 `docs/3-phase实现/`；新增跨 Phase 的架构规划，应放入 `docs/2-专项设计/`。
-
----
-
-# 一、当前项目阶段
-
-当前仓库状态：
-
-```text
-Phase 1-P0：Runtime MVP 已完成。
-Phase 2-P0：共享能力资产原型已完成。
-Phase 3-P0：训练与评估闭环 MVP 已完成并冻结。
-Phase 4-P0：经验候选与训练数据候选沉淀机制已完成并冻结。
-Phase 4-P1：候选治理与安全加固已完成并冻结。
-Phase 5-P0：持久化与治理底座已完成并冻结。
-Phase 5-P1：最小 Console 与访问治理已完成并冻结。
-Phase 5-P2：最小前端 Console MVP 已完成并冻结。
-Phase 6-P0：受控 Agent 执行层 MVP 已完成并冻结。
-Phase 7-P0：RAG EvidenceProvider MVP 已完成并冻结。
-Phase 7-P1：KG-lite / Graph Evidence 原型已完成并冻结。
-Phase 8-P0：Python AI Provider / EmbeddingProvider MVP 已完成并冻结。
-Phase 8-P1：ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP 已完成并冻结。
-Phase 8-P2：ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP 已完成并冻结。
-Phase 9-P0：Tool / MCP / Skills 受控接入 MVP 已完成并冻结。
-```
-
-当前下一阶段建议：
-
-```text
-Phase 9-P1：真实 MCP adapter 设计 / Phase 9-P2：Skills 文件系统与 Skill Store / Phase 10：Tool Console / Skill Console / Provider Console
-```
-
-当前新增专项规划：
-
-```text
-docs/2-专项设计/Python_AIProvider接入规划.md
-```
-
-该文档用于约束 Phase 8 之后 Java Runtime 与 Python AI Provider 的跨语言协同方式。
+> 本文件是 `docs/` 目录入口。  
+> 当前总设计版本：v3.0。  
+> 当前项目状态：Phase 1–11 P1 已冻结；Phase 12-P0 Clinical Evidence Engine 处于设计评审期。
 
 ---
 
-# 二、当前目录结构
+# 一、当前阶段
 
 ```text
-docs/
-  README.md
-
-  0-项目入口/
-    00_项目设计地图.md
-    项目展示导读.md
-    架构文档缺口审查清单.md
-
-  1-总设计/
-    ClinMindRuntime完整系统设计.md
-    ClinMindRuntime阶段拆分路线图.md
-    ClinMindRuntime技术实现总方案.md
-    全局技术栈与架构选型.md
-    架构模式与设计模式说明.md
-
-  2-专项设计/
-    AI前沿技术选型与接入规划.md
-    医学知识库与RAG构建规划.md
-    模型训练与后训练规划.md
-    Python_AIProvider接入规划.md
-    数据安全与合规边界规划.md
-    数据库持久化设计.md
-    平台前端与Console规划.md
-    部署与运维规划.md
-    测试与CI总方案.md
-
-  3-phase实现/
-    Phase1_* / Phase2_* / Phase3_* / Phase4_* / Phase5_*
-    Phase6_P0*
-    Phase7_P0*
-    Phase7_P1*
-    Phase8_P0*
-    Phase8_P1*
-    Phase8_P2*
-    Phase9_P0*
-
-  4-实现约束/
-    AI_IMPLEMENTATION_SKILL.md
+Phase 1–11 P1：FROZEN
+Phase 12-P0：DESIGN REVIEW
+Phase 12-P1：PLANNED
+Phase 12-P2：PLANNED
+Phase 13–22：按路线图后置
 ```
+
+Phase 12-P0 设计完成评审前，只允许：
+
+```text
+设计审阅
+语料与许可证调研
+Provider 候选验证
+pgvector / PostgreSQL Full-text 技术 Spike
+Offline Evaluation CaseSet 草案
+```
+
+暂不允许正式 Phase 12-P0 产品代码进入 `main`。
 
 ---
 
-# 三、推荐阅读顺序
+# 二、权威阅读顺序
 
-## 3.1 第一次看项目 / 面试展示
+## 2.1 了解项目全貌
 
 ```text
 1. docs/0-项目入口/项目展示导读.md
 2. docs/0-项目入口/00_项目设计地图.md
 3. docs/1-总设计/ClinMindRuntime完整系统设计.md
-4. docs/1-总设计/ClinMindRuntime技术实现总方案.md
-5. docs/3-phase实现/Phase7_P1冻结记录.md
-6. docs/3-phase实现/Phase7_P0冻结记录.md
-7. docs/3-phase实现/Phase6_P0冻结记录.md
-8. docs/1-总设计/架构模式与设计模式说明.md
-```
-
-阅读目标：快速理解项目为什么不是普通 RAG / Agent Demo，而是 Runtime 主控、Agent / RAG / Graph / Model / Tool 受控接入、Evaluation / Audit / Governance 闭环的医疗 AI Runtime。
-
-## 3.2 后续设计 / AI 编码工具
-
-```text
-1. docs/0-项目入口/00_项目设计地图.md
-2. docs/1-总设计/ClinMindRuntime完整系统设计.md
-3. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
 4. docs/1-总设计/ClinMindRuntime阶段拆分路线图.md
 5. docs/1-总设计/ClinMindRuntime技术实现总方案.md
-6. 当前专项设计文档
-7. 当前 Phase 实现规格
-8. 当前 Phase 开发任务清单
-9. docs/2-专项设计/测试与CI总方案.md
-10. docs/2-专项设计/数据安全与合规边界规划.md
+6. docs/1-总设计/Phase11后架构缺口与路线收敛决策.md
 ```
 
-阅读目标：先确认当前阶段、允许范围和禁止边界，再进入具体实现。
-
-## 3.3 Phase 8-P1 冻结归档阅读
+## 2.2 进入 Phase 12 设计
 
 ```text
-1. docs/0-项目入口/00_项目设计地图.md
-2. docs/1-总设计/ClinMindRuntime完整系统设计.md
-3. docs/2-专项设计/Python_AIProvider接入规划.md
-4. docs/2-专项设计/模型训练与后训练规划.md
-5. docs/2-专项设计/医学知识库与RAG构建规划.md
-6. docs/3-phase实现/Phase8_P1冻结记录.md
-7. docs/3-phase实现/Phase8_P1人工测试结果.md
-8. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
+1. docs/3-phase实现/Phase12真实临床能力纵切_总体设计.md
+2. docs/3-phase实现/Phase12_P0ClinicalEvidenceEngine_实现规格.md
+3. docs/3-phase实现/Phase12_P0EvidenceEngine_API与测试设计.md
+4. docs/3-phase实现/Phase12_P0开发任务清单.md
+5. docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md
 ```
 
-阅读目标：确认 Python / Model / Judge / Risk classifier 都只能作为受控 Provider 接入，不能成为 Runtime 主控、SafetyGate 决策器或患者端回答生成器。
+## 2.3 开始编码前
+
+必须确认：
+
+```text
+总体设计已审阅
+实现规格已审阅
+API 与测试设计已审阅
+任务清单已审阅
+Source Manifest 范围确定
+许可证记录方式确定
+Provider 与 DenseIndexPort 方案确定
+Evaluation CaseSet 结构确定
+```
 
 ---
 
-# 四、文档分组说明
+# 三、目录结构
 
-## 4.1 项目入口与导航组
-
-| 文档 | 状态 | 用途 |
-|---|---|---|
-| `README.md` | 活跃 | 仓库根入口，说明当前项目状态和阅读入口 |
-| `docs/README.md` | 活跃 | docs 目录导航入口 |
-| `docs/0-项目入口/00_项目设计地图.md` | 活跃 / 权威入口 | 说明总设计、专项设计、Phase 文档、实现约束和冻结记录之间的关系 |
-| `docs/0-项目入口/项目展示导读.md` | 活跃 | 面向阅读者 / 面试官的项目导读 |
-| `docs/0-项目入口/架构文档缺口审查清单.md` | 活跃 | 检查文档缺口、过期状态和后续补文档顺序 |
-
-## 4.2 总设计组
-
-| 文档 | 状态 | 用途 |
-|---|---|---|
-| `docs/1-总设计/ClinMindRuntime完整系统设计.md` | 活跃 / 权威 | 定义项目定位、八个能力域、五层架构、统一 Runtime 主链路、AI 前沿技术覆盖矩阵 |
-| `docs/1-总设计/ClinMindRuntime技术实现总方案.md` | 活跃 | 代码分层、包结构、统一 Runtime 主链路、Capability Orchestration、Runtime Validation |
-| `docs/1-总设计/ClinMindRuntime阶段拆分路线图.md` | 活跃 | Phase 1–10 的长期演进顺序 |
-| `docs/1-总设计/全局技术栈与架构选型.md` | 活跃 | Java、Spring Boot、React、PostgreSQL、Python、pgvector 等选型 |
-| `docs/1-总设计/架构模式与设计模式说明.md` | 活跃 | Provider、Policy、Validator、Store、Strategy、AgentRuntime 等工程模式说明 |
-
-## 4.3 专项设计组
-
-| 文档 | 状态 | 对应总设计位置 |
-|---|---|---|
-| `docs/2-专项设计/AI前沿技术选型与接入规划.md` | 专项设计 / 技术雷达 | Agent 受控执行域；Tool / MCP / Skills；模型能力域 |
-| `docs/2-专项设计/医学知识库与RAG构建规划.md` | 专项设计 | 医学知识与证据域；RAG / KG-lite / GraphRAG |
-| `docs/2-专项设计/模型训练与后训练规划.md` | 专项设计 | 模型能力与 Provider 域；评估、审计与持续进化域 |
-| `docs/2-专项设计/Python_AIProvider接入规划.md` | 专项设计 / Phase 8 前置 | Java Runtime 与 Python AI Provider 的跨语言协同边界 |
-| `docs/2-专项设计/数据安全与合规边界规划.md` | 专项设计 | 输出边界与安全治理域；Audit；脱敏 |
-| `docs/2-专项设计/数据库持久化设计.md` | 专项设计 | Storage / Integration 层 |
-| `docs/2-专项设计/平台前端与Console规划.md` | 专项设计 | 平台治理层；Console / Review Queue / Audit Center |
-| `docs/2-专项设计/部署与运维规划.md` | 专项设计 / 后置 | 部署、运维、Docker、发布 |
-| `docs/2-专项设计/测试与CI总方案.md` | 专项设计 | 测试、CI、回归与质量治理 |
-
-专项文档不是直接编码依据。进入实现前，必须先形成对应 Phase 实现规格和开发任务清单。
-
-## 4.4 Phase 实现规格与冻结归档组
-
-| 阶段 | 状态 | 代表文档 |
-|---|---|---|
-| Phase 1–2 | 已完成 | `docs/3-phase实现/Phase1_*`、`docs/3-phase实现/Phase2_*` |
-| Phase 3 | 已冻结 | `docs/3-phase实现/Phase3_*`、`docs/3-phase实现/Phase3_P0冻结记录.md` |
-| Phase 4 | 已冻结 | `docs/3-phase实现/Phase4_*`、`docs/3-phase实现/Phase4_P0冻结记录.md`、`docs/3-phase实现/Phase4_P1冻结记录.md` |
-| Phase 5 | 已冻结 | `docs/3-phase实现/Phase5_*`、`docs/3-phase实现/Phase5冻结记录.md` |
-| Phase 6-P0 | 已冻结 | `docs/3-phase实现/Phase6_P0*`、`docs/3-phase实现/Phase6_P0冻结记录.md` |
-| Phase 7-P0 | 已冻结 | `docs/3-phase实现/Phase7_P0*`、`docs/3-phase实现/Phase7_P0冻结记录.md` |
-| Phase 7-P1 | 已冻结 | `docs/3-phase实现/Phase7_P1*`、`docs/3-phase实现/Phase7_P1冻结记录.md` |
-| Phase 8-P0 | 已冻结 | `docs/3-phase实现/Phase8_P0*`、`docs/3-phase实现/Phase8_P0冻结记录.md` |
-| Phase 8-P1 | 已冻结 | `docs/3-phase实现/Phase8_P1*`、`docs/3-phase实现/Phase8_P1冻结记录.md` |
-| Phase 8-P2 | 已冻结 | `docs/3-phase实现/Phase8_P2*`、`docs/3-phase实现/Phase8_P2冻结记录.md` |
-| Phase 9-P0 | 已冻结 | `docs/3-phase实现/Phase9_P0*`、`docs/3-phase实现/Phase9_P0冻结记录.md` |
-
-## 4.5 实现约束组
-
-| 文档 | 状态 | 用途 |
-|---|---|---|
-| `docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md` | 活跃 | 约束 AI / Cursor / Claude Code / Codex 后续实现 |
+```text
+docs/
+├── README.md
+│
+├── 0-项目入口/
+│   ├── 00_项目设计地图.md
+│   ├── 项目展示导读.md
+│   └── 架构文档缺口审查清单.md
+│
+├── 1-总设计/
+│   ├── ClinMindRuntime完整系统设计.md
+│   ├── ClinMindRuntime阶段拆分路线图.md
+│   ├── ClinMindRuntime技术实现总方案.md
+│   ├── Phase11后架构缺口与路线收敛决策.md
+│   ├── 全局技术栈与架构选型.md
+│   └── 架构模式与设计模式说明.md
+│
+├── 2-专项设计/
+│   ├── AI前沿技术选型与接入规划.md
+│   ├── 医学知识库与RAG构建规划.md
+│   ├── 模型训练与后训练规划.md
+│   ├── Python_AIProvider接入规划.md
+│   ├── 数据安全与合规边界规划.md
+│   ├── 数据库持久化设计.md
+│   ├── 平台前端与Console规划.md
+│   ├── 部署与运维规划.md
+│   └── 测试与CI总方案.md
+│
+├── 3-phase实现/
+│   ├── Phase1_* ... Phase11_*
+│   ├── Phase12真实临床能力纵切_总体设计.md
+│   ├── Phase12_P0ClinicalEvidenceEngine_实现规格.md
+│   ├── Phase12_P0EvidenceEngine_API与测试设计.md
+│   └── Phase12_P0开发任务清单.md
+│
+└── 4-实现约束/
+    └── AI_IMPLEMENTATION_SKILL.md
+```
 
 ---
 
-# 五、专项文档如何用于实现
+# 四、核心文档职责
 
-正确链路：
+| 文档 | 职责 |
+|---|---|
+| `ClinMindRuntime完整系统设计.md` | 定义系统最终是什么、能力域、逻辑平面和永久边界 |
+| `ClinMindRuntime阶段拆分路线图.md` | 定义各能力属于哪个 Phase、进入条件和状态 |
+| `ClinMindRuntime技术实现总方案.md` | 定义包、接口、API、存储、测试、部署和运维落点 |
+| `Phase11后架构缺口与路线收敛决策.md` | 记录为何优先做真实 Evidence / LLM / FHIR 纵切 |
+| `Phase12真实临床能力纵切_总体设计.md` | 定义 P0/P1/P2 的范围、依赖和共同边界 |
+| `Phase12_P0ClinicalEvidenceEngine_实现规格.md` | 定义 P0 领域模型、检索链路、责任边界和完成标准 |
+| `Phase12_P0EvidenceEngine_API与测试设计.md` | 定义 API、Provider Contract、数据库测试、Evaluation 与冻结阈值 |
+| `Phase12_P0开发任务清单.md` | 定义正式实现顺序、依赖、交付物和验收标准 |
+| `AI_IMPLEMENTATION_SKILL.md` | 约束 AI 编码工具当前允许和禁止的工作 |
+
+---
+
+# 五、Phase 12-P0 设计摘要
 
 ```text
-总设计
-↓
-项目设计地图
-↓
-专项设计
-↓
-Phase 实现规格
-↓
-Phase 开发任务清单
-↓
-代码实现
-↓
-测试与人工验证
-↓
+Source Registry
+→ Versioned Evidence Asset
+→ Chunk / Span / Curated Claim
+→ PostgreSQL Lexical Recall
+→ Real Dense Recall
+→ Reciprocal Rank Fusion
+→ Cross-encoder Rerank
+→ Authority / Freshness / Applicability
+→ Citation Entailment
+→ Conflict Detection
+→ EvidenceValidation
+→ RuntimeEvidenceGraph Patch
+→ Runtime Commit / DecisionBoundary
+```
+
+技术责任：
+
+```text
+Java Runtime
+负责编排、过滤、验证、采用、提交、Trace、Audit 和 Evaluation。
+
+Python Provider
+只负责 Embedding、Rerank、Citation Entailment 等无状态模型推理。
+
+PostgreSQL
+负责证据资产、版本、Claim、Citation、检索 Trace 与词法索引。
+```
+
+---
+
+# 六、冻结文档规则
+
+每个 Phase 进入 FROZEN 至少需要：
+
+```text
+实现规格
+API 与测试设计
+开发任务清单
+代码与 migration
+自动化测试
+人工测试结果
+Evaluation 结果
 冻结记录
+README / 项目地图 / 技术方案 / AI 约束同步
 ```
 
-示例：做 Phase 8 Python AI Provider：
+冻结记录不能通过改写历史事实来补齐，必须与仓库实际状态一致。
+
+---
+
+# 七、当前禁止事项
 
 ```text
-docs/1-总设计/ClinMindRuntime完整系统设计.md
-↓
-docs/2-专项设计/Python_AIProvider接入规划.md
-↓
-docs/3-phase实现/Phase8_P0Python_AIProvider_实现规格.md
-↓
-docs/3-phase实现/Phase8_P0开发任务清单.md
-↓
-代码实现
-↓
-docs/3-phase实现/Phase8_P0冻结记录.md
+不让模型、Agent、Evidence 或 Tool 接管 Runtime。
+不让 Evidence Engine 直接输出患者诊断。
+不让未验证 Citation 进入 accepted EvidenceGraph。
+不导入真实患者或 PHI 数据。
+不发布许可证未知的证据资产。
+不提前建设 ClinicalFactLedger、完整 Governance Kernel、写操作或 Multi-Agent。
+不一次性建立 Phase 13–22 空目录和空表。
+不把 Mock / hash embedding / token overlap 描述为真实生产能力。
 ```
 
 ---
 
-# 六、当前不应做什么
+# 八、已冻结基线
+
+Phase 11-P1 冻结依据：
 
 ```text
-1. 不应向 Phase 1–9 P0 已冻结阶段继续堆新能力。
-2. 不应让 Python 成为 Runtime 主控。
-3. 不应让 Python Agent 自主循环。
-4. 不应让 Python 直接输出 PatientOutput。
-5. 不应让 Python 直接判断最终诊断。
-6. 不应让 JudgeProvider 直接决定最终诊断。
-7. 不应让 RiskSignalClassifierProvider 直接触发 SafetyGate。
-8. 不应绕过 ProviderCapabilityPolicy / ProviderValidation。
-9. 不应提前做模型训练 / 后训练。
-10. 不应提前接真实远程 MCP、Browser Agent / Computer Use / RPA 或高风险写工具。
-11. 不应提前实现正式医生审核平台、Tool Console 或 Knowledge Console。
+docs/3-phase实现/Phase11_P1人工测试结果.md
+docs/3-phase实现/Phase11_P1冻结记录.md
 ```
 
----
-
-# 七、当前建议做什么
-
-```text
-1. 保持 Phase 1–9 P0 冻结边界。
-2. 以 Phase9_P0冻结记录.md 作为 Tool / MCP / Skills 受控接入治理基线。
-3. 后续新增能力进入 Phase 9-P1 / Phase 9-P2 / Phase 10。
-4. 新阶段必须先建立实现规格、API 与测试设计、开发任务清单。
-5. 再更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md。
-```
-
----
-
-# 八、最终结论
-
-当前文档体系已经进入：
-
-```text
-Runtime 主控
-→ 受控 Agent
-→ RAG EvidenceProvider
-→ KG-lite / Graph Evidence
-→ Python AI Provider / EmbeddingProvider
-→ ModelProvider / JudgeProvider / ProviderCapabilityProfile
-→ ModelRegistry / PromptRegistry / TrainingDatasetVersion
-→ Tool / MCP / Skills 受控接入 MVP
-```
-
-Phase 9-P0 已冻结归档。下一步不是继续向 P0 堆真实外部工具能力，而是进入：
-
-```text
-Phase 9-P1：真实 MCP adapter 设计
-或 Phase 9-P2：Skills 文件系统与 Skill Store
-或 Phase 10：Tool Console / Skill Console / Provider Console
-```
+Phase 11-P1 冻结后只允许修复明确回归，不再扩展 Role-specific View 范围。

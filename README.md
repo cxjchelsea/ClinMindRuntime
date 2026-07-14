@@ -1,118 +1,161 @@
 # ClinMindRuntime
 
-受控医疗 AI Agent Runtime 与能力治理平台：以 Runtime 为主控，将 Agent / RAG / Model / Tool 作为受控能力单元接入统一主链路，并通过 Evaluation / Candidate / Audit / Governance 形成可追踪、可评估、可回滚的医疗 AI 能力闭环。
+受控医疗 AI Agent Runtime 与能力治理平台。
 
-当前版本：**Phase 11-P1 Runtime-backed Role-specific View API / Frontend BFF 已完成并冻结**（RuntimeStore、PARTIAL、FALLBACK、角色安全边界、自动化测试与浏览器人工验证均已通过）。
+ClinMindRuntime 以 Java Runtime 为唯一控制平面，将 Agent、Clinical Evidence、Model Provider、Tool / MCP / Skill 作为受控能力接入统一主链路，并通过 Safety、Validation、DecisionBoundary、Trace、Audit、Evaluation、Review 与 Release Governance 形成可追踪、可评估、可降级、可恢复和可回滚的医疗 AI 能力闭环。
 
-当前总设计：[`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) 已升级为 **v2.2**，项目定位为：
+## 当前状态
 
 ```text
-受控医疗 AI Agent Runtime 与能力治理平台
+Phase 1–11 P1：已完成并冻结
+Phase 12-P0：Clinical Evidence Engine 设计评审期
+Phase 12-P1：真实 LLM Agent + 只读 FHIR + 最小统一治理，尚未开始
+Phase 12-P2：胸痛 / 胸闷临床纵切，尚未开始
 ```
 
-文档体系入口：[`docs/0-项目入口/00_项目设计地图.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/00_%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1%E5%9C%B0%E5%9B%BE.md)
+当前总设计版本：**v3.0**。
+
+Phase 12-P0 设计完成评审前，不进入正式代码实现。
 
 ---
 
 ## 项目定位
 
-ClinMindRuntime 不是普通 RAG 医疗问答，也不是自由自治式医疗 Agent。
-
-它的核心思路是：
-
-- **Runtime 主控**：问诊流程、安全门、患者/医生双端输出边界由代码控制。
-- **统一 Runtime 主链路**：所有能力都插入同一条 Runtime 主链路，而不是各自独立运行。
-- **Capability Orchestration**：Runtime 根据当前病例状态决定是否调用 Agent / RAG / Model / Tool。
-- **Agent 受控执行**：Agent 只能生成 Proposal / Draft / Candidate / Finding，不能直接修改 RuntimeState 或输出最终诊断。
-- **RAG 证据化**：RAG / GraphRAG 只能返回 EvidenceCandidate，进入 EvidenceGraph 后再由 Runtime 判断作用。
-- **Model Provider 化**：模型能力只能作为可评估、可替换、可回滚的 Provider 接入。
-- **Tool / MCP / Skills 最小权限**：外部工具调用必须经过 ToolInvocationPolicy、ToolResultValidationService 和 Runtime Validation。
-- **Evaluation 闭环**：标准病例集 → Runtime 执行 → Scorer 评分 → 聚合报告 → CapabilityProfile 更新建议。
-- **Candidate 治理**：从 Evaluation 暴露的问题中生成可追踪、可审核、不可自动生效的经验候选与训练数据候选。
-- **Persistence / Audit / Console 治理底座**：通过 PostgreSQL、Repository 双实现、AuditLog、Safe DTO 和最小 Console，让治理对象可持久化、可审计、可复盘。
-
-与“检索 + 大模型直接回答”的区别：
+ClinMindRuntime 不是：
 
 ```text
-Runtime 不绕过结构化模块做最终临床判断。
-Agent 不绕过 Runtime 修改状态或输出诊断。
-RAG 不绕过 EvidenceGraph 和 DecisionBoundary 直接回答患者。
-Model 不绕过 Evaluation / CapabilityProfile 直接上线。
-Tool / MCP 不绕过 Runtime Validation 写入系统状态。
-Candidate 不自动上线经验或进入训练集。
-Console 不暴露敏感原文和未脱敏候选输入。
+普通医疗聊天机器人
+普通文档 RAG
+自由自治式 AI 医生
+由 LLM 直接维护患者状态的 Agent
+由模型直接执行处方、病历写入或高风险动作的系统
+只依赖最终文本审核的 Guardrail Demo
+```
+
+它是：
+
+```text
+Runtime 主控
++ Clinical Data / Fact Plane
++ Clinical Evidence Engine
++ Controlled Agent / Workflow
++ Model Provider Lifecycle
++ Tool / MCP / Skills Governance
++ Unified Runtime Governance Kernel
++ Role-safe Patient / Clinician Projection
++ Evaluation / Audit / Continuous Improvement
++ Production Governance Platform
+```
+
+核心权力边界：
+
+```text
+Runtime
+负责状态、控制流、能力授权、安全判断、结果提交、输出边界、恢复和审计。
+
+Agent / Evidence / Model / Tool / MCP / Skill
+只能生成 Proposal、Draft、Candidate、EvidenceRef 或 Structured Result。
+
+Evaluation / Review / Governance
+负责能力评估、发布授权、回滚、再认证和持续改进。
 ```
 
 ---
 
-## 当前已实现 / 已设计
+## 当前已冻结能力
 
 | 阶段 | 能力 | 状态 |
-|------|------|------|
-| Phase 1 | 患者/医生 Runtime、SafetyGate、Trace、DecisionBoundary | 已完成 |
-| Phase 2 | 资产包 `phase2-default`、Provider 接口、debug `assets-used` | 已完成 |
-| Phase 3 | YAML 病例集、`RuntimeEvaluationRunner`、7 个 Scorer、EvaluationResult 聚合、CapabilityProfile Proposal、debug Evaluation API | 已冻结 |
-| Phase 4-P0 | ExperienceCandidate / TrainingExampleCandidate 候选沉淀机制、Candidate debug API | 已冻结 |
-| Phase 4-P1 | CandidateSanitizer、SourceRef 强校验、Candidate review 记录 | 已冻结 |
-| Phase 5-P0 | PostgreSQL 持久化、Repository 双实现、AuditLog、Persistence health / Audit API | 已冻结 |
-| Phase 5-P1 | 最小 Console API、RBAC-lite、Audit Center、Safe DTO | 已冻结 |
-| Phase 5-P2 | 最小前端 Console MVP（`console-web/`） | 已冻结 |
-| Phase 6-P0 | 受控 Agent 执行层 MVP | 已冻结 |
-| Phase 7-P0 | RAG EvidenceProvider MVP | 已冻结 |
-| Phase 7-P1 | KG-lite / Graph Evidence 原型 | 已冻结 |
-| Phase 8-P0 | Python AI Provider / EmbeddingProvider MVP | 已冻结 |
-| Phase 8-P1 | ModelProvider / JudgeProvider / ProviderCapabilityProfile MVP | 已冻结 |
-| Phase 8-P2 | ModelRegistry / PromptRegistry / TrainingDatasetVersion MVP | 已冻结 |
-| Phase 9-P0 | Tool / MCP / Skills 受控接入 MVP | 已冻结 |
+|---|---|---|
+| Phase 1 | RuntimeState、SafetyGate、DecisionBoundary、Trace 与角色输出 | FROZEN |
+| Phase 2 | AssetPackage、Provider、版本与 CapabilityProfile | FROZEN |
+| Phase 3 | Evaluation CaseSet、Runner、Scorer 与回归闭环 | FROZEN |
+| Phase 4 | Candidate、Sanitization、SourceRef 与 Review | FROZEN |
+| Phase 5 | PostgreSQL、Repository、Audit、Safe DTO 与 Console 基础 | FROZEN |
+| Phase 6 | 受控 Agent 执行层 | FROZEN |
+| Phase 7 | RAG EvidenceProvider 与 KG-lite / Graph Evidence 原型 | FROZEN |
+| Phase 8 | Python Provider、Model / Prompt / Dataset Governance 原型 | FROZEN |
+| Phase 9 | Tool / MCP / Skills 治理原型 | FROZEN |
+| Phase 10 | Governance / Runtime Console MVP | FROZEN |
+| Phase 11-P0 | Patient / Clinician / Governance 三角色前端 | FROZEN |
+| Phase 11-P1 | Runtime-backed Role-specific View API / Frontend BFF | FROZEN |
 
-Phase 9-P0 冻结记录见 [`docs/3-phase实现/Phase9_P0冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase9_P0%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。Phase 8-P2 冻结记录见 [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)。
+Phase 11-P1 冻结证据：
 
-当前尚未完整实现：
+- [`Phase11_P1人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase11_P1%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md)
+- [`Phase11_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase11_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md)
+
+---
+
+## Phase 12 设计入口
+
+Phase 12 用一个可评测临床纵切证明真实 Evidence、LLM Agent、FHIR 数据和 Runtime 治理可以协同，但仍不允许模型绕过 Runtime 做最终医疗决定。
+
+推荐阅读：
+
+1. [`Phase12真实临床能力纵切_总体设计.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase12%E7%9C%9F%E5%AE%9E%E4%B8%B4%E5%BA%8A%E8%83%BD%E5%8A%9B%E7%BA%B5%E5%88%87_%E6%80%BB%E4%BD%93%E8%AE%BE%E8%AE%A1.md)
+2. [`Phase12_P0ClinicalEvidenceEngine_实现规格.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase12_P0ClinicalEvidenceEngine_%E5%AE%9E%E7%8E%B0%E8%A7%84%E6%A0%BC.md)
+3. [`Phase12_P0EvidenceEngine_API与测试设计.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase12_P0EvidenceEngine_API%E4%B8%8E%E6%B5%8B%E8%AF%95%E8%AE%BE%E8%AE%A1.md)
+4. [`Phase12_P0开发任务清单.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase12_P0%E5%BC%80%E5%8F%91%E4%BB%BB%E5%8A%A1%E6%B8%85%E5%8D%95.md)
+5. [`AI_IMPLEMENTATION_SKILL.md`](docs/4-%E5%AE%9E%E7%8E%B0%E7%BA%A6%E6%9D%9F/AI_IMPLEMENTATION_SKILL.md)
+
+Phase 12-P0 核心链路：
 
 ```text
-真实远程 MCP Adapter
-Skills 文件系统与 Skill Store
-Tool Console / Skill Console
-Multi-Agent / Handoffs
-生产级登录 / 多租户 / RBAC
-正式医生审核平台
+Versioned Medical Source
+→ Chunk / Span / Curated Claim
+→ PostgreSQL Lexical Recall + Dense Recall
+→ RRF + Cross-encoder Rerank
+→ Authority / Freshness / Applicability
+→ Citation Entailment / Conflict
+→ EvidenceValidation
+→ RuntimeEvidenceGraph Patch
+→ Runtime Commit / DecisionBoundary
 ```
+
+---
+
+## 关键文档
+
+| 文档 | 作用 |
+|---|---|
+| [`00_项目设计地图.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/00_%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1%E5%9C%B0%E5%9B%BE.md) | 文档体系总入口 |
+| [`ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) | v3.0 权威系统设计 |
+| [`ClinMindRuntime阶段拆分路线图.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E9%98%B6%E6%AE%B5%E6%8B%86%E5%88%86%E8%B7%AF%E7%BA%BF%E5%9B%BE.md) | Phase 0–22 实现路线 |
+| [`ClinMindRuntime技术实现总方案.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%80%BB%E6%96%B9%E6%A1%88.md) | 模块、接口、API、存储、测试与部署蓝图 |
+| [`Phase11后架构缺口与路线收敛决策.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/Phase11%E5%90%8E%E6%9E%B6%E6%9E%84%E7%BC%BA%E5%8F%A3%E4%B8%8E%E8%B7%AF%E7%BA%BF%E6%94%B6%E6%95%9B%E5%86%B3%E7%AD%96.md) | Phase 11 后的优先级和边界决策 |
+| [`docs/README.md`](docs/README.md) | docs 目录导航 |
 
 ---
 
 ## 快速启动
 
-**环境**：JDK 21（推荐）、Maven 3.9+
+后端要求 Java 17+，推荐使用 JDK 21 与 Maven 3.9+。
 
 ```powershell
 set JAVA_HOME=D:\cxj\software\jdk21
+mvn test
 mvn -DskipTests package
 java -jar target\clinmind-runtime-0.1.0-SNAPSHOT.jar
 ```
 
-服务默认：`http://localhost:8080`
+后端默认：`http://localhost:8080`
 
-### 前端 Console（Phase 5-P2）
+前端：
 
 ```powershell
 cd console-web
 npm install
+npm run typecheck
+npm test
+npm run build
 npm run dev
 ```
 
-开发服务器默认 `http://localhost:5173`，侧边栏 **Debug Context** 可配置 Token / Actor / Roles 并测试连接；`/api` 代理至后端 `8080`。
-
-前端测试：
-
-```powershell
-cd console-web
-npm run test
-npm run build
-```
+前端开发服务器默认：`http://localhost:5173`
 
 ---
 
-## 运行一次 Runtime（患者端）
+## 运行 Runtime 示例
 
 ```http
 POST /api/v1/runtime/start
@@ -126,102 +169,24 @@ Content-Type: application/json
 }
 ```
 
-高风险输入应返回 `runtime_status: safety_gate_triggered`，患者端输出含风险提示且 **不泄露** DDx 板。
+患者端输出必须遵守 DecisionBoundary，不得泄露 DDx、Raw Evidence、Trace、Prompt 或完整内部推理。
 
 ---
 
-## 运行一次 Evaluation
-
-```http
-POST /api/v1/debug/evaluations/runs
-Content-Type: application/json
-
-{
-  "case_set_id": "phase3-default",
-  "case_set_version": "0.3.0",
-  "asset_package_id": "phase2-default",
-  "asset_package_version": "0.2.0",
-  "include_tags": ["high_risk"],
-  "fail_fast": false
-}
-```
-
-后续可查询：
-
-- `GET /api/v1/debug/evaluations/runs/{run_id}/result`
-- `GET /api/v1/debug/evaluations/runs/{run_id}/items/{case_id}`
-- `POST /api/v1/debug/evaluations/runs/{run_id}/capability-profile-proposal?symptom_group=chest_pain`
-
----
-
-## 文档入口
-
-| 文档 | 说明 |
-|------|------|
-| [`docs/0-项目入口/00_项目设计地图.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/00_%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1%E5%9C%B0%E5%9B%BE.md) | 文档体系总入口，说明总设计、专项设计、Phase 文档和实现约束之间的关系 |
-| [`docs/README.md`](docs/README.md) | docs 目录导航 |
-| [`docs/1-总设计/ClinMindRuntime完整系统设计.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E5%AE%8C%E6%95%B4%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.md) | v2.2 权威总设计：八个能力域、五层架构、统一 Runtime 主链路 |
-| [`docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md`](docs/4-%E5%AE%9E%E7%8E%B0%E7%BA%A6%E6%9D%9F/AI_IMPLEMENTATION_SKILL.md) | AI 实现约束（给 Cursor / Agent / Claude Code / Codex） |
-| [`docs/0-项目入口/项目展示导读.md`](docs/0-%E9%A1%B9%E7%9B%AE%E5%85%A5%E5%8F%A3/%E9%A1%B9%E7%9B%AE%E5%B1%95%E7%A4%BA%E5%AF%BC%E8%AF%BB.md) | 面试 / 展示用精简导读 |
-| [`docs/3-phase实现/Phase5冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase5%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 5 全阶段冻结依据 |
-| [`docs/3-phase实现/Phase8_P1冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 8-P1 冻结依据 |
-| [`docs/3-phase实现/Phase8_P1人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P1%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 8-P1 验收记录 |
-| [`docs/3-phase实现/Phase8_P2冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 8-P2 冻结依据 |
-| [`docs/3-phase实现/Phase8_P2人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase8_P2%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 8-P2 验收记录 |
-| [`docs/3-phase实现/Phase9_P0冻结记录.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase9_P0%E5%86%BB%E7%BB%93%E8%AE%B0%E5%BD%95.md) | Phase 9-P0 冻结依据 |
-| [`docs/3-phase实现/Phase9_P0人工测试结果.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase9_P0%E4%BA%BA%E5%B7%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.md) | Phase 9-P0 验收记录 |
-| [`docs/1-总设计/ClinMindRuntime阶段拆分路线图.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E9%98%B6%E6%AE%B5%E6%8B%86%E5%88%86%E8%B7%AF%E7%BA%BF%E5%9B%BE.md) | 阶段路线图：Phase 6/7/8/9/10 长期演进顺序 |
-| [`docs/1-总设计/ClinMindRuntime技术实现总方案.md`](docs/1-%E6%80%BB%E8%AE%BE%E8%AE%A1/ClinMindRuntime%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%80%BB%E6%96%B9%E6%A1%88.md) | 技术实现总方案：统一 Runtime 主链路、Capability Orchestration、AgentExecutionLayer、Runtime Validation |
-
----
-
-## 当前不做什么
-
-- 不向 Phase 1–9 P0 已冻结阶段继续堆新能力。
-- 不让模型能力接管 Runtime、SafetyGate 或 PatientOutput。
-- 不训练基础大模型 / 不做 RLHF。
-- 不自动修改生产资产包或 CapabilityProfile。
-- 不自动上线 ExperienceCandidate。
-- 不自动把 TrainingExampleCandidate 进入训练集。
-- 不把 Candidate review 当作正式临床审核。
-- 不做正式登录、OAuth、多租户。
-- 不提前接真实远程 MCP、Browser Agent / Computer Use / RPA 或高风险写工具。
-- 不让 Agent / RAG / Model / Tool 绕过 Runtime Validation 和 DecisionBoundary。
-
----
-
-## 下一阶段
-
-**Phase 9-P0 已冻结。** 当前建议下一阶段进入：
+## 当前禁止事项
 
 ```text
-Phase 9-P1：真实 MCP adapter 设计
-或 Phase 9-P2：Skills 文件系统与 Skill Store
-或 Phase 10：Tool Console / Skill Console / Provider Console
+不在设计评审完成前实现 Phase 12-P0 产品代码。
+不并行启动 Phase 12-P1、P2 或 Phase 13–22。
+不让 Evidence Engine、Agent、Model、Tool 绕过 Runtime Validation。
+不导入真实患者或 PHI 数据。
+不发布许可证未知的证据资产。
+不让未验证 Citation 进入 accepted EvidenceGraph。
+不提前接入外部写操作、生产认证或自由自治 Multi-Agent。
 ```
-
-进入下一阶段前，应先完成：
-
-```text
-1. 新增对应 Phase 的实现规格。
-2. 新增对应 API 与测试设计。
-3. 新增对应开发任务清单。
-4. 更新 docs/4-实现约束/AI_IMPLEMENTATION_SKILL.md，明确新阶段允许范围和禁止边界。
-```
-
-不应在未立项的新 Phase 中破坏 Phase 1–9 P0 已冻结的 Runtime 主控、ProviderCapabilityPolicy、ProviderValidation、Model Governance、Tool Governance、Safe DTO 与治理边界。
 
 ---
 
 ## License
 
 Internal prototype — 见仓库根目录许可说明（如有）。
-
-## Phase 11-P1 当前状态（2026-07-14）
-
-Patient / Clinician 已采用 RuntimeStore 主路径与显式 seed fallback；PARTIAL、FALLBACK、policy、sanitizer 和 audit 边界已实现。当前冻结状态为 **FROZEN**，详见：
-
-- docs/3-phase实现/Phase11_P1人工测试结果.md
-- docs/3-phase实现/Phase11_P1冻结记录.md
-
-Phase 11-P1 自动化测试与浏览器人工验证均已通过；下一阶段入口为 Phase 12-P0 Clinical Evidence Engine。
