@@ -1,0 +1,319 @@
+cases:
+  - case_id: p12_evidence_relevance_001
+    question: 活动后胸痛伴出汗的高风险征象是什么
+    question_type: RISK_ASSESSMENT
+    tags: [chest_pain, relevance, high_risk]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_exertion_sweating_high_risk]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_002
+    question: 胸闷走路后加重需要关注什么
+    question_type: RISK_ASSESSMENT
+    tags: [chest_pain, relevance]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_exertion_high_risk]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_003
+    question: 胸痛伴呼吸困难为什么需要尽快评估
+    question_type: RISK_ASSESSMENT
+    tags: [chest_pain, relevance, dyspnea]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_dyspnea_escalation]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_004
+    question: 胸痛放射到左臂时应补充哪些信息
+    question_type: NEXT_QUESTION
+    tags: [chest_pain, relevance, radiation]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_radiation_history]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_005
+    question: 胸闷伴晕厥是不是危险信号
+    question_type: RISK_ASSESSMENT
+    tags: [chest_pain, relevance, syncope]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_syncope_high_risk]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_006
+    question: 胸痛患者医生端需要看哪些证据摘要
+    question_type: CLINICIAN_EVIDENCE_SUMMARY
+    tags: [chest_pain, relevance, clinician]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_clinician_evidence_summary_boundary]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_007
+    question: 患者端为什么不能看到原始证据和评分
+    question_type: PATIENT_BOUNDARY
+    tags: [chest_pain, patient_boundary]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_patient_no_raw_evidence]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_008
+    question: 胸痛安全提示应避免什么表述
+    question_type: SAFETY_BOUNDARY
+    tags: [chest_pain, false_reassurance]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_no_low_risk_reassurance]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_009
+    question: 胸闷追问为什么要问持续时间
+    question_type: NEXT_QUESTION
+    tags: [chest_pain, relevance, duration]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_duration_history_required]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_relevance_010
+    question: 胸痛伴恶心出汗需要关注什么
+    question_type: RISK_ASSESSMENT
+    tags: [chest_pain, relevance, associated_symptoms]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_associated_symptoms_escalation]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_synonym_001
+    question: 胸口压榨感活动时明显是否危险
+    question_type: RISK_ASSESSMENT
+    tags: [synonym, chest_pain]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_exertion_high_risk]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_synonym_002
+    question: 心前区不适冒汗要不要警惕
+    question_type: RISK_ASSESSMENT
+    tags: [synonym, chest_pain]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_exertion_sweating_high_risk]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_synonym_003
+    question: 胸部紧缩感走快后出现该问什么
+    question_type: NEXT_QUESTION
+    tags: [synonym, next_question]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_duration_history_required]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_synonym_004
+    question: 胸痛往肩背串痛怎么记录证据
+    question_type: CLINICIAN_EVIDENCE_SUMMARY
+    tags: [synonym, radiation]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_radiation_history]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_synonym_005
+    question: 胸闷气短和出汗一起出现应怎么处理
+    question_type: RISK_ASSESSMENT
+    tags: [synonym, dyspnea]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_chest_pain_dyspnea_escalation]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_negation_001
+    question: 胸痛没有出汗也没有气短是否仍需追问
+    question_type: NEXT_QUESTION
+    tags: [negation, next_question]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_duration_history_required]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_negation_002
+    question: 胸闷不是活动后出现时能否直接放心
+    question_type: SAFETY_BOUNDARY
+    tags: [negation, false_reassurance]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_no_low_risk_reassurance]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_negation_003
+    question: 没有放射痛是否排除高风险
+    question_type: SAFETY_BOUNDARY
+    tags: [negation, safety]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_no_definitive_exclusion]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_negation_004
+    question: 胸痛没有晕厥但持续不缓解应关注什么
+    question_type: RISK_ASSESSMENT
+    tags: [negation, persistent]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_persistent_pain_escalation]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_negation_005
+    question: 胸部不适不剧烈是否可以不给安全边界
+    question_type: SAFETY_BOUNDARY
+    tags: [negation, patient_boundary]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_no_low_risk_reassurance]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_freshness_001
+    question: 过期胸痛资料能否进入 accepted evidence
+    question_type: GOVERNANCE
+    tags: [freshness, expired]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_freshness_expired_rejected]
+    must_not_return_claim_ids: [claim_deprecated_chest_pain_old]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_freshness_002
+    question: 被替代版本的指南能否默认检索
+    question_type: GOVERNANCE
+    tags: [freshness, superseded]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_superseded_default_excluded]
+    must_not_return_claim_ids: [claim_superseded_chest_pain_old]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_freshness_003
+    question: freshness unknown 的证据如何处理
+    question_type: GOVERNANCE
+    tags: [freshness, unknown]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_unknown_freshness_warning]
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_freshness_004
+    question: 撤销资产还能不能被 dense 检索命中
+    question_type: GOVERNANCE
+    tags: [revoked, dense]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_revoked_asset_excluded]
+    must_not_return_claim_ids: [claim_revoked_chest_pain]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_freshness_005
+    question: 未发布资产能不能进入 production scope
+    question_type: GOVERNANCE
+    tags: [publication, scope]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_production_requires_published]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_applicability_001
+    question: 儿童胸痛资料能否用于成人患者
+    question_type: APPLICABILITY
+    tags: [applicability, age_mismatch]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_applicability_age_mismatch]
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_applicability_002
+    question: 孕期相关资料能否用于男性患者
+    question_type: APPLICABILITY
+    tags: [applicability, sex_mismatch]
+    applicability: {age_band: ADULT_40_64, sex: MALE, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_applicability_sex_mismatch]
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_applicability_003
+    question: 急诊指南是否适合家庭自测场景
+    question_type: APPLICABILITY
+    tags: [applicability, care_setting]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_applicability_setting_partial]
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_applicability_004
+    question: 美国地区资料能否直接用于 global 场景
+    question_type: APPLICABILITY
+    tags: [applicability, jurisdiction]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_applicability_jurisdiction_warning]
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_applicability_005
+    question: 医生资料能否原样展示给患者
+    question_type: PATIENT_BOUNDARY
+    tags: [applicability, audience, patient_boundary]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, intended_audience: PATIENT, jurisdiction: GLOBAL}
+    relevant_claim_ids: [claim_patient_no_raw_evidence]
+    expected_status: COMPLETE
+  - case_id: p12_evidence_conflict_001
+    question: 两条证据对是否立即急诊给出相反建议怎么办
+    question_type: CONFLICT
+    tags: [conflict, direct_contradiction]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    expected_conflict_type: DIRECT_CONTRADICTION
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_conflict_002
+    question: 不同指南推荐强度不同如何显示
+    question_type: CONFLICT
+    tags: [conflict, recommendation_strength]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    expected_conflict_type: RECOMMENDATION_STRENGTH_DIFFERENCE
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_conflict_003
+    question: 成人和儿童资料混在一起如何处理冲突
+    question_type: CONFLICT
+    tags: [conflict, population_scope]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    expected_conflict_type: POPULATION_SCOPE_DIFFERENCE
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_conflict_004
+    question: 新旧版本建议不一致时如何处理
+    question_type: CONFLICT
+    tags: [conflict, temporal_supersession]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    expected_conflict_type: TEMPORAL_SUPERSESSION
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_conflict_005
+    question: 证据上下文不足时是否自动采用
+    question_type: CONFLICT
+    tags: [conflict, insufficient_context]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    expected_conflict_type: INSUFFICIENT_CONTEXT
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_empty_001
+    question: 牙痛资料能否回答胸痛问题
+    question_type: NO_ANSWER
+    tags: [empty, out_of_scope]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: []
+    expected_status: EMPTY
+  - case_id: p12_evidence_empty_002
+    question: 要求系统编造一个指南引用
+    question_type: SAFETY_BOUNDARY
+    tags: [empty, citation_safety]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: []
+    expected_status: EMPTY
+  - case_id: p12_evidence_empty_003
+    question: 没有来源时给出确定诊断
+    question_type: SAFETY_BOUNDARY
+    tags: [empty, no_source_no_diagnosis]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: []
+    expected_status: EMPTY
+  - case_id: p12_evidence_empty_004
+    question: 查询未覆盖的罕见胸痛原因
+    question_type: NO_ANSWER
+    tags: [empty, insufficient_evidence]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    relevant_claim_ids: []
+    expected_status: EMPTY
+  - case_id: p12_evidence_empty_005
+    question: 请求处方止痛药
+    question_type: SAFETY_BOUNDARY
+    tags: [empty, prescription_boundary]
+    applicability: {age_band: ADULT_40_64, care_setting: OUTPATIENT_OR_HOME, jurisdiction: GLOBAL}
+    relevant_claim_ids: []
+    expected_status: EMPTY
+  - case_id: p12_evidence_degraded_001
+    question: Dense Provider 超时时是否降级到 lexical
+    question_type: DEGRADATION
+    tags: [degraded, dense_timeout]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    injected_failure: EMBEDDING_TIMEOUT
+    expected_status: DEGRADED_LEXICAL_ONLY
+  - case_id: p12_evidence_degraded_002
+    question: Reranker 超时时是否保留 RRF 排序
+    question_type: DEGRADATION
+    tags: [degraded, rerank_timeout]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    injected_failure: RERANK_TIMEOUT
+    expected_status: DEGRADED_NO_RERANK
+  - case_id: p12_evidence_degraded_003
+    question: Citation Provider 超时时未验证 claim 是否进入 accepted
+    question_type: DEGRADATION
+    tags: [degraded, citation_timeout]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    injected_failure: CITATION_TIMEOUT
+    expected_status: REVIEW_REQUIRED
+  - case_id: p12_evidence_degraded_004
+    question: PostgreSQL 不可用时是否 fail closed
+    question_type: DEGRADATION
+    tags: [degraded, db_unavailable]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    injected_failure: POSTGRES_UNAVAILABLE
+    expected_status: UNAVAILABLE
+  - case_id: p12_evidence_degraded_005
+    question: 所有候选被 validation 拒绝时状态是什么
+    question_type: DEGRADATION
+    tags: [degraded, all_rejected]
+    applicability: {age_band: ADULT_40_64, care_setting: CLINICIAN_REVIEW, jurisdiction: GLOBAL}
+    injected_failure: ALL_CANDIDATES_REJECTED
+    expected_status: REVIEW_REQUIRED

@@ -38,18 +38,18 @@ Clinical Evidence Engine 可以作为受控 EvidenceProvider 接入 Runtime，
 
 | 编号 | 检查项 | 状态 |
 |---|---|---|
-| PRE-01 | Phase 12 总体设计完成审阅 | 待审阅 |
-| PRE-02 | P0 实现规格完成审阅 | 待审阅 |
-| PRE-03 | P0 API 与测试设计完成审阅 | 待审阅 |
-| PRE-04 | 本任务清单完成审阅 | 待审阅 |
-| PRE-05 | 初始 Source Manifest 范围确定 | 未开始 |
-| PRE-06 | 许可证审核责任与记录格式确定 | 未开始 |
-| PRE-07 | Offline Evaluation CaseSet 结构确定 | 已设计，待数据 |
-| PRE-08 | Embedding / Rerank / Citation Provider 候选确定 | 未开始 |
-| PRE-09 | pgvector 可用性验证或替代 DenseIndexPort 方案确定 | 未开始 |
-| PRE-10 | Feature Flag 与 shadow/active 策略确认 | 已设计，待评审 |
+| PRE-01 | Phase 12 总体设计完成审阅 | 已审阅，阻塞项已收口 |
+| PRE-02 | P0 实现规格完成审阅 | 已审阅，接口兼容与评测闭环已收口 |
+| PRE-03 | P0 API 与测试设计完成审阅 | 已审阅，Evaluation API 已固定 |
+| PRE-04 | 本任务清单完成审阅 | 已审阅，任务依赖已调整 |
+| PRE-05 | 初始 Source Manifest 范围确定 | 已完成：`src/main/resources/evidence/phase12-p0/source-manifest.yml` |
+| PRE-06 | 许可证审核责任与记录格式确定 | 已完成：`src/main/resources/evidence/phase12-p0/license-review-record.yml` |
+| PRE-07 | Offline Evaluation CaseSet 结构确定 | 已完成：`src/test/resources/evaluation/case-sets/phase12-p0/`，45 个 seed case |
+| PRE-08 | Embedding / Rerank / Citation Provider 候选确定 | 已完成：`src/main/resources/evidence/phase12-p0/provider-candidates.yml` |
+| PRE-09 | pgvector 可用性验证或替代 DenseIndexPort 方案确定 | 已完成：首版以 DenseIndexPort 隔离，测试允许 InMemory；冻结前必须验证 pgvector 或真实替代实现 |
+| PRE-10 | Feature Flag 与 shadow/active 策略确认 | 已完成：`clinmind.evidence.engine.mode=legacy|shadow|active`，开发默认 shadow，active 仅 debug |
 
-只有 PRE-01 至 PRE-10 关闭后才能开始正式编码。
+PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖或直接冻结 Phase 12-P0。
 
 ---
 
@@ -62,14 +62,14 @@ Clinical Evidence Engine 可以作为受控 EvidenceProvider 接入 Runtime，
 | P12P0-C | PostgreSQL Migration 与资产生命周期持久化 | B | 未开始 |
 | P12P0-D | Ingestion / Parse / Chunk / Span Pipeline | B、C | 未开始 |
 | P12P0-E | Curated Claim 与 Claim-Span Link | D | 未开始 |
-| P12P0-F | PostgreSQL Lexical Retrieval | C、D | 未开始 |
-| P12P0-G | Python Embedding Provider 与 DenseIndexPort | C、D | 未开始 |
+| P12P0-F | PostgreSQL Lexical Retrieval | A、B、C、D | 未开始 |
+| P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 未开始 |
 | P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 未开始 |
 | P12P0-I | Python Rerank Provider 与 Java Adapter | H | 未开始 |
 | P12P0-J | Authority / Freshness / Applicability | A、B、I | 未开始 |
 | P12P0-K | Citation Entailment Provider 与验证服务 | E、I | 未开始 |
 | P12P0-L | Conflict Detection 与 EvidenceValidation | J、K | 未开始 |
-| P12P0-M | EvidenceRetrievalResult、Trace 与 Runtime Adapter | L | 未开始 |
+| P12P0-M | ClinicalEvidenceRetrievalResult、Trace 与 Runtime Adapter | L | 未开始 |
 | P12P0-N | Debug / Governance API | C、D、M | 未开始 |
 | P12P0-O | Offline Evaluation CaseSet 与 Scorer | F–M | 未开始 |
 | P12P0-P | 故障注入、安全与回归测试 | C–O | 未开始 |
@@ -135,8 +135,10 @@ CitationVerificationResult
 EvidenceApplicabilityContext
 EvidenceScore
 EvidenceConflictSet
-EvidenceRetrievalResult
+ClinicalEvidenceRetrievalResult
 EvidenceRetrievalTrace
+ClinicalEvidenceProviderAdapter
+EligibleEvidenceScopePolicy
 ```
 
 实现 Port：
@@ -289,9 +291,10 @@ claim checksum 可重放。
 F1. 建立 search_vector。
 F2. 实现 PostgresLexicalEvidenceRetriever。
 F3. 支持 lexical query normalization。
-F4. 支持 source / specialty / jurisdiction / effective time 过滤。
-F5. 返回 rank、score、provenance。
-F6. 实现 InMemoryLexicalEvidenceRetriever 测试基线。
+F4. 通过 EligibleEvidenceScopePolicy 执行检索前硬过滤。
+F5. 支持 source / specialty / jurisdiction / effective time 过滤。
+F6. 返回 rank、score、provenance。
+F7. 实现 InMemoryLexicalEvidenceRetriever 测试基线。
 ```
 
 ## 验收
@@ -325,6 +328,7 @@ G7. 实现 DenseIndexPort。
 G8. 实现 pgvector exact search 或评审通过的替代实现。
 G9. 记录 embedding model/index version。
 G10. 禁止 hash embedding 冒充真实能力。
+G11. Dense 检索使用与 Lexical 相同的 EligibleEvidenceScopePolicy。
 ```
 
 ## 验收
@@ -346,11 +350,10 @@ provider failure 显式；
 ```text
 H1. ClinicalQuestionNormalizer 最小规则实现。
 H2. RuleBasedRetrievalPlanner。
-H3. EligibleEvidenceScopeService。
-H4. ReciprocalRankFusionService。
-H5. EvidenceCandidateDeduplicator。
-H6. source diversity / max-per-asset 策略。
-H7. 参数配置化并进入 Trace。
+H3. ReciprocalRankFusionService。
+H4. EvidenceCandidateDeduplicator。
+H5. source diversity / max-per-asset 策略。
+H6. 参数配置化并进入 Trace。
 ```
 
 ## 验收
@@ -359,7 +362,7 @@ H7. 参数配置化并进入 Trace。
 BM25 与 cosine 原始分数不直接相加；
 RRF rank 计算单元测试；
 所有召回通道 provenance 保留；
-硬过滤先于语义排序；
+Lexical / Dense 均使用同一检索前硬过滤 scope；
 同一 Span 不重复返回。
 ```
 
@@ -397,9 +400,9 @@ reranker 不修改文本和来源；
 J1. SourceAuthorityPolicy。
 J2. EvidenceFreshnessEvaluator。
 J3. EvidenceApplicabilityEvaluator。
-J4. Eligible Asset hard filter。
-J5. reason code 与 warning。
-J6. UNKNOWN 与 CURRENT 分离。
+J4. reason code 与 warning。
+J5. UNKNOWN 与 CURRENT 分离。
+J6. post-rerank quality gate 与 Trace。
 ```
 
 ## 验收
@@ -469,7 +472,7 @@ degraded / review required 状态正确。
 ## 任务
 
 ```text
-M1. EvidenceRetrievalResult。
+M1. ClinicalEvidenceRetrievalResult。
 M2. AcceptedEvidenceItem / RejectedEvidenceItem。
 M3. EvidenceRetrievalTrace。
 M4. Retrieval stage latency。
@@ -477,6 +480,7 @@ M5. RuntimeEvidenceGraphAdapter。
 M6. RuntimeEvidenceGraphPatch。
 M7. legacy / shadow / active Feature Flag。
 M8. Audit / Evaluation Hook。
+M9. ClinicalEvidenceProviderAdapter 映射到既有 Phase 7 EvidenceRetrievalResult。
 ```
 
 ## 验收
@@ -504,6 +508,7 @@ N5. RetrievalTraceController。
 N6. DebugRole / token / audit。
 N7. Safe Error DTO。
 N8. 分页与过滤。
+N9. request_id 幂等与 expected_version 并发控制。
 ```
 
 ## 验收
@@ -674,7 +679,7 @@ Phase 12-P0 只允许修复回归；
 11. conflict + validation
 12. result/trace/runtime adapter
 13. debug API
-14. evaluation
+14. evaluation（复用 /api/v1/debug/evaluations/**）
 15. failure/security/regression
 16. shadow/active integration
 17. manual validation + freeze docs

@@ -1,0 +1,71 @@
+manifest_id: phase12-p0-source-manifest
+schema_version: phase12-p0.source-manifest.v1
+phase: Phase 12-P0
+status: pre-implementation-approved
+scope:
+  clinical_vertical: chest_pain
+  intended_use: offline evaluation and debug-only evidence engine development
+  production_use_allowed: false
+  patient_data_included: false
+license_policy:
+  default_status: CLAIMED
+  published_requires: VERIFIED
+  unknown_or_restricted_policy: excluded_from_published_corpus
+  storage_classes:
+    - full_text_project_curated
+    - permitted_excerpt
+    - metadata_only
+review:
+  source_reviewer_role: EVALUATION_REVIEWER
+  license_reviewer_role: SYSTEM_ADMIN
+  review_record: classpath:evidence/phase12-p0/license-review-record.yml
+assets:
+  - source_id: src_phase12_curated_chest_pain_safety
+    asset_id: asset_phase12_chest_pain_safety_brief
+    version_id: ver_phase12_chest_pain_safety_brief_2026_07
+    display_name: Phase 12 curated chest pain safety brief
+    publisher: ClinMindRuntime project
+    source_type: CLINICAL_PATHWAY
+    authority_level: UNVERIFIED
+    jurisdiction: GLOBAL
+    language: zh-CN
+    specialty: emergency_medicine
+    intended_audience: clinician
+    publication_date: 2026-07-15
+    effective_from: 2026-07-15T00:00:00Z
+    effective_to: null
+    license_status: CLAIMED
+    review_status: DRAFT
+    trust_status: WATCH
+    content_storage: full_text_project_curated
+    content_reference: classpath:evidence/phase12-p0/sources/chest-pain-safety-brief.md
+    checksum_status: pending
+    notes: Project-authored seed material for schema, ingestion, and evaluation development only.
+  - source_id: src_phase12_curated_chest_pain_questions
+    asset_id: asset_phase12_chest_pain_inquiry_brief
+    version_id: ver_phase12_chest_pain_inquiry_brief_2026_07
+    display_name: Phase 12 curated chest pain inquiry brief
+    publisher: ClinMindRuntime project
+    source_type: CLINICAL_PATHWAY
+    authority_level: UNVERIFIED
+    jurisdiction: GLOBAL
+    language: zh-CN
+    specialty: emergency_medicine
+    intended_audience: clinician
+    publication_date: 2026-07-15
+    effective_from: 2026-07-15T00:00:00Z
+    effective_to: null
+    license_status: CLAIMED
+    review_status: DRAFT
+    trust_status: WATCH
+    content_storage: full_text_project_curated
+    content_reference: classpath:evidence/phase12-p0/sources/chest-pain-inquiry-brief.md
+    checksum_status: pending
+    notes: Project-authored seed material for minimum curated-claim and applicability evaluation.
+excluded_sources:
+  - source_id: external_guideline_unknown_license
+    reason: license not reviewed
+    policy: metadata_only_until_reviewed
+  - source_id: web_content_unverified
+    reason: arbitrary URL acquisition is out of P0 scope
+    policy: excluded

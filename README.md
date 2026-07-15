@@ -8,14 +8,15 @@ ClinMindRuntime 以 Java Runtime 为唯一控制平面，将 Agent、Clinical Ev
 
 ```text
 Phase 1–11 P1：已完成并冻结
-Phase 12-P0：Clinical Evidence Engine 设计评审期
+Phase 12-P0：Clinical Evidence Engine 编码前准备已完成，可从 P12P0-A 开始实现
 Phase 12-P1：真实 LLM Agent + 只读 FHIR + 最小统一治理，尚未开始
 Phase 12-P2：胸痛 / 胸闷临床纵切，尚未开始
 ```
 
 当前总设计版本：**v3.0**。
 
-Phase 12-P0 设计完成评审前，不进入正式代码实现。
+Phase 12-P0 的 PRE-01～PRE-10 已关闭；当前可以按任务清单从 P12P0-A 顺序实现。
+这不代表 Phase 12-P0 已完成或冻结。
 
 ---
 
@@ -98,6 +99,13 @@ Phase 12 用一个可评测临床纵切证明真实 Evidence、LLM Agent、FHIR 
 4. [`Phase12_P0开发任务清单.md`](docs/3-phase%E5%AE%9E%E7%8E%B0/Phase12_P0%E5%BC%80%E5%8F%91%E4%BB%BB%E5%8A%A1%E6%B8%85%E5%8D%95.md)
 5. [`AI_IMPLEMENTATION_SKILL.md`](docs/4-%E5%AE%9E%E7%8E%B0%E7%BA%A6%E6%9D%9F/AI_IMPLEMENTATION_SKILL.md)
 
+编码前准备材料：
+
+- [`source-manifest.yml`](src/main/resources/evidence/phase12-p0/source-manifest.yml)
+- [`license-review-record.yml`](src/main/resources/evidence/phase12-p0/license-review-record.yml)
+- [`provider-candidates.yml`](src/main/resources/evidence/phase12-p0/provider-candidates.yml)
+- [`phase12-p0 evidence cases`](src/test/resources/evaluation/case-sets/phase12-p0/manifest.yml)
+
 Phase 12-P0 核心链路：
 
 ```text
@@ -176,7 +184,7 @@ Content-Type: application/json
 ## 当前禁止事项
 
 ```text
-不在设计评审完成前实现 Phase 12-P0 产品代码。
+不跳过 P12P0-A～R 任务依赖直接冻结 Phase 12-P0。
 不并行启动 Phase 12-P1、P2 或 Phase 13–22。
 不让 Evidence Engine、Agent、Model、Tool 绕过 Runtime Validation。
 不导入真实患者或 PHI 数据。

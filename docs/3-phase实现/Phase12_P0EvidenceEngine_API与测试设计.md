@@ -30,7 +30,7 @@
 
 ```java
 public interface ClinicalEvidenceQueryService {
-    EvidenceRetrievalResult retrieve(EvidenceQueryRequest request);
+    ClinicalEvidenceRetrievalResult retrieve(EvidenceQueryRequest request);
 }
 ```
 
@@ -77,6 +77,7 @@ P0 只支持受控本地文件或预置资源引用，不提供任意 URL 自动
 ```java
 public interface EvidenceAssetGovernanceService {
     SourceRegistryEntry registerSource(RegisterEvidenceSourceCommand command);
+    SourceReviewResult reviewSource(ReviewEvidenceSourceCommand command);
     EvidenceAssetVersion createAssetVersion(CreateEvidenceAssetVersionCommand command);
     AssetReviewResult reviewAsset(ReviewEvidenceAssetCommand command);
     AssetPublicationResult publishAsset(PublishEvidenceAssetCommand command);
@@ -97,12 +98,20 @@ dense index complete or explicitly lexical-only evaluation mode
 offline evaluation passed
 ```
 
+说明：
+
+```text
+offline evaluation 使用 EVALUATION scope，可以读取 APPROVED + INDEXED/EVALUATED asset。
+publishAsset 必须引用通过阈值的 evaluation_run_id；发布后才进入 PRODUCTION scope。
+这样避免“只有 PUBLISHED 才能评测、但评测通过后才能 PUBLISHED”的循环依赖。
+```
+
 ## 2.4 ClinicalEvidenceValidationService
 
 ```java
 public interface ClinicalEvidenceValidationService {
     EvidenceValidationResult validate(
-        EvidenceRetrievalResult result,
+        ClinicalEvidenceRetrievalResult result,
         EvidenceValidationContext context
     );
 }
@@ -113,7 +122,7 @@ public interface ClinicalEvidenceValidationService {
 ```java
 public interface RuntimeEvidenceGraphAdapter {
     RuntimeEvidenceGraphPatch toPatch(
-        EvidenceRetrievalResult result,
+        ClinicalEvidenceRetrievalResult result,
         EvidenceValidationResult validation
     );
 }
@@ -129,18 +138,30 @@ Base Path：
 /api/v1/debug/evidence
 ```
 
+写入型 Debug API 通用字段：
+
+```text
+request_id：调用方生成，用于幂等。
+expected_version：可选，用于状态转换的乐观并发控制。
+reviewer_note / reason_code：审核、发布、撤销和废弃操作必须提供。
+```
+
+重复 `request_id` 必须返回同一幂等结果；`expected_version` 不匹配返回 409。
+
 ## 3.1 Source Registry
 
 ```text
 POST /api/v1/debug/evidence/sources
 GET  /api/v1/debug/evidence/sources
 GET  /api/v1/debug/evidence/sources/{sourceId}
+POST /api/v1/debug/evidence/sources/{sourceId}/review
 ```
 
 ### POST Source Request
 
 ```json
 {
+  "request_id": "src_req_xxx",
   "display_name": "Example Clinical Guideline Publisher",
   "publisher": "Example Publisher",
   "source_type": "GUIDELINE",
@@ -148,9 +169,9 @@ GET  /api/v1/debug/evidence/sources/{sourceId}
   "jurisdiction": "GLOBAL",
   "language": "en",
   "homepage": "https://example.invalid",
-  "license_status": "VERIFIED",
-  "license_name": "verified-by-project-review",
-  "license_reference": "internal-review-ref-001",
+  "license_status": "CLAIMED",
+  "license_name": "claimed-by-project-review",
+  "license_reference": "candidate-review-ref-001",
   "trust_status": "TRUSTED",
   "notes": "P0 curated source"
 }
@@ -171,7 +192,8 @@ GET  /api/v1/debug/evidence/sources/{sourceId}
 
 ```text
 API 不允许客户端直接提交 review_status=APPROVED。
-license_status=VERIFIED 仍需要 reviewer 和 review record。
+API 不允许普通 registerSource 请求直接提交 license_status=VERIFIED。
+license_status=VERIFIED 只能由 reviewSource / reviewAsset 类写操作生成，并必须记录 reviewer、review record 和 audit_ref。
 ```
 
 ## 3.2 Asset Version
@@ -191,6 +213,7 @@ POST /api/v1/debug/evidence/assets/{versionId}/revoke
 
 ```json
 {
+  "request_id": "asset_req_xxx",
   "source_id": "src_xxx",
   "asset_id": "asset_chest_pain_guide",
   "title": "Chest Pain Guidance",
@@ -237,13 +260,17 @@ file:（仅项目配置允许的 evidence import directory）
   "parser_version": "markdown-parser-1",
   "chunk_count": 42,
   "span_count": 63,
-  "curated_claim_count": 18,
-  "lexical_index_status": "READY",
-  "dense_index_status": "READY",
+  "claim_import_status": "NOT_STARTED",
+  "lexical_index_status": "NOT_STARTED",
+  "dense_index_status": "NOT_STARTED",
   "warnings": [],
   "trace_ref": "trace_xxx"
 }
 ```
+
+Ingestion 只承诺完成内容获取、解析、Chunk 和 Span 生成。
+Curated Claim import、Lexical Index 和 Dense Index 是后续显式阶段；若采用聚合 Pipeline API，
+必须在响应中分别标明每个阶段的状态和失败原因。
 
 ## 3.4 Retrieval API
 
@@ -348,21 +375,27 @@ quoted_text 只返回许可和长度策略允许的 Span。
 
 ## 3.5 Evaluation API
 
-复用 Phase 3 Evaluation Framework，并增加：
+固定复用 Phase 3 Evaluation Framework，不新增第二套 Evidence 专用 Evaluation API：
 
 ```text
-POST /api/v1/debug/evidence/evaluations/runs
-GET  /api/v1/debug/evidence/evaluations/runs/{runId}
-GET  /api/v1/debug/evidence/evaluations/runs/{runId}/items/{caseId}
+POST /api/v1/debug/evaluations/runs
+GET  /api/v1/debug/evaluations/runs/{runId}
+GET  /api/v1/debug/evaluations/runs/{runId}/items/{caseId}
+GET  /api/v1/debug/evaluations/runs/{runId}/result
 ```
 
-Evaluation 也可以最终统一进入既有：
+Phase 12-P0 扩展现有 EvaluationRunConfig：
 
 ```text
-/api/v1/debug/evaluations/**
+evaluation_type = CLINICAL_EVIDENCE
+case_set = phase12-p0-evidence-cases
+evaluation_scope = EVALUATION
+asset_version_ids = [...]
+provider_version_policy = PINNED
 ```
 
-具体路径在编码前二选一并固定；禁止同时维护两套不兼容 Evaluation 模型。
+Evaluation 写操作继续使用现有 DebugRole / token / audit 机制。
+Patient / Clinician 前端不得调用该 API。
 
 ---
 
@@ -535,6 +568,10 @@ determinism_notes
 ---
 
 # 五、错误响应
+
+Phase 12-P0 可以在 Evidence Debug API 内扩展现有 `ApiResponse.fail(ApiError)`，但不得破坏
+Phase 1–11 既有 API 响应兼容性。若引入 Safe Error DTO，必须只用于 Phase 12 新接口或通过
+向后兼容字段扩展实现。
 
 统一结构：
 

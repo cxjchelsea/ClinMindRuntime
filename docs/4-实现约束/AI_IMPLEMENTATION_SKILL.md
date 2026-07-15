@@ -3,8 +3,8 @@
 > 本文件用于约束 AI / Cursor / Claude Code / Codex 在本仓库中的实现行为。  
 > Phase 1–11 P1 已完成并冻结。  
 > 当前总设计版本：v3.0。  
-> 当前阶段：Phase 12-P0 设计评审期，尚未进入代码实现。  
-> 只有 Phase 12 总体设计、P0 实现规格、API/测试设计和开发任务清单通过评审后，才允许建立实现分支并按任务清单编码。
+> 当前阶段：Phase 12-P0 编码前准备已完成，可从 P12P0-A 开始实现。
+> PRE-01～PRE-10 已关闭；仍必须按任务清单顺序编码、测试和归档，不得直接冻结。
 
 ---
 
@@ -12,15 +12,15 @@
 
 | 项 | 内容 |
 |---|---|
-| 当前阶段 | Phase 12-P0 Clinical Evidence Engine 设计评审期 |
+| 当前阶段 | Phase 12-P0 Clinical Evidence Engine 可开始 P12P0-A 实现 |
 | 前置状态 | Phase 1–11 P1 已冻结 |
 | 前置冻结记录 | `docs/3-phase实现/Phase11_P1冻结记录.md` |
 | 总体设计 | `docs/3-phase实现/Phase12真实临床能力纵切_总体设计.md` |
 | P0 实现规格 | `docs/3-phase实现/Phase12_P0ClinicalEvidenceEngine_实现规格.md` |
 | P0 API 与测试设计 | `docs/3-phase实现/Phase12_P0EvidenceEngine_API与测试设计.md` |
 | P0 开发任务清单 | `docs/3-phase实现/Phase12_P0开发任务清单.md` |
-| 当前允许工作 | 设计审阅、语料与许可证调研、Provider 候选验证、实现前技术 Spike |
-| 当前禁止工作 | 在设计评审完成前提交正式 Phase 12-P0 产品代码 |
+| 当前允许工作 | 按 P12P0-A～R 任务清单顺序实现、测试、审计和文档归档 |
+| 当前禁止工作 | 跳过任务依赖、未验证即冻结、并行启动 Phase 12-P1/P2/13+ |
 
 ---
 
@@ -59,7 +59,8 @@ Java Runtime
 拥有状态、控制流、能力调用、验证、部分采纳、提交、安全、恢复和角色输出边界。
 
 Clinical Evidence Engine
-只能返回 EvidenceRetrievalResult / EvidenceCandidate / EvidenceGraph Patch。
+内部返回 ClinicalEvidenceRetrievalResult，并经 adapter 映射为既有 EvidenceRetrievalResult /
+EvidenceCandidate / EvidenceGraph Patch。
 
 Python Provider
 只能返回 Embedding、Rerank、Citation Entailment 等结构化模型结果。
@@ -104,8 +105,9 @@ CitationVerificationResult
 EvidenceApplicabilityContext
 EvidenceScore
 EvidenceConflictSet
-EvidenceRetrievalResult
+ClinicalEvidenceRetrievalResult
 EvidenceRetrievalTrace
+ClinicalEvidenceProviderAdapter
 
 EvidenceIngestionService
 EvidenceAssetGovernanceService
@@ -137,6 +139,15 @@ Python citation-entailment endpoint
 Debug evidence source / asset / query / trace API
 Offline evidence Evaluation CaseSet 与 Scorer
 Source Manifest 与许可证审核记录
+```
+
+P0 编码前材料：
+
+```text
+src/main/resources/evidence/phase12-p0/source-manifest.yml
+src/main/resources/evidence/phase12-p0/license-review-record.yml
+src/main/resources/evidence/phase12-p0/provider-candidates.yml
+src/test/resources/evaluation/case-sets/phase12-p0/manifest.yml
 ```
 
 ---
@@ -276,6 +287,8 @@ Question
 → Citation Entailment
 → Conflict Detection
 → EvidenceValidation
+→ ClinicalEvidenceRetrievalResult
+→ ClinicalEvidenceProviderAdapter
 → EvidenceRetrievalResult
 → RuntimeEvidenceGraphAdapter
 → Runtime Commit
@@ -446,7 +459,7 @@ P0 冻结阈值以 `Phase12_P0EvidenceEngine_API与测试设计.md` 为准。
 
 ---
 
-# 十四、当前设计评审期允许的工作
+# 十四、当前实现期允许的工作
 
 在本设计 PR 合并前允许：
 

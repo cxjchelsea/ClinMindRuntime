@@ -1,0 +1,10 @@
+case_set_id: phase12-p0-evidence
+version: 0.1.0
+description: Phase 12-P0 Clinical Evidence Engine offline evaluation seed case set
+evaluation_type: CLINICAL_EVIDENCE
+evaluation_scope: EVALUATION
+case_files:
+  - phase12-p0-evidence-cases.yml
+minimum_case_count: 40
+seed_case_count: 45
+status: pre-implementation-approved

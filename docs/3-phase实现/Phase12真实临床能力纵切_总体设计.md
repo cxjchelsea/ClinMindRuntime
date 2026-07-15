@@ -56,7 +56,7 @@ EvidenceChunk / EvidenceSpan
 EvidenceClaim
 ClaimEvidenceLink
 EvidenceApplicability
-EvidenceGrade
+EvidenceQuality
 CitationVerificationResult
 EvidenceConflictSet（最小版）
 
@@ -314,7 +314,9 @@ Phase 7 RagEvidenceProvider
 保留为 deterministic baseline / fallback，不删除历史实现。
 
 Phase 7 EvidenceGraph
-通过 adapter 接收新的 EvidenceRetrievalResult，不由新引擎绕过 Runtime 直接写入。
+通过 adapter 接收 Phase 12 内部的 ClinicalEvidenceRetrievalResult，
+再映射为既有 EvidenceCandidate / EvidenceValidation / EvidenceGraph contract；
+新引擎不得绕过 Runtime 直接写入。
 
 Phase 8 Embedding / Rerank Provider
 在既有 Provider 协议上增加真实模型实现和版本信息，不改成 Python 主控。

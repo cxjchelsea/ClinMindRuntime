@@ -1,0 +1,38 @@
+record_id: phase12-p0-license-review
+schema_version: phase12-p0.license-review.v1
+status: pre-implementation-approved
+review_date: 2026-07-15
+review_scope: Phase 12-P0 initial chest pain evidence corpus
+review_rules:
+  - CLAIMED sources may be registered and evaluated but may not be published.
+  - VERIFIED sources require reviewer, review note, allowed use, storage class, and audit reference.
+  - UNKNOWN, RESTRICTED, and REJECTED sources are excluded from Published Corpus.
+  - Project-authored curated briefs are usable for development and offline evaluation, not clinical production.
+reviewers:
+  source_reviewer_role: EVALUATION_REVIEWER
+  license_reviewer_role: SYSTEM_ADMIN
+records:
+  - source_id: src_phase12_curated_chest_pain_safety
+    asset_id: asset_phase12_chest_pain_safety_brief
+    license_status: CLAIMED
+    allowed_use:
+      offline_evaluation: true
+      debug_demo: true
+      production_clinical_use: false
+      redistribution: false
+    content_storage: full_text_project_curated
+    reviewer: pending
+    review_record_required_for_verified: true
+    audit_ref: pending
+  - source_id: src_phase12_curated_chest_pain_questions
+    asset_id: asset_phase12_chest_pain_inquiry_brief
+    license_status: CLAIMED
+    allowed_use:
+      offline_evaluation: true
+      debug_demo: true
+      production_clinical_use: false
+      redistribution: false
+    content_storage: full_text_project_curated
+    reviewer: pending
+    review_record_required_for_verified: true
+    audit_ref: pending

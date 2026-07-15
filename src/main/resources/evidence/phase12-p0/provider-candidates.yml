@@ -1,0 +1,49 @@
+provider_decision_id: phase12-p0-provider-candidates
+schema_version: phase12-p0.provider-candidates.v1
+status: pre-implementation-approved
+python_provider_boundary:
+  stateless: true
+  requires_metadata: true
+  owns_runtime_decision: false
+embedding:
+  primary_candidate:
+    provider_id: phase12-embedding
+    implementation_class: PythonProviderEmbeddingAdapter
+    model_selection: configurable-local-or-service-model
+    freeze_requirement: real embedding model before Phase 12-P0 freeze
+  fallback_for_tests:
+    provider_id: phase12-inmemory-dense-test
+    allowed_scope: tests_only
+    may_freeze_as_real_dense: false
+rerank:
+  primary_candidate:
+    provider_id: phase12-reranker
+    implementation_class: PythonProviderRerankAdapter
+    model_selection: configurable-cross-encoder
+    freeze_requirement: real reranker or reviewed deterministic disabled-baseline limitation
+  fallback_for_tests:
+    provider_id: phase12-rerank-disabled-baseline
+    allowed_scope: tests_and_degradation
+    result_status: DEGRADED_NO_RERANK
+citation_entailment:
+  primary_candidate:
+    provider_id: phase12-citation-entailment
+    implementation_class: PythonProviderCitationEntailmentAdapter
+    model_selection: configurable-nli-model
+    freeze_requirement: must distinguish SUPPORTS, PARTIALLY_SUPPORTS, CONTRADICTS, CONTEXT_ONLY, OUT_OF_SCOPE, INSUFFICIENT
+  fallback_for_tests:
+    provider_id: phase12-rule-citation-test-double
+    allowed_scope: tests_only
+    may_enter_accepted_evidence: false
+dense_index:
+  p0_plan:
+    abstraction: DenseIndexPort
+    preferred_runtime: PostgreSQL pgvector exact cosine search
+    local_preimplementation_decision: pgvector not yet verified in this workspace
+    allowed_before_freeze: InMemoryDenseIndex for tests plus explicit known limitation
+    freeze_requirement: pgvector or reviewed real DenseIndexPort implementation must be verified before Phase 12-P0 freeze
+feature_flag:
+  property: clinmind.evidence.engine.mode
+  allowed_values: [legacy, shadow, active]
+  default_for_development: shadow
+  active_scope: debug_only_until_freeze

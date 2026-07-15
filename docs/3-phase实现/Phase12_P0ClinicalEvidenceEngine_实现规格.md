@@ -71,7 +71,7 @@ P0 必须证明：
 7. Freshness / Applicability / Authority 是独立维度。
 8. 已废弃或未发布资产不会进入 accepted result。
 9. Provider 失败时有显式 DEGRADE / UNAVAILABLE，而非静默回退。
-10. EvidenceRetrievalResult 只有经过 Runtime Validation 后才能进入 RuntimeEvidenceGraph。
+10. ClinicalEvidenceRetrievalResult 只有经过 Runtime Validation 与 Phase 7 adapter 后才能进入 RuntimeEvidenceGraph。
 11. 同一资产版本、索引版本和 Provider 版本可重放。
 12. 患者端不直接暴露原始证据和内部评分。
 ```
@@ -121,7 +121,7 @@ EvidenceQueryRequest
 → Citation Entailment
 → Conflict Detection
 → EvidenceValidation
-→ EvidenceRetrievalResult
+→ ClinicalEvidenceRetrievalResult
 → RuntimeEvidenceGraphAdapter
 ```
 
@@ -171,7 +171,7 @@ AuthorityLevel
 A / B / C / UNVERIFIED
 
 LicenseStatus
-VERIFIED / RESTRICTED / UNKNOWN / REJECTED
+CLAIMED / VERIFIED / RESTRICTED / UNKNOWN / REJECTED
 
 SourceTrustStatus
 TRUSTED / WATCH / BLOCKED
@@ -223,6 +223,15 @@ DRAFT
 只有 PUBLISHED 且在 effective interval 内的版本进入默认检索。
 REVOKED 永不参与检索。
 SUPERSEDED 默认不参与普通检索，可在冲突和历史回放模式中显式使用。
+```
+
+Evaluation 例外：
+
+```text
+PRODUCTION scope：只允许 PUBLISHED asset 进入检索和 Runtime adapter。
+EVALUATION scope：允许 source APPROVED 且 asset INDEXED / EVALUATED 的版本参与离线评测。
+EVALUATION scope 的结果只能写入 trace / evaluation report，不能形成 RuntimeEvidenceGraphPatch。
+asset 发布时必须引用通过阈值的 evaluation_run_id，避免“必须先发布才能评测”的循环依赖。
 ```
 
 ## 5.3 EvidenceChunk
@@ -396,10 +405,10 @@ public record EvidenceScore(
 
 禁止新增一个无解释的 `finalScore` 作为唯一采用依据。
 
-## 5.10 EvidenceRetrievalResult
+## 5.10 ClinicalEvidenceRetrievalResult
 
 ```java
-public record EvidenceRetrievalResult(
+public record ClinicalEvidenceRetrievalResult(
     String retrievalId,
     String queryId,
     RetrievalStatus status,
@@ -410,6 +419,15 @@ public record EvidenceRetrievalResult(
     EvidenceRetrievalTrace trace,
     String schemaVersion
 ) {}
+```
+
+说明：
+
+```text
+ClinicalEvidenceRetrievalResult 是 Phase 12 内部结果模型。
+仓库已有 Phase 7 EvidenceRetrievalResult / EvidenceProvider contract 保持兼容，不直接改名或覆盖。
+RuntimeEvidenceGraphAdapter 负责把 ClinicalEvidenceRetrievalResult 映射为既有 EvidenceCandidate /
+EvidenceValidation / EvidenceGraph contract。
 ```
 
 状态：
@@ -653,6 +671,14 @@ language / jurisdiction / audience 满足请求约束
 
 硬过滤必须发生在语义排序之前。
 
+Scope 模式：
+
+```text
+PRODUCTION：asset.lifecycle_status 必须为 PUBLISHED。
+EVALUATION：asset.lifecycle_status 可为 INDEXED / EVALUATED / PUBLISHED，但 source 必须 APPROVED，
+license 必须 VERIFIED，且结果不得进入 Runtime adapter。
+```
+
 ## 8.2 Authority
 
 Authority 不由模型自由判断，优先来自 Source Registry 的审核字段。
@@ -725,7 +751,7 @@ Level 2：规则校验
 否定、数值、单位、比较方向、绝对/条件性表述是否明显冲突。
 
 Level 3：Model Entailment
-SUPPORT / PARTIAL / CONTRADICT / IRRELEVANT。
+SUPPORTS / PARTIALLY_SUPPORTS / CONTRADICTS / CONTEXT_ONLY / OUT_OF_SCOPE / INSUFFICIENT。
 
 Level 4：Policy Decision
 是否允许进入 accepted evidence。
@@ -736,10 +762,15 @@ Level 4：Policy Decision
 以下为工程默认值，冻结前必须由 Evaluation 校准：
 
 ```text
-VERIFIED_SUPPORT：entailment >= 0.80
-VERIFIED_PARTIAL：0.60 <= entailment < 0.80
-低于 0.60：UNVERIFIED 或 CONTRADICTION
+VERIFIED_SUPPORT：relation == SUPPORTS 且 entailment_score >= 0.80
+VERIFIED_PARTIAL：relation == PARTIALLY_SUPPORTS 且 0.60 <= entailment_score < 0.80
+VERIFIED_CONTRADICTION：relation == CONTRADICTS 且 contradiction_score >= 0.70
+UNVERIFIED：relation == INSUFFICIENT / CONTEXT_ONLY / OUT_OF_SCOPE，或 entailment_score < 0.60
+REVIEW_REQUIRED：规则校验与模型关系冲突，或关键数值 / 否定 / 人群条件无法自动判断
 ```
+
+低 entailment 不得自动等价为 contradiction；只有 contradiction_score 和关系枚举同时满足阈值时，
+才进入 VERIFIED_CONTRADICTION。
 
 即使分数达到阈值，以下任一情况仍不得自动接受：
 
@@ -797,7 +828,7 @@ REVIEW_REQUIRED
 ```java
 public interface ClinicalEvidenceValidationService {
     EvidenceValidationResult validate(
-        EvidenceRetrievalResult result,
+        ClinicalEvidenceRetrievalResult result,
         EvidenceValidationContext context
     );
 }
@@ -839,11 +870,20 @@ UNAVAILABLE
 
 ## 12.1 Provider 接口
 
-复用并演进 EvidenceProvider：
+Phase 12-P0 不直接替换仓库既有 Phase 7 `EvidenceProvider` 接口。
+P0 新增 ClinicalEvidenceQueryService / ClinicalEvidenceEngine 作为内部能力，
+再通过 adapter 接入既有 EvidenceProvider / EvidenceRetrievalRuntime：
 
 ```java
-public interface EvidenceProvider {
-    EvidenceRetrievalResult retrieve(EvidenceQueryRequest request);
+public interface ClinicalEvidenceQueryService {
+    ClinicalEvidenceRetrievalResult retrieve(EvidenceQueryRequest request);
+}
+
+public interface ClinicalEvidenceProviderAdapter {
+    EvidenceRetrievalResult toPhase7Result(
+        ClinicalEvidenceRetrievalResult clinicalResult,
+        EvidenceRetrievalRequest phase7Request
+    );
 }
 ```
 
@@ -856,7 +896,7 @@ Phase 12-P0 不要求正式 CapabilityLease；该参数在 Phase 12-P1 最小治
 ```java
 public interface RuntimeEvidenceGraphAdapter {
     RuntimeEvidenceGraphPatch toPatch(
-        EvidenceRetrievalResult result,
+        ClinicalEvidenceRetrievalResult result,
         EvidenceValidationResult validation
     );
 }
