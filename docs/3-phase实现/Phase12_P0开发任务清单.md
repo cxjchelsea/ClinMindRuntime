@@ -57,7 +57,7 @@ PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖
 
 | 编号 | 任务 | 依赖 | 状态 |
 |---|---|---|---|
-| P12P0-A | Source Manifest、许可证与语料范围冻结 | PRE | 未开始 |
+| P12P0-A | Source Manifest、许可证与语料范围冻结 | PRE | 已完成：loader / validation / unit test 通过 |
 | P12P0-B | Evidence Domain Model 与 Repository Port | A | 未开始 |
 | P12P0-C | PostgreSQL Migration 与资产生命周期持久化 | B | 未开始 |
 | P12P0-D | Ingestion / Parse / Chunk / Span Pipeline | B、C | 未开始 |

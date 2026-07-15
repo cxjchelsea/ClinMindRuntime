@@ -39,7 +39,8 @@ assets:
     trust_status: WATCH
     content_storage: full_text_project_curated
     content_reference: classpath:evidence/phase12-p0/sources/chest-pain-safety-brief.md
-    checksum_status: pending
+    checksum: sha256:2c620d57a822f5de67b4467dad4b4e9897c7037e6fb596b443abce222a1e82cc
+    checksum_status: computed
     notes: Project-authored seed material for schema, ingestion, and evaluation development only.
   - source_id: src_phase12_curated_chest_pain_questions
     asset_id: asset_phase12_chest_pain_inquiry_brief
@@ -60,8 +61,75 @@ assets:
     trust_status: WATCH
     content_storage: full_text_project_curated
     content_reference: classpath:evidence/phase12-p0/sources/chest-pain-inquiry-brief.md
-    checksum_status: pending
+    checksum: sha256:fd8c21e5b324d65052ba8b170c6d3ef624b34453af6c9d747e3d0c2e1fd7d414
+    checksum_status: computed
     notes: Project-authored seed material for minimum curated-claim and applicability evaluation.
+  - source_id: src_phase12_curated_chest_pain_applicability
+    asset_id: asset_phase12_chest_pain_applicability_brief
+    version_id: ver_phase12_chest_pain_applicability_brief_2026_07
+    display_name: Phase 12 curated chest pain applicability brief
+    publisher: ClinMindRuntime project
+    source_type: CLINICAL_PATHWAY
+    authority_level: UNVERIFIED
+    jurisdiction: GLOBAL
+    language: zh-CN
+    specialty: emergency_medicine
+    intended_audience: clinician
+    publication_date: 2026-07-15
+    effective_from: 2026-07-15T00:00:00Z
+    effective_to: null
+    license_status: CLAIMED
+    review_status: DRAFT
+    trust_status: WATCH
+    content_storage: full_text_project_curated
+    content_reference: classpath:evidence/phase12-p0/sources/chest-pain-applicability-brief.md
+    checksum: sha256:0ae7ba09f002512eae1140c6f89e6fb4d2566467ffcfb4d1872d7f914c629de9
+    checksum_status: computed
+    notes: Project-authored seed material for applicability and audience-boundary evaluation.
+  - source_id: src_phase12_curated_chest_pain_conflict
+    asset_id: asset_phase12_chest_pain_conflict_brief
+    version_id: ver_phase12_chest_pain_conflict_brief_2026_07
+    display_name: Phase 12 curated chest pain conflict brief
+    publisher: ClinMindRuntime project
+    source_type: CLINICAL_PATHWAY
+    authority_level: UNVERIFIED
+    jurisdiction: GLOBAL
+    language: zh-CN
+    specialty: emergency_medicine
+    intended_audience: clinician
+    publication_date: 2026-07-15
+    effective_from: 2026-07-15T00:00:00Z
+    effective_to: null
+    license_status: CLAIMED
+    review_status: DRAFT
+    trust_status: WATCH
+    content_storage: full_text_project_curated
+    content_reference: classpath:evidence/phase12-p0/sources/chest-pain-conflict-brief.md
+    checksum: sha256:5b6adfa96db4ef4f7c23903342af2b4211511ee21d26fd05740a94e25d0d89c4
+    checksum_status: computed
+    notes: Project-authored seed material for conflict and review-required evaluation.
+  - source_id: src_phase12_curated_chest_pain_governance
+    asset_id: asset_phase12_chest_pain_governance_brief
+    version_id: ver_phase12_chest_pain_governance_brief_2026_07
+    display_name: Phase 12 curated chest pain governance brief
+    publisher: ClinMindRuntime project
+    source_type: CLINICAL_PATHWAY
+    authority_level: UNVERIFIED
+    jurisdiction: GLOBAL
+    language: zh-CN
+    specialty: emergency_medicine
+    intended_audience: governance
+    publication_date: 2026-07-15
+    effective_from: 2026-07-15T00:00:00Z
+    effective_to: null
+    license_status: CLAIMED
+    review_status: DRAFT
+    trust_status: WATCH
+    content_storage: full_text_project_curated
+    content_reference: classpath:evidence/phase12-p0/sources/chest-pain-governance-brief.md
+    checksum: sha256:7a67906f6f471337f59bff7f2e484f25467a3b25be203a474d563bf226bed952
+    checksum_status: computed
+    notes: Project-authored seed material for license, lifecycle, and scope evaluation.
 excluded_sources:
   - source_id: external_guideline_unknown_license
     reason: license not reviewed

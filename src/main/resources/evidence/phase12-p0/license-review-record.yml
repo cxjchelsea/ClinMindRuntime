@@ -36,3 +36,39 @@ records:
     reviewer: pending
     review_record_required_for_verified: true
     audit_ref: pending
+  - source_id: src_phase12_curated_chest_pain_applicability
+    asset_id: asset_phase12_chest_pain_applicability_brief
+    license_status: CLAIMED
+    allowed_use:
+      offline_evaluation: true
+      debug_demo: true
+      production_clinical_use: false
+      redistribution: false
+    content_storage: full_text_project_curated
+    reviewer: pending
+    review_record_required_for_verified: true
+    audit_ref: pending
+  - source_id: src_phase12_curated_chest_pain_conflict
+    asset_id: asset_phase12_chest_pain_conflict_brief
+    license_status: CLAIMED
+    allowed_use:
+      offline_evaluation: true
+      debug_demo: true
+      production_clinical_use: false
+      redistribution: false
+    content_storage: full_text_project_curated
+    reviewer: pending
+    review_record_required_for_verified: true
+    audit_ref: pending
+  - source_id: src_phase12_curated_chest_pain_governance
+    asset_id: asset_phase12_chest_pain_governance_brief
+    license_status: CLAIMED
+    allowed_use:
+      offline_evaluation: true
+      debug_demo: true
+      production_clinical_use: false
+      redistribution: false
+    content_storage: full_text_project_curated
+    reviewer: pending
+    review_record_required_for_verified: true
+    audit_ref: pending
