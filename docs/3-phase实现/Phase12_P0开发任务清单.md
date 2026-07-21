@@ -62,7 +62,7 @@ PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖
 | P12P0-C | PostgreSQL Migration 与资产生命周期持久化 | B | 已完成：Flyway v12 schema / JDBC source+asset+trace repository / Testcontainers 通过 |
 | P12P0-D | Ingestion / Parse / Chunk / Span Pipeline | B、C | 已完成：classpath allowlist / checksum / markdown parser / chunk+span JDBC / failure quarantine 测试通过 |
 | P12P0-E | Curated Claim 与 Claim-Span Link | D | 已完成：curated-claims YAML / PICO metadata / review+origin / claim-span link / checksum gate 测试通过 |
-| P12P0-F | PostgreSQL Lexical Retrieval | A、B、C、D | 未开始 |
+| P12P0-F | PostgreSQL Lexical Retrieval | A、B、C、D | 已完成：PostgreSQL FTS / eligible scope / rank+score+provenance / unit+Testcontainers 通过|
 | P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 未开始 |
 | P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 未开始 |
 | P12P0-I | Python Rerank Provider 与 Java Adapter | H | 未开始 |
@@ -445,6 +445,32 @@ F7. 实现 InMemoryLexicalEvidenceRetriever 测试基线。
 
 ---
 
+
+## 当前实现状态（2026-07-21）
+
+```text
+已新增 Phase12 P0-F lexical retrieval 主路径：
+- ClinicalQuestionLexicalNormalizer：NFKC / whitespace / 小型医学缩写与中英关键词规范化。
+- EligibleEvidenceScope：显式表达 PRODUCTION / EVALUATION 等检索 scope，以及 source_type / specialty / jurisdiction / language / audience 过滤。
+- LexicalEvidenceRetriever / LexicalRetrievalRequest / LexicalRetrievalCandidate：返回 rank、score、source → asset → chunk → span provenance。
+- InMemoryLexicalEvidenceRetriever：仅作为测试基线，验证 scope/filter/rank/provenance 行为；不作为正式实现。
+- PostgresLexicalEvidenceRetriever：正式实现使用 PostgreSQL to_tsvector('simple', normalized_text) + websearch_to_tsquery('simple', ?)，复用 migration 中的 GIN index idx_evidence_chunk_text_gin。
+
+硬过滤边界：
+- Source 必须 APPROVED + license VERIFIED + trust_status != BLOCKED。
+- PRODUCTION scope 必须 asset lifecycle=PUBLISHED 且 review_status=PUBLISHED，并满足 effective_from/effective_to。
+- 非 PRODUCTION scope 仍排除 REVOKED / DEPRECATED。
+- 支持 source_type / specialty / jurisdiction / language / intended_audience 过滤。
+
+验证：
+- JDK17 Maven：mvn "-Dtest=InMemoryLexicalEvidenceRetrieverTest,ClinicalEvidenceDomainModelTest,MinimalMarkdownEvidenceParserTest" test
+  通过：7 tests / 0 failures / 0 errors。
+- PostgreSQL Testcontainers：RUN_POSTGRES_TESTS=true mvn "-Dtest=PostgresLexicalEvidenceRetrieverTest,JdbcPhase12EvidenceRepositoryTest" test
+  通过：5 tests / 0 failures / 0 errors；Flyway 空库迁移到 v12.0.0 成功。
+
+边界：
+P12P0-F 仅完成 PostgreSQL Lexical Retrieval；Dense Retrieval、RRF/Dedup、Rerank、Citation Verification 和 Runtime Adapter 仍属于 P12P0-G/H/I/K/M。
+```
 # 十、P12P0-G：Embedding Provider 与 Dense Retrieval
 
 ## Python 任务
