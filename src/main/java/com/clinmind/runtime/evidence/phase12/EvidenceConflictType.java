@@ -1,0 +1,10 @@
+package com.clinmind.runtime.evidence.phase12;
+
+public enum EvidenceConflictType {
+    DIRECT_CONTRADICTION,
+    RECOMMENDATION_STRENGTH_DIFFERENCE,
+    POPULATION_SCOPE_DIFFERENCE,
+    TEMPORAL_SUPERSESSION,
+    INSUFFICIENT_CONTEXT,
+    NONE
+}

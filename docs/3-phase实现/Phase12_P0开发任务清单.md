@@ -58,10 +58,10 @@ PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖
 | 编号 | 任务 | 依赖 | 状态 |
 |---|---|---|---|
 | P12P0-A | Source Manifest、许可证与语料范围冻结 | PRE | 已完成：loader / validation / unit test 通过 |
-| P12P0-B | Evidence Domain Model 与 Repository Port | A | 未开始 |
-| P12P0-C | PostgreSQL Migration 与资产生命周期持久化 | B | 未开始 |
-| P12P0-D | Ingestion / Parse / Chunk / Span Pipeline | B、C | 未开始 |
-| P12P0-E | Curated Claim 与 Claim-Span Link | D | 未开始 |
+| P12P0-B | Evidence Domain Model 与 Repository Port | A | 已完成：domain model / repository port / deterministic query skeleton / unit test 通过 |
+| P12P0-C | PostgreSQL Migration 与资产生命周期持久化 | B | 已完成：Flyway v12 schema / JDBC source+asset+trace repository / Testcontainers 通过 |
+| P12P0-D | Ingestion / Parse / Chunk / Span Pipeline | B、C | 已完成：classpath allowlist / checksum / markdown parser / chunk+span JDBC / failure quarantine 测试通过 |
+| P12P0-E | Curated Claim 与 Claim-Span Link | D | 已完成：curated-claims YAML / PICO metadata / review+origin / claim-span link / checksum gate 测试通过 |
 | P12P0-F | PostgreSQL Lexical Retrieval | A、B、C、D | 未开始 |
 | P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 未开始 |
 | P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 未开始 |
@@ -174,6 +174,34 @@ checksum validation
 serialization contract
 ```
 
+## 当前实现状态（2026-07-15）
+
+```text
+已新增 Phase12 evidence domain model：
+SourceRegistryEntry / EvidenceAssetVersion / EvidenceChunk / EvidenceSpan /
+EvidenceClaim / ClaimEvidenceLink / CitationVerificationResult /
+EvidenceApplicabilityContext / EvidenceScore / EvidenceConflictSet /
+ClinicalEvidenceRetrievalResult / EvidenceRetrievalTrace。
+
+已新增 Repository Port：
+EvidenceSourceRepository / EvidenceAssetVersionRepository / EvidenceChunkRepository /
+EvidenceSpanRepository / EvidenceClaimRepository / ClaimEvidenceLinkRepository /
+CitationVerificationRepository / EvidenceRetrievalTraceRepository / DenseIndexPort。
+
+已新增最小 deterministic ClinicalEvidenceQueryService skeleton：
+仅用于 P0 本地 evaluation/debug 骨架验证；
+读取 Phase12 Source Manifest；
+不会把 CLAIMED/DRAFT seed 资产提升为 PRODUCTION accepted evidence；
+不替代 P12P0-C 之后的 PostgreSQL、真实 Lexical/Dense、RRF、Rerank、Citation Provider。
+
+验证：
+Docker JDK17 Maven 测试通过：
+ClinicalEvidenceDomainModelTest
+DeterministicClinicalEvidenceQueryServiceTest
+YamlPhase12SourceManifestRepositoryTest
+共 10 tests / 0 failures / 0 errors。
+```
+
 ---
 
 # 六、P12P0-C：PostgreSQL Migration 与持久化
@@ -216,7 +244,32 @@ Testcontainers 通过；
 不修改历史 migration；
 不破坏 Phase 5–11 repository tests。
 ```
+## 当前实现状态（2026-07-21）
 
+```text
+已新增 Flyway migration：
+V12_0_0__phase12_p0_evidence_engine_schema.sql
+
+已创建 P12P0-C 要求的核心表：
+evidence_source / evidence_asset_version / evidence_chunk / evidence_span /
+evidence_claim / claim_evidence_link / citation_verification_result /
+evidence_conflict_set / evidence_conflict_member /
+retrieval_trace / retrieval_candidate_trace /
+embedding_index_metadata / evidence_chunk_embedding。
+
+已新增最小 JDBC persistence 闭环：
+JdbcEvidenceSourceRepository
+JdbcEvidenceAssetVersionRepository
+JdbcEvidenceRetrievalTraceRepository
+
+验证：
+RUN_POSTGRES_TESTS=true mvn -Dtest=JdbcPhase12EvidenceRepositoryTest test
+通过，2 tests / 0 failures / 0 errors；Flyway 从空库迁移到 v12.0.0 成功。
+
+边界：
+当前仅完成 source / asset lifecycle / retrieval trace 的 JDBC 闭环；
+chunk / span / claim / link / citation 的写入管线属于 P12P0-D/E/K 后续接入，表结构已就绪但尚未由 ingestion pipeline 生产数据。
+```
 ---
 
 # 七、P12P0-D：Ingestion / Parse / Chunk / Span
@@ -255,8 +308,46 @@ checksum 重放一致；
 恶意路径和异常文件被拒绝。
 ```
 
----
+## 当前实现状态（2026-07-21）
 
+```text
+已新增 EvidenceIngestionService 最小实现：
+LocalEvidenceIngestionService
+EvidenceIngestionCommand
+EvidenceIngestionResult
+EvidenceIngestionStatus
+MinimalMarkdownEvidenceParser
+
+已完成 P0 ingestion 边界：
+仅允许 classpath:evidence/phase12-p0/ 下的 .md / .txt；
+拒绝路径穿越、反斜杠路径、非 allowlist、非 md/txt；
+校验内容大小与 sha256 checksum；
+checksum mismatch 时返回 QUARANTINED，并将 asset lifecycle 更新为 QUARANTINED；
+parse / allowlist 失败返回 FAILED，不写入 chunk/span；
+成功时按 heading、段落、列表项生成 EvidenceChunk 与 EvidenceSpan；
+保留 sectionPath、locator、parser_version、content_reference、chunk/span checksum；
+成功 ingestion 后 asset lifecycle 更新为 INGESTED。
+
+已新增 JDBC persistence：
+JdbcEvidenceChunkRepository
+JdbcEvidenceSpanRepository
+
+验证：
+Docker JDK17 Maven：
+-Dtest=ClinicalEvidenceDomainModelTest,DeterministicClinicalEvidenceQueryServiceTest,YamlPhase12SourceManifestRepositoryTest,MinimalMarkdownEvidenceParserTest test
+通过，12 tests / 0 failures / 0 errors。
+
+PostgreSQL / Testcontainers：
+RUN_POSTGRES_TESTS=true mvn -Dtest=JdbcPhase12EvidenceRepositoryTest,JdbcPhase12EvidenceIngestionServiceTest test
+通过，5 tests / 0 failures / 0 errors。
+
+边界：
+P12P0-D 只生产 chunk/span；
+curated claim、claim-span link、citation verification 属于 P12P0-E/K；
+lexical/dense index 仍属于 P12P0-F/G。
+```
+
+---
 # 八、P12P0-E：Curated Claim 与 Claim-Span Link
 
 ## 任务
@@ -281,8 +372,54 @@ span checksum mismatch 拒绝；
 claim checksum 可重放。
 ```
 
----
+## 当前实现状态（2026-07-21）
 
+```text
+已新增 curated claim import schema：
+src/main/resources/evidence/phase12-p0/curated-claims.yml
+
+已新增 Claim 领域字段：
+population / intervention / comparator / outcome / evidence_quality /
+recommendation_strength / review_status / origin_type / claim_checksum。
+
+已新增 Claim governance enum：
+ClaimReviewStatus
+ClaimOriginType
+EvidenceQuality
+RecommendationStrength
+
+已新增 import service：
+YamlCuratedClaimImportService
+CuratedClaimImportCommand
+CuratedClaimImportResult
+
+已新增 JDBC persistence：
+JdbcEvidenceClaimRepository
+JdbcClaimEvidenceLinkRepository
+
+已完成 P0 claim/link 边界：
+每个 curated claim 必须绑定 primary_span_id；
+primary span 必须存在；
+primary_span_checksum 必须与 EvidenceSpan.spanChecksum 匹配；
+claim_checksum 必须可重放；
+EXTRACTED_CANDIDATE 不允许作为 APPROVED/PUBLISHED curated claim 导入；
+导入后写入 evidence_claim 与 claim_evidence_link。
+
+验证：
+Docker JDK17 Maven 非 Postgres 回归：
+-Dtest=ClinicalEvidenceDomainModelTest,DeterministicClinicalEvidenceQueryServiceTest,YamlPhase12SourceManifestRepositoryTest,MinimalMarkdownEvidenceParserTest test
+通过，12 tests / 0 failures / 0 errors。
+
+PostgreSQL / Testcontainers：
+RUN_POSTGRES_TESTS=true mvn -Dtest=JdbcPhase12EvidenceRepositoryTest,JdbcPhase12EvidenceIngestionServiceTest,YamlCuratedClaimImportServiceTest test
+通过，8 tests / 0 failures / 0 errors。
+
+边界：
+P12P0-E 只完成 curated claim 与 primary span link；
+自动模型抽取 claim、citation entailment provider、conflict detection、lexical/dense retrieval 均属于后续任务。
+```
+
+---
 # 九、P12P0-F：PostgreSQL Lexical Retrieval
 
 ## 任务

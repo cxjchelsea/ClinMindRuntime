@@ -1,0 +1,55 @@
+schema_version: phase12-p0.curated-claims.v1
+claim_set_id: phase12-p0-chest-pain-curated-claims
+status: draft-evaluation-only
+claims:
+  - claim_id: claim_chest_pain_exertion_sweating_high_risk
+    version_id: ver_phase12_chest_pain_safety_brief_2026_07
+    primary_span_id: span_ver_phase12_chest_pain_safety_brief_2026_07_1
+    primary_span_checksum: sha256:72635374e3b1097d9fc11201504946e6050dfbf8fed308c2ba7d1d4ce5a4d39a
+    claim_type: RISK_SIGNAL
+    normalized_claim: Chest discomfort that is worse with exertion and accompanied by sweating should be treated as a high-risk signal until urgent causes have been considered by a clinician.
+    intended_audience: clinician
+    tags: [phase12-p0, chest_pain, high_risk, sweating, exertion]
+    population: adults with chest discomfort
+    intervention: urgent clinician review
+    comparator: no immediate review
+    outcome: safer triage for urgent causes
+    evidence_quality: UNRATED
+    recommendation_strength: SAFETY_BOUNDARY
+    review_status: APPROVED
+    origin_type: CURATED
+    claim_checksum: sha256:dea47947cb86f6d5d1c45926b0a6b8230b753562a1ed2241a5bb858bfaba65e7
+  - claim_id: claim_duration_history_required
+    version_id: ver_phase12_chest_pain_inquiry_brief_2026_07
+    primary_span_id: span_ver_phase12_chest_pain_inquiry_brief_2026_07_1
+    primary_span_checksum: sha256:547913697c7c828091e731abde78b64148c6328f3e80bdb89a075d1688587f2f
+    claim_type: NEXT_QUESTION
+    normalized_claim: Chest pain assessment should collect duration, onset, exertional relationship, rest response, radiation, associated symptoms, prior heart disease, pregnancy status when relevant, and care setting.
+    intended_audience: clinician
+    tags: [phase12-p0, chest_pain, inquiry]
+    population: people reporting chest pain
+    intervention: structured history collection
+    comparator: incomplete history collection
+    outcome: better evidence applicability and triage context
+    evidence_quality: UNRATED
+    recommendation_strength: CONDITIONAL
+    review_status: APPROVED
+    origin_type: CURATED
+    claim_checksum: sha256:dc02c7cc6b85f1c14646861fd91d6df0a528cd83d7a106b5a47a3ae64bbe632d
+  - claim_id: claim_patient_no_raw_evidence
+    version_id: ver_phase12_chest_pain_applicability_brief_2026_07
+    primary_span_id: span_ver_phase12_chest_pain_applicability_brief_2026_07_2
+    primary_span_checksum: sha256:847291df3b6d351131d84792ecaab7125882243b72a856fc1328ce787699edd9
+    claim_type: PATIENT_BOUNDARY
+    normalized_claim: Patient-facing output must be transformed into safe summaries without raw evidence, internal scores, or differential diagnosis boards.
+    intended_audience: clinician
+    tags: [phase12-p0, patient_boundary, evidence_safety]
+    population: patient-facing users
+    intervention: safe summary transformation
+    comparator: raw evidence exposure
+    outcome: reduced patient-facing evidence misuse
+    evidence_quality: UNRATED
+    recommendation_strength: SAFETY_BOUNDARY
+    review_status: APPROVED
+    origin_type: CURATED
+    claim_checksum: sha256:1f5b17c07fe12d20113c02bdd4c3c75224d773d6d7c3c15b576c94e1ef91195d
