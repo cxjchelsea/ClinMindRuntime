@@ -13,7 +13,7 @@ from app.schemas.capability import CapabilityProfilesResponse
 from app.schemas.common import HealthResponse, ProviderCapability, ProvidersResponse, ProviderTraceSummary
 from app.schemas.embedding import EmbeddingRequest, EmbeddingResponse, EmbeddingResultPayload, Phase12EmbeddingRequest, Phase12EmbeddingResponse
 from app.schemas.judge import JudgeRequest, JudgeResponse, JudgeResultPayload
-from app.schemas.rerank import RerankRequest, RerankResponse, RerankResultPayload
+from app.schemas.rerank import Phase12RerankRequest, Phase12RerankResponse, Phase12RerankResult, RerankRequest, RerankResponse, RerankResultPayload
 from app.schemas.risk import RiskSignalClassificationRequest, RiskSignalClassificationResponse, RiskSignalDraftPayload
 
 app = FastAPI(title="ClinMind Python AI Provider", version=config.PROVIDER_VERSION)
@@ -122,6 +122,35 @@ def phase12_embedding(request: Phase12EmbeddingRequest) -> Phase12EmbeddingRespo
         embeddings=embeddings,
         latency_ms=latency_ms,
         warnings=["deterministic_test_double_not_real_dense_embedding"],
+        trace_ref=request.trace_ref,
+    )
+
+
+@app.post("/v1/providers/rerank", response_model=Phase12RerankResponse)
+def phase12_rerank(request: Phase12RerankRequest) -> Phase12RerankResponse:
+    started = time.perf_counter()
+    if request.provider_id != "phase12-reranker":
+        raise HTTPException(status_code=400, detail="INVALID_PROVIDER_ID")
+    candidate_ids = [candidate.candidate_id for candidate in request.candidates]
+    if len(candidate_ids) != len(set(candidate_ids)):
+        raise HTTPException(status_code=422, detail="DUPLICATE_CANDIDATE_ID")
+    ranked_payload = rerank_items(
+        request.query,
+        request.request_id,
+        [(candidate.candidate_id, candidate.text) for candidate in request.candidates],
+    )["ranked_items"][: request.top_k]
+    latency_ms = int((time.perf_counter() - started) * 1000)
+    return Phase12RerankResponse(
+        provider_id="phase12-reranker",
+        provider_version=config.PROVIDER_VERSION,
+        model_id=config.RERANK_MODEL_ID,
+        model_version=config.RERANK_MODEL_VERSION,
+        results=[
+            Phase12RerankResult(candidate_id=item["item_id"], score=item["score"], rank=index)
+            for index, item in enumerate(ranked_payload, start=1)
+        ],
+        latency_ms=latency_ms,
+        warnings=["deterministic_test_double_not_real_cross_encoder_reranker"],
         trace_ref=request.trace_ref,
     )
 @app.post("/v1/embeddings", response_model=EmbeddingResponse)

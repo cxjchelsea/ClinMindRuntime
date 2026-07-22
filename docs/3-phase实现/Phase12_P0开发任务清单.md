@@ -64,8 +64,8 @@ PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖
 | P12P0-E | Curated Claim 与 Claim-Span Link | D | 已完成：curated-claims YAML / PICO metadata / review+origin / claim-span link / checksum gate 测试通过 |
 | P12P0-F | PostgreSQL Lexical Retrieval | A、B、C、D | 已完成：PostgreSQL FTS / eligible scope / rank+score+provenance / unit+Testcontainers 通过|
 | P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 部分完成：Phase12 embedding contract / DenseIndexPort / JSONB exact cosine 通过；真实 embedding/pgvector 仍是冻结前阻塞|
-| P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 未开始 |
-| P12P0-I | Python Rerank Provider 与 Java Adapter | H | 未开始 |
+| P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 已完成：RuleBasedRetrievalPlanner / RRF / Dedup / provenance-preserving fusion / unit test 通过 |
+| P12P0-I | Python Rerank Provider 与 Java Adapter | H | 部分完成：/v1/providers/rerank contract / Java adapter validation+fallback / pytest+unit test 通过；真实 cross-encoder 仍是冻结前阻塞 |
 | P12P0-J | Authority / Freshness / Applicability | A、B、I | 未开始 |
 | P12P0-K | Citation Entailment Provider 与验证服务 | E、I | 未开始 |
 | P12P0-L | Conflict Detection 与 EvidenceValidation | J、K | 未开始 |
@@ -504,6 +504,15 @@ provider failure 显式；
 撤销资产不会被 Dense 检索返回。
 ```
 
+
+## P12P0-G 留存问题 / 冻结前阻塞（2026-07-22）
+
+```text
+G-BLOCK-01：Python embedding provider 当前仍是 deterministic test double，不是真实 dense embedding；冻结前必须接入真实 embedding provider 或评审通过的本地真实模型，并保留 provider metadata。
+G-BLOCK-02：Java DenseIndexPort 当前提供 InMemory 与 JDBC JSONB exact cosine 实现，不是 pgvector 主路径；冻结前必须验证 pgvector 或正式接受 JSONB exact cosine 作为 P0 替代方案。
+G-BLOCK-03：DenseIndexPort 尚未接入 Hybrid Fusion 主查询路径；P12P0-H 已实现独立 RRF/Dedup 基础层，但完整 Engine 主路径仍需后续阶段串联。
+G-BLOCK-04：尚未生成 Active Index Version Snapshot；冻结前必须记录 embedding model/index version、corpus version 与可重放配置。
+```
 ---
 
 # 十一、P12P0-H：Retrieval Planner、RRF 与 Dedup
@@ -529,6 +538,23 @@ Lexical / Dense 均使用同一检索前硬过滤 scope；
 同一 Span 不重复返回。
 ```
 
+
+## 当前实现状态（2026-07-22）
+
+```text
+已新增 Phase12 P0-H hybrid retrieval 基础层：
+- RetrievalPlan：固定 normalized question、lexical/dense query、TopK、RRF K、scope 与验证开关。
+- RuleBasedRetrievalPlanner：复用 ClinicalQuestionLexicalNormalizer，按 question type / symptom group 生成最小规则计划，并把 EvidenceQueryRequest scope/applicability 映射为 EligibleEvidenceScope。
+- ReciprocalRankFusionService：按 Reciprocal Rank Fusion 合并 lexical 与 dense 候选，明确只使用 rank，不直接相加 BM25 / cosine 原始分数，并保留 lexical/dense 通道 provenance。
+- EvidenceCandidateDeduplicator：按 span checksum、chunk text checksum、version+locator、chunk id 去重，并执行 max-per-asset-version 与 final limit。
+
+验证：
+- JDK17 Maven：mvn "-Dtest=RuleBasedRetrievalPlannerTest,ReciprocalRankFusionServiceTest,EvidenceCandidateDeduplicatorTest" test
+  通过：新增 H 单元测试全部通过。
+
+边界：
+P12P0-H 仅完成 Retrieval Planner / RRF / Dedup 的独立基础层；尚未替换 DeterministicClinicalEvidenceQueryService 主路径，Rerank Provider 属于 P12P0-I，Authority/Freshness/Applicability 属于 P12P0-J，Citation/Conflict/Validation/Runtime Adapter 属于 P12P0-K/L/M。
+```
 ---
 
 # 十二、P12P0-I：Rerank Provider
@@ -553,6 +579,27 @@ reranker 不修改文本和来源；
 故障进入 DEGRADED_NO_RERANK。
 ```
 
+
+## 当前实现状态（2026-07-22）
+
+```text
+已新增 Phase12 P0-I rerank contract 与 Java adapter 基础层：
+- Python /v1/providers/rerank：实现 provider.rerank.v1 请求/响应合同，校验 provider_id、duplicate candidate_id、top_k，并保留 candidate_id round-trip。
+- Python endpoint 明确返回 implementation_kind=DETERMINISTIC_TEST_DOUBLE 与 warning=deterministic_test_double_not_real_cross_encoder_reranker，避免把 token overlap mock 冒充真实 cross-encoder。
+- Java EvidenceReranker / Phase12RerankerAdapter / Phase12RerankProviderPort：只接受 provider 返回的 candidate_id、rank、score；原始 text/provenance 由输入 candidate 回填，防止 reranker 修改来源文本。
+- Java adapter 校验 schema_version、provider_id、provider/model metadata、unexpected/duplicate candidate_id、非法 score/rank，并在 provider unavailable 或 invalid schema 时降级为 DEGRADED_NO_RERANK / PROVIDER_SCHEMA_INVALID，保持原 RRF 排序。
+
+验证：
+- Python：python -m pytest -q tests/test_phase12_rerank_contract.py tests/test_rerank.py
+  通过：3 passed。
+- JDK17 Maven：mvn "-Dtest=Phase12RerankerAdapterTest" test
+  通过：新增 I 单元测试全部通过。
+
+冻结前阻塞：
+I-BLOCK-01：当前 Python reranker 仍复用 deterministic token/keyword overlap test double，不是真实 cross-encoder 或评审通过的真实 reranker。
+I-BLOCK-02：Java adapter 目前通过 Phase12RerankProviderPort 抽象验证合同和 fallback，尚未实现真实 HTTP client 连接 /v1/providers/rerank。
+I-BLOCK-03：Rerank 尚未接入完整 Evidence Engine 主路径；P12P0-J 之后还需与 Authority/Freshness/Applicability、Citation、Validation、Trace 串联。
+```
 ---
 
 # 十三、P12P0-J：Authority / Freshness / Applicability
