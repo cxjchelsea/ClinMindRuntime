@@ -11,7 +11,7 @@ from app.providers.reranker_provider import rerank_items
 from app.providers.risk_classifier_provider import classify_risk
 from app.schemas.capability import CapabilityProfilesResponse
 from app.schemas.common import HealthResponse, ProviderCapability, ProvidersResponse, ProviderTraceSummary
-from app.schemas.embedding import EmbeddingRequest, EmbeddingResponse, EmbeddingResultPayload
+from app.schemas.embedding import EmbeddingRequest, EmbeddingResponse, EmbeddingResultPayload, Phase12EmbeddingRequest, Phase12EmbeddingResponse
 from app.schemas.judge import JudgeRequest, JudgeResponse, JudgeResultPayload
 from app.schemas.rerank import RerankRequest, RerankResponse, RerankResultPayload
 from app.schemas.risk import RiskSignalClassificationRequest, RiskSignalClassificationResponse, RiskSignalDraftPayload
@@ -74,6 +74,56 @@ def get_capability_profiles() -> CapabilityProfilesResponse:
     )
 
 
+
+
+@app.get("/v1/providers/health", response_model=HealthResponse)
+def provider_health() -> HealthResponse:
+    return health()
+
+
+@app.get("/v1/providers/metadata")
+def provider_metadata() -> dict:
+    return {
+        "provider_id": "phase12-embedding",
+        "provider_version": config.PROVIDER_VERSION,
+        "capability_type": "EMBEDDING",
+        "model_id": config.EMBEDDING_MODEL_ID,
+        "model_version": config.EMBEDDING_MODEL_VERSION,
+        "schema_versions": ["provider.embedding.v1", config.SCHEMA_VERSION],
+        "max_batch_size": 32,
+        "max_input_length": 4096,
+        "dimension": config.EMBEDDING_DIMENSION,
+        "device": "cpu",
+        "determinism_notes": "P12P0-G contract endpoint uses a deterministic test double until a real embedding model is configured.",
+        "implementation_kind": "DETERMINISTIC_TEST_DOUBLE",
+    }
+
+
+@app.post("/v1/providers/embedding", response_model=Phase12EmbeddingResponse)
+def phase12_embedding(request: Phase12EmbeddingRequest) -> Phase12EmbeddingResponse:
+    started = time.perf_counter()
+    if request.provider_id != "phase12-embedding":
+        raise HTTPException(status_code=400, detail="INVALID_PROVIDER_ID")
+    if len(request.texts) > 32:
+        raise HTTPException(status_code=422, detail="BATCH_TOO_LARGE")
+    if any(text is None or not text.strip() for text in request.texts):
+        raise HTTPException(status_code=422, detail="EMPTY_TEXT")
+    if any(len(text) > 4096 for text in request.texts):
+        raise HTTPException(status_code=422, detail="TEXT_TOO_LONG")
+    embeddings = [embed_items([(f"text_{index}", text)])[0]["vector"] for index, text in enumerate(request.texts)]
+    latency_ms = int((time.perf_counter() - started) * 1000)
+    return Phase12EmbeddingResponse(
+        provider_id="phase12-embedding",
+        provider_version=config.PROVIDER_VERSION,
+        model_id=config.EMBEDDING_MODEL_ID,
+        model_version=config.EMBEDDING_MODEL_VERSION,
+        dimension=config.EMBEDDING_DIMENSION,
+        normalized=request.normalize,
+        embeddings=embeddings,
+        latency_ms=latency_ms,
+        warnings=["deterministic_test_double_not_real_dense_embedding"],
+        trace_ref=request.trace_ref,
+    )
 @app.post("/v1/embeddings", response_model=EmbeddingResponse)
 def embeddings(request: EmbeddingRequest) -> EmbeddingResponse:
     started = time.perf_counter()

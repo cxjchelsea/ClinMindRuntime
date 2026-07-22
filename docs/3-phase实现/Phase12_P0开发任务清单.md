@@ -63,7 +63,7 @@ PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖
 | P12P0-D | Ingestion / Parse / Chunk / Span Pipeline | B、C | 已完成：classpath allowlist / checksum / markdown parser / chunk+span JDBC / failure quarantine 测试通过 |
 | P12P0-E | Curated Claim 与 Claim-Span Link | D | 已完成：curated-claims YAML / PICO metadata / review+origin / claim-span link / checksum gate 测试通过 |
 | P12P0-F | PostgreSQL Lexical Retrieval | A、B、C、D | 已完成：PostgreSQL FTS / eligible scope / rank+score+provenance / unit+Testcontainers 通过|
-| P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 未开始 |
+| P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 部分完成：Phase12 embedding contract / DenseIndexPort / JSONB exact cosine 通过；真实 embedding/pgvector 仍是冻结前阻塞|
 | P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 未开始 |
 | P12P0-I | Python Rerank Provider 与 Java Adapter | H | 未开始 |
 | P12P0-J | Authority / Freshness / Applicability | A、B、I | 未开始 |

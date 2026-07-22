@@ -42,3 +42,27 @@ class EmbeddingResponse(BaseModel):
     error_code: str | None = None
     latency_ms: int = 0
     trace: ProviderTraceSummary = Field(default_factory=ProviderTraceSummary)
+
+
+class Phase12EmbeddingRequest(BaseModel):
+    request_id: str
+    provider_id: str
+    texts: list[str] = Field(min_length=1, max_length=32)
+    input_type: str = "QUERY"
+    normalize: bool = True
+    trace_ref: str | None = None
+
+
+class Phase12EmbeddingResponse(BaseModel):
+    schema_version: str = "provider.embedding.v1"
+    provider_id: str
+    provider_version: str
+    model_id: str
+    model_version: str
+    dimension: int
+    normalized: bool
+    embeddings: list[list[float]]
+    latency_ms: int = 0
+    warnings: list[str] = Field(default_factory=list)
+    implementation_kind: str = "DETERMINISTIC_TEST_DOUBLE"
+    trace_ref: str | None = None
