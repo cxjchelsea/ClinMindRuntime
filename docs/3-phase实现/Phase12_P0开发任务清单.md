@@ -66,7 +66,7 @@ PRE-01 至 PRE-10 已关闭，可以开始 P12P0-A；仍不得跳过任务依赖
 | P12P0-G | Python Embedding Provider 与 DenseIndexPort | A、B、C、D | 部分完成：Phase12 embedding contract / DenseIndexPort / JSONB exact cosine 通过；真实 embedding/pgvector 仍是冻结前阻塞|
 | P12P0-H | Hybrid Fusion、Dedup 与 Retrieval Planner | F、G | 已完成：RuleBasedRetrievalPlanner / RRF / Dedup / provenance-preserving fusion / unit test 通过 |
 | P12P0-I | Python Rerank Provider 与 Java Adapter | H | 部分完成：/v1/providers/rerank contract / Java adapter validation+fallback / pytest+unit test 通过；真实 cross-encoder 仍是冻结前阻塞 |
-| P12P0-J | Authority / Freshness / Applicability | A、B、I | 未开始 |
+| P12P0-J | Authority / Freshness / Applicability | A、B、I | 已完成：SourceAuthorityPolicy / Freshness / Applicability / post-rerank quality gate / trace summary / unit test 通过 |
 | P12P0-K | Citation Entailment Provider 与验证服务 | E、I | 未开始 |
 | P12P0-L | Conflict Detection 与 EvidenceValidation | J、K | 未开始 |
 | P12P0-M | ClinicalEvidenceRetrievalResult、Trace 与 Runtime Adapter | L | 未开始 |
@@ -625,6 +625,24 @@ UNKNOWN 明确告警；
 所有拒绝原因进入 Trace。
 ```
 
+
+## 当前实现状态（2026-07-22）
+
+```text
+已新增 Phase12 P0-J post-rerank quality gate 基础层：
+- SourceAuthorityPolicy：authority level 明确来自 retrieval candidate/Registry provenance；A/B 可接受，C/UNVERIFIED/UNKNOWN 进入 REVIEW_REQUIRED，并输出 reason code / warning。
+- EvidenceFreshnessEvaluator：区分 CURRENT / EXPIRED / NOT_YET_EFFECTIVE / UNKNOWN；EXPIRED 与 NOT_YET_EFFECTIVE 默认拒绝，UNKNOWN 不冒充 CURRENT。
+- EvidenceApplicabilityEvaluator：校验 jurisdiction 与 intended_audience；MISMATCH 默认拒绝，UNKNOWN 输出 warning 并进入 review。
+- PostRerankQualityGate：汇总 authority/freshness/applicability，生成 EvidenceScore、accepted/review_required/rejected 分组、warnings 和 traceSummary。
+- Dense-only candidate 若缺少 Registry/lexical provenance，不允许直接 accepted，输出 REGISTRY_PROVENANCE_MISSING 与 DENSE_ONLY_CANDIDATE_REQUIRES_PROVENANCE_HYDRATION。
+
+验证：
+- JDK17 Maven：mvn "-Dtest=PostRerankQualityGateTest" test
+  通过：新增 J 单元测试全部通过。
+
+边界：
+P12P0-J 仅完成 post-rerank quality gate 独立基础层；尚未接入完整 ClinicalEvidenceQueryService 主路径。Citation Entailment 属于 P12P0-K，Conflict / EvidenceValidation 属于 P12P0-L，Result/Trace/Runtime Adapter 串联属于 P12P0-M。
+```
 ---
 
 # 十四、P12P0-K：Citation Entailment
